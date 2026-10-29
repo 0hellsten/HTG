@@ -8,6 +8,14 @@ export interface SourceHealthRecord {
   succeededAt?: string;
   ageSeconds: number;
   message: string;
+  pausedUntil?: string;
+}
+
+export interface ApiResponse<T> {
+  data: T | null;
+  status: SourceStatus;
+  fetchedAt: string;
+  message: string;
 }
 
 export interface HealthResponse {

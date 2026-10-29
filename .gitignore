@@ -13,10 +13,12 @@ build/
 .env.*.local
 
 # Database
-data/*.db
-data/*.db-journal
-data/*.db-wal
-data/*.db-shm
+data/
+**/data/*.db*
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
 
 # Backups
 backups/

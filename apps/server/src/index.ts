@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { logger } from './lib/logger.js';
+import { getDb } from './db/connection.js';
+import { runMigrations } from './db/migrations.js';
+import { kallorRoutes } from './routes/kallor.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,14 +16,26 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 const port = Number(process.env.PORT) || 3001;
 
-export async function createServer() {
+export async function createServer(customDbPath?: string) {
+  // Kör databasmigrationer automatiskt
+  try {
+    const db = customDbPath ? getDb(customDbPath) : undefined;
+    runMigrations(db);
+  } catch (err) {
+    logger.error('Fel vid körning av databasmigrationer', err);
+    throw err;
+  }
+
   const app = fastify({
-    logger: false, // Vi använder vår egen logger enligt kodreglerna
+    logger: false, // Egen logger enligt projektets regler
   });
 
   await app.register(cors, {
     origin: true,
   });
+
+  // Registrera API-rutter
+  await app.register(kallorRoutes);
 
   // Hälsokontroll enligt Fas 1-specifikationen
   app.get('/halsa', async (_req, reply) => {
