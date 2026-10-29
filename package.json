@@ -1,0 +1,23 @@
+{
+  "name": "stallbacken-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n \"server,web\" -c \"blue,green\" \"pnpm --filter @stallbacken/server dev\" \"pnpm --filter @stallbacken/web dev\"",
+    "build": "pnpm --filter @stallbacken/shared build && pnpm --filter @stallbacken/server build && pnpm --filter @stallbacken/web build",
+    "test": "pnpm -r test",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md,css,html}\""
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "@typescript-eslint/eslint-plugin": "^8.20.0",
+    "@typescript-eslint/parser": "^8.20.0",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.18.0",
+    "playwright": "^1.64.1",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
+  }
+}
