@@ -10,6 +10,7 @@ import {
   HorseProfileResponse,
   TrainingAndDriverForm,
   SourceStatus,
+  HorseDetail,
 } from '@stallbacken/shared';
 import { fetchWithPolicy, FetchOptions } from '../collect/queue.js';
 import { HealthManager } from '../health/health-manager.js';
@@ -17,7 +18,12 @@ import { logger } from '../lib/logger.js';
 import { getHorseById } from '../db/queries/horses.js';
 import { getHorseResults, getTrackPositionStats } from '../db/queries/horse-results.js';
 import { AtgHorseProfileSchema, AtgHorseResultsSchema } from './atg-schemas.js';
-import { saveHorseProfileToDb, saveHorseResultsToDb } from './atg-horse-storage.js';
+import {
+  saveHorseProfileToDb,
+  saveHorseResultsToDb,
+  findHorseInDb,
+  createFallbackHorseProfile,
+} from './atg-horse-storage.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,14 +46,14 @@ export async function fetchHorseProfileData(
   const { db, sourceId, baseUrl, healthManager } = ctx;
 
   // 1. Kontrollera sparad data och ålder (lazy fetch, max 1 ggr/dygn = 86400 s)
-  const existingHorse = getHorseById(db, horseId);
-  const existingResults = getHorseResults(db, horseId);
+  const existingHorse = findHorseInDb(db, horseId);
+  const existingResults = existingHorse ? getHorseResults(db, existingHorse.id) : [];
 
   if (!forceRefresh && existingHorse && existingResults.length > 0) {
     const ageSeconds = 300; // färskt i cachen
     return buildHorseResponse(
       db,
-      horseId,
+      existingHorse.id,
       'ok',
       nowIso,
       ageSeconds,
@@ -181,35 +187,29 @@ function buildHorseResponse(
   message: string,
   sourceId: string
 ): SourceResult<HorseProfileResponse> {
-  const horse = getHorseById(db, horseId);
-  const allStarts = getHorseResults(db, horseId);
+  const horse = findHorseInDb(db, horseId);
+  if (!horse) {
+    return createFallbackHorseProfile(horseId, nowIso, sourceId, 'degraded');
+  }
+
+  const realId = horse.id;
+  const allStarts = getHorseResults(db, realId);
   const regularStarts = allStarts.filter((s) => s.raceType !== 'qualifier');
   const pastStarts = regularStarts.slice(0, 10);
   const qualifiers = allStarts.filter((s) => s.raceType === 'qualifier');
-  const positionStats = getTrackPositionStats(db, horseId);
+  const positionStats = getTrackPositionStats(db, realId);
 
   // Bygg tränar- och kuskform
   const trainingForm: TrainingAndDriverForm = {
-    trainerName: horse?.trainerName,
-    trainerWinPercent: horse?.winPercentage !== undefined ? horse.winPercentage : null,
-    trainerStarts: horse?.starts ?? 0,
+    trainerName: horse.trainerName,
+    trainerWinPercent: horse.winPercentage !== undefined ? horse.winPercentage : null,
+    trainerStarts: horse.starts ?? 0,
     driverName: pastStarts[0]?.driverName,
     driverWinPercent: null,
     driverStarts: 0,
     qualifierNotes:
       qualifiers.length === 0 ? 'Inga kvallopp eller träningsnoteringar registrerade' : undefined,
   };
-
-  if (!horse) {
-    return {
-      sourceId,
-      status: 'failed',
-      data: null as unknown as HorseProfileResponse,
-      fetchedAt: nowIso,
-      ageSeconds,
-      message: 'Den här uppgiften saknas just nu',
-    };
-  }
 
   return {
     sourceId,
@@ -240,16 +240,9 @@ function buildDegradedOrFailedResponse(
   message: string,
   sourceId: string
 ): SourceResult<HorseProfileResponse> {
-  const horse = getHorseById(db, horseId);
+  const horse = findHorseInDb(db, horseId);
   if (horse) {
-    return buildHorseResponse(db, horseId, status, nowIso, ageSeconds, message, sourceId);
+    return buildHorseResponse(db, horse.id, status, nowIso, ageSeconds, message, sourceId);
   }
-  return {
-    sourceId,
-    status: 'failed',
-    data: null as unknown as HorseProfileResponse,
-    fetchedAt: nowIso,
-    ageSeconds,
-    message,
-  };
+  return createFallbackHorseProfile(horseId, nowIso, sourceId, status);
 }

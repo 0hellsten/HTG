@@ -68,10 +68,19 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
     await expect(rankCBtn).toBeVisible();
     await rankCBtn.click();
 
-    // Stäng rutan
-    const closeBtn = dialog.locator('button[aria-label="Stäng informationsruta"]');
-    await closeBtn.click();
-    await expect(dialog).not.toBeVisible();
+    // Klicka på "Öppna fullständigt hästkort" och verifiera att fullständigt hästkort öppnas utan fel
+    const openHorseBtn = dialog.locator('button:has-text("Öppna fullständigt hästkort")');
+    await expect(openHorseBtn).toBeVisible();
+    await openHorseBtn.click();
+
+    // Verifiera att HästScreen öppnas med hästens info och ALDRIG "Hästen saknas"
+    await expect(page.locator('text=Hästen saknas')).not.toBeVisible();
+    await expect(page.locator('button:has-text("Tillbaka")').first()).toBeVisible();
+    await expect(page.locator('button:has-text("Mitt stall")').first()).toBeVisible();
+
+    // Klicka på Tillbaka för att återgå till Bong-maskinen
+    await page.locator('button:has-text("Tillbaka")').first().click();
+    await expect(page.locator('h1')).toContainText('Bong-maskinen');
 
     // 8. Kontrollera att export-knapparna finns
     await expect(page.getByRole('button', { name: 'Kopiera', exact: true })).toBeVisible();

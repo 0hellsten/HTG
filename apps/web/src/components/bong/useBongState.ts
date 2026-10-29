@@ -33,11 +33,15 @@ export function useBongState(
     initialComp?.gameType || initialGameType || 'V75'
   );
   const [activeLegIndex, setActiveLegIndex] = useState<number>(0);
-  const [raceDay, setRaceDay] = useState<BongRaceDayData>(() =>
-    initialComp
-      ? buildRaceDayFromCompetition(initialComp)
-      : buildDefaultRaceDay(initialGameType || 'V75')
+  const initialRaceDay = useMemo(
+    () =>
+      initialComp
+        ? buildRaceDayFromCompetition(initialComp)
+        : buildDefaultRaceDay(initialGameType || 'V75'),
+    [initialComp, initialGameType]
   );
+
+  const [raceDay, setRaceDay] = useState<BongRaceDayData>(initialRaceDay);
 
   const [selectedHorses, setSelectedHorses] = useState<Record<number, string[]>>(() => {
     if (initialSelectedHorses) return initialSelectedHorses;
@@ -50,15 +54,15 @@ export function useBongState(
         }
       } catch {}
     }
-    return {
-      0: ['h_0_1', 'h_0_2'],
-      1: ['h_1_1', 'h_1_2', 'h_1_3'],
-      2: ['h_2_1'],
-      3: ['h_3_1', 'h_3_2'],
-      4: ['h_4_1', 'h_4_2', 'h_4_3', 'h_4_4'],
-      5: ['h_5_1'],
-      6: ['h_6_1', 'h_6_2', 'h_6_3'],
-    };
+    const initial: Record<number, string[]> = {};
+    const count = initialRaceDay.races.length;
+    for (let l = 0; l < count; l++) {
+      const horses = initialRaceDay.races[l]?.horses || [];
+      const h1 = horses[0]?.id;
+      const h2 = horses[1]?.id;
+      initial[l] = [h1, h2].filter(Boolean) as string[];
+    }
+    return initial;
   });
 
   const [ranks, setRanks] = useState<Record<string, HorseRank>>(() => {
@@ -71,24 +75,14 @@ export function useBongState(
         }
       } catch {}
     }
-    return {
-      h_0_1: 'A',
-      h_0_2: 'B',
-      h_1_1: 'A',
-      h_1_2: 'B',
-      h_1_3: 'C',
-      h_2_1: 'A',
-      h_3_1: 'A',
-      h_3_2: 'B',
-      h_4_1: 'A',
-      h_4_2: 'B',
-      h_4_3: 'C',
-      h_4_4: 'C',
-      h_5_1: 'A',
-      h_6_1: 'A',
-      h_6_2: 'B',
-      h_6_3: 'C',
-    };
+    const defaultRanks: Record<string, HorseRank> = {};
+    const count = initialRaceDay.races.length;
+    for (let l = 0; l < count; l++) {
+      const horses = initialRaceDay.races[l]?.horses || [];
+      if (horses[0]) defaultRanks[horses[0].id] = 'A';
+      if (horses[1]) defaultRanks[horses[1].id] = 'B';
+    }
+    return defaultRanks;
   });
 
   const [onlyTopPool, setOnlyTopPool] = useState<boolean>(false);
@@ -123,15 +117,19 @@ export function useBongState(
     setSelectedDateIso(comp.dateIso);
     setGameType(comp.gameType);
     setActiveLegIndex(0);
-    setRaceDay(buildRaceDayFromCompetition(comp));
+    const newRaceDay = buildRaceDayFromCompetition(comp);
+    setRaceDay(newRaceDay);
 
     const newSel: Record<number, string[]> = {};
     const newRanks: Record<string, HorseRank> = {};
     const count = comp.gameType === 'V75' ? 7 : 8;
     for (let l = 0; l < count; l++) {
-      newSel[l] = [`h_${l}_1`, `h_${l}_2`];
-      newRanks[`h_${l}_1`] = 'A';
-      newRanks[`h_${l}_2`] = 'B';
+      const horses = newRaceDay.races[l]?.horses || [];
+      const h1 = horses[0]?.id;
+      const h2 = horses[1]?.id;
+      newSel[l] = [h1, h2].filter(Boolean) as string[];
+      if (h1) newRanks[h1] = 'A';
+      if (h2) newRanks[h2] = 'B';
     }
     setSelectedHorses(newSel);
     setRanks(newRanks);

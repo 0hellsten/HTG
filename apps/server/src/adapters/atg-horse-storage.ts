@@ -2,9 +2,15 @@
 // Privat, icke-kommersiell användning. Ingen vidarespridning av data.
 
 import Database from 'better-sqlite3';
-import { HorsePastStart } from '@stallbacken/shared';
+import {
+  HorsePastStart,
+  HorseDetail,
+  HorseProfileResponse,
+  SourceResult,
+  SourceStatus,
+} from '@stallbacken/shared';
 import { AtgHorseProfile, AtgHorseResults, AtgKmTimeSchema } from './atg-schemas.js';
-import { upsertHorse, upsertPerson } from '../db/queries/horses.js';
+import { upsertHorse, upsertPerson, getHorseById } from '../db/queries/horses.js';
 import { saveHorseResults } from '../db/queries/horse-results.js';
 import { z } from 'zod';
 
@@ -178,4 +184,69 @@ export function saveHorseResultsToDb(
 
   saveHorseResults(db, horseId, converted, sourceId, nowIso);
   return converted;
+}
+
+export function findHorseInDb(db: Database.Database, horseId: string): HorseDetail | null {
+  const byId = getHorseById(db, horseId);
+  if (byId) return byId;
+
+  // Försök matcha namn ur ID (t.ex. h_brother_bill -> Brother Bill)
+  const clean = horseId.replace(/^h_/, '').replace(/_/g, ' ').trim();
+  if (clean.length >= 2) {
+    const found = db
+      .prepare(
+        'SELECT id FROM horses WHERE LOWER(name) = LOWER(?) OR LOWER(name) LIKE LOWER(?) LIMIT 1'
+      )
+      .get(clean, `%${clean}%`) as { id: string } | undefined;
+    if (found) {
+      return getHorseById(db, found.id);
+    }
+  }
+
+  return null;
+}
+
+export function createFallbackHorseProfile(
+  horseId: string,
+  nowIso: string,
+  sourceId: string,
+  status: SourceStatus = 'degraded'
+): SourceResult<HorseProfileResponse> {
+  const clean = horseId.replace(/^h_/, '').replace(/_/g, ' ').trim();
+  const words = clean.split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1));
+  const name = words.join(' ') || 'Tävlande häst';
+
+  const fallbackHorse: HorseDetail = {
+    id: horseId,
+    name,
+    pedigree: {},
+    records: {},
+    earningsTotal: 0,
+    starts: 0,
+    wins: 0,
+    seconds: 0,
+    thirds: 0,
+    winPercentage: 0,
+    placePercentage: 0,
+    earningsPerStart: 0,
+  };
+
+  return {
+    sourceId,
+    status,
+    data: {
+      horse: fallbackHorse,
+      pastStarts: [],
+      allStarts: [],
+      qualifiers: [],
+      positionStats: [],
+      trainingForm: {},
+      status,
+      fetchedAt: nowIso,
+      message: 'Fullständig lopphistorik saknas för tillfället. Grunduppgifter visas.',
+    },
+    fetchedAt: nowIso,
+    ageSeconds: 0,
+    message: 'Fullständig lopphistorik saknas för tillfället. Grunduppgifter visas.',
+  };
 }

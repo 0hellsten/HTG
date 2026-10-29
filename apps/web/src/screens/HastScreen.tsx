@@ -46,6 +46,30 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
         setStatus(json.status);
         setStatusMessage(json.message);
       } else {
+        // Fallback: prova söka på hästens namn om id inte matchade direkt
+        const cleanName = horseId.replace(/^h_/, '').replace(/_/g, ' ');
+        if (cleanName.length >= 2) {
+          try {
+            const searchRes = await fetch(`/api/hastar/sok?q=${encodeURIComponent(cleanName)}`);
+            if (searchRes.ok) {
+              const searchJson = await searchRes.json();
+              const matched = searchJson?.data?.[0];
+              if (matched) {
+                const matchedRes = await fetch(`/api/hastar/${matched.id}`);
+                if (matchedRes.ok) {
+                  const matchedJson = await matchedRes.json();
+                  if (matchedJson?.data) {
+                    setProfile(matchedJson.data);
+                    setStatus('ok');
+                    setStatusMessage('Allt är färskt och uppdaterat.');
+                    return;
+                  }
+                }
+              }
+            }
+          } catch {}
+        }
+
         setStatus('failed');
         setStatusMessage(
           json?.message ||
