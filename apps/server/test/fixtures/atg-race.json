@@ -1,0 +1,186 @@
+{
+  "id": "2026-10-29_1_4",
+  "name": "Solvalla Hästägarförenings Jubileumslopp",
+  "number": 4,
+  "distance": 2140,
+  "startMethod": "auto",
+  "startTime": "2026-10-29T19:30:00",
+  "status": "upcoming",
+  "purse": "100 000 kr",
+  "terms": "För 3-14-åriga lägst 300 001 kr. Körsvenskrav kat. 1.",
+  "track": {
+    "id": 1,
+    "name": "Solvalla",
+    "countryCode": "SE",
+    "condition": "Lätt bana"
+  },
+  "starts": [
+    {
+      "number": 1,
+      "postPosition": 1,
+      "distance": 2140,
+      "horse": {
+        "id": "712345",
+        "name": "Global Badman",
+        "age": 7,
+        "sex": "stallion",
+        "color": "brun",
+        "trainer": {
+          "id": "3104",
+          "name": "Daniel Wäjersten"
+        },
+        "owner": {
+          "name": "Sälen Högfjällshotell"
+        },
+        "records": {
+          "auto": "1.10,7a",
+          "volt": "1.12,4"
+        },
+        "money": 3450000
+      },
+      "driver": {
+        "id": "3104",
+        "name": "Daniel Wäjersten"
+      },
+      "shoes": {
+        "front": {
+          "hasShoe": false,
+          "changed": true
+        },
+        "back": {
+          "hasShoe": false,
+          "changed": false
+        }
+      },
+      "sulky": {
+        "type": {
+          "text": "Amerikansk sulky"
+        },
+        "color": "Blå"
+      },
+      "scratched": false
+    },
+    {
+      "number": 2,
+      "postPosition": 2,
+      "distance": 2140,
+      "horse": {
+        "id": "723456",
+        "name": "Kentucky River",
+        "age": 6,
+        "sex": "gelding",
+        "color": "mörkbrun",
+        "trainer": {
+          "id": "4201",
+          "name": "Per Nordström"
+        },
+        "records": {
+          "auto": "1.10,2a",
+          "volt": "1.13,1"
+        },
+        "money": 2890500
+      },
+      "driver": {
+        "id": "4201",
+        "name": "Per Nordström"
+      },
+      "shoes": {
+        "front": {
+          "hasShoe": true,
+          "changed": false
+        },
+        "back": {
+          "hasShoe": true,
+          "changed": false
+        }
+      },
+      "sulky": {
+        "type": {
+          "text": "Vanlig vagn"
+        }
+      },
+      "scratched": false
+    },
+    {
+      "number": 3,
+      "postPosition": 3,
+      "distance": 2140,
+      "horse": {
+        "id": "734567",
+        "name": "Castor The Star",
+        "age": 6,
+        "sex": "gelding",
+        "color": "fux",
+        "trainer": {
+          "id": "1189",
+          "name": "Jörgen Westholm"
+        },
+        "records": {
+          "auto": "1.09,6a",
+          "volt": "1.12,8"
+        },
+        "money": 3120000
+      },
+      "driver": {
+        "id": "1290",
+        "name": "Mats E Djuse"
+      },
+      "shoes": {
+        "front": {
+          "hasShoe": false,
+          "changed": false
+        },
+        "back": {
+          "hasShoe": false,
+          "changed": false
+        }
+      },
+      "sulky": {
+        "type": {
+          "text": "Amerikansk sulky"
+        }
+      },
+      "scratched": false
+    },
+    {
+      "number": 4,
+      "postPosition": 4,
+      "distance": 2140,
+      "horse": {
+        "id": "745678",
+        "name": "Missle Hill",
+        "age": 9,
+        "sex": "stallion",
+        "trainer": {
+          "id": "5002",
+          "name": "Daniel Redén"
+        },
+        "records": {
+          "auto": "1.09,2a"
+        },
+        "money": 6450000
+      },
+      "driver": {
+        "id": "5003",
+        "name": "Örjan Kihlström"
+      },
+      "shoes": {
+        "front": {
+          "hasShoe": false,
+          "changed": false
+        },
+        "back": {
+          "hasShoe": true,
+          "changed": false
+        }
+      },
+      "sulky": {
+        "type": {
+          "text": "Amerikansk sulky"
+        }
+      },
+      "scratched": true,
+      "scratchReason": "Feber"
+    }
+  ]
+}

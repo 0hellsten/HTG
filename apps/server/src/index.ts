@@ -7,6 +7,7 @@ import { logger } from './lib/logger.js';
 import { getDb } from './db/connection.js';
 import { runMigrations } from './db/migrations.js';
 import { kallorRoutes } from './routes/kallor.js';
+import { loppRoutes } from './routes/lopp.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +37,7 @@ export async function createServer(customDbPath?: string) {
 
   // Registrera API-rutter
   await app.register(kallorRoutes);
+  await app.register(loppRoutes);
 
   // Hälsokontroll enligt Fas 1-specifikationen
   app.get('/halsa', async (_req, reply) => {

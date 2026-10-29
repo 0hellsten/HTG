@@ -45,4 +45,11 @@ export default defineConfig({
       '/api': 'http://localhost:3001',
     },
   },
+  preview: {
+    port: 5173,
+    proxy: {
+      '/halsa': 'http://localhost:3001',
+      '/api': 'http://localhost:3001',
+    },
+  },
 });

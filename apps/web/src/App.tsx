@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Search, Award, Star, Menu, Download } from 'lucide-react';
+import { Race } from '@stallbacken/shared';
 import { IdagScreen } from './screens/IdagScreen';
+import { LoppScreen } from './screens/LoppScreen';
 
 type Tab = 'idag' | 'hastar' | 'tips' | 'stall' | 'mer';
 
@@ -11,6 +13,8 @@ interface BeforeInstallPromptEvent extends Event {
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('idag');
+  const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
+  const [siblingRaces, setSiblingRaces] = useState<Race[]>([]);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
@@ -31,6 +35,13 @@ export const App: React.FC = () => {
     const choice = await installPrompt.userChoice;
     if (choice.outcome === 'accepted') {
       setInstallPrompt(null);
+    }
+  };
+
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    if (tab === 'idag') {
+      setSelectedRaceId(null);
     }
   };
 
@@ -67,7 +78,7 @@ export const App: React.FC = () => {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => handleTabChange(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-base font-medium transition-colors ${
                   isActive
                     ? 'bg-amber-500 text-slate-950 font-semibold shadow-sm'
@@ -118,7 +129,24 @@ export const App: React.FC = () => {
 
         {/* Vy-yta */}
         <main className="flex-1 p-4 sm:p-6 lg:p-10 max-w-5xl w-full mx-auto pb-24 lg:pb-10">
-          {activeTab === 'idag' && <IdagScreen />}
+          {activeTab === 'idag' && (
+            selectedRaceId ? (
+              <LoppScreen
+                raceId={selectedRaceId}
+                onBack={() => setSelectedRaceId(null)}
+                onSelectRace={(id) => setSelectedRaceId(id)}
+                siblingRaces={siblingRaces}
+              />
+            ) : (
+              <IdagScreen
+                onOpenRace={(raceId, siblings) => {
+                  setSelectedRaceId(raceId);
+                  setSiblingRaces(siblings);
+                }}
+              />
+            )
+          )}
+
           {activeTab !== 'idag' && (
             <div className="bg-white rounded-xl border border-slate-200 p-8 text-center max-w-lg mx-auto mt-8">
               <h2 className="text-xl font-semibold text-slate-900 mb-2">
@@ -142,7 +170,7 @@ export const App: React.FC = () => {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => handleTabChange(item.id)}
                 className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 rounded-md transition-colors ${
                   isActive ? 'text-amber-600 font-semibold' : 'text-slate-500'
                 }`}

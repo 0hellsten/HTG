@@ -3,7 +3,7 @@ import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 
-const artifactDir = 'C:/Users/hells/.gemini/antigravity/brain/d238af12-572d-4015-b9d6-c892da2ab781';
+const artifactDir = process.env.ARTIFACT_DIR || 'C:/Users/hells/.gemini/antigravity/brain/f9b48fb7-66c9-4422-953e-9bdb51a497b8';
 if (!fs.existsSync(artifactDir)) {
   fs.mkdirSync(artifactDir, { recursive: true });
 }
@@ -49,8 +49,10 @@ async function run() {
     console.log('3. Startar Chromium via Playwright...');
     const browser = await chromium.launch();
 
-    // 1. Mobil: 390x844
-    console.log('Tar skärmbild för mobil (390x844)...');
+    // ==========================================
+    // 1. Mobil: 390x844 — Startsida (Idag)
+    // ==========================================
+    console.log('Tar skärmbild för mobil (390x844) - Dagens omgång...');
     const mobileContext = await browser.newContext({
       viewport: { width: 390, height: 844 },
       isMobile: true,
@@ -59,27 +61,61 @@ async function run() {
     });
     const mobilePage = await mobileContext.newPage();
     await mobilePage.goto('http://localhost:5173', { waitUntil: 'networkidle' });
-    await sleep(1000);
-    const mobileShotPath = path.join(artifactDir, 'fas-1-mobil-390x844.png');
-    await mobilePage.screenshot({ path: mobileShotPath, fullPage: true });
-    console.log(`Mobil skärmbild sparad till: ${mobileShotPath}`);
+    await sleep(1500);
+
+    const mobileIdagPath = path.join(artifactDir, 'fas-3-mobil-idag-390x844.png');
+    await mobilePage.screenshot({ path: mobileIdagPath });
+    console.log(`Mobil Idag sparad till: ${mobileIdagPath}`);
+
+    // Klicka på Lopp 4 för att öppna loppkortet
+    console.log('Mobil: Navigerar in i Lopp 4...');
+    const raceButton = mobilePage.locator('button:has-text("Lopp 4")').first();
+    await raceButton.click();
+    await sleep(1500);
+
+    const mobileLoppPath = path.join(artifactDir, 'fas-3-mobil-lopp-390x844.png');
+    await mobilePage.screenshot({ path: mobileLoppPath });
+    console.log(`Mobil Loppkort sparad till: ${mobileLoppPath}`);
+
+    // Klicka på färskhetspricken för att visa lugn förklaring
+    const dotBtn = mobilePage.locator('button[aria-label="Visa information om uppgifternas färskhet"]').first();
+    if (await dotBtn.isVisible()) {
+      await dotBtn.click();
+      await sleep(500);
+      const dotShotPath = path.join(artifactDir, 'fas-3-mobil-prick-klick.png');
+      await mobilePage.screenshot({ path: dotShotPath });
+      console.log(`Mobil Prick-klick sparad till: ${dotShotPath}`);
+    }
     await mobileContext.close();
 
-    // 2. Laptop: 1440x900
-    console.log('Tar skärmbild för laptop (1440x900)...');
+    // ==========================================
+    // 2. Laptop: 1440x900 — Startsida & Loppkort
+    // ==========================================
+    console.log('Tar skärmbild för laptop (1440x900) - Dagens omgång...');
     const laptopContext = await browser.newContext({
       viewport: { width: 1440, height: 900 },
     });
     const laptopPage = await laptopContext.newPage();
     await laptopPage.goto('http://localhost:5173', { waitUntil: 'networkidle' });
-    await sleep(1000);
-    const laptopShotPath = path.join(artifactDir, 'fas-1-laptop-1440x900.png');
-    await laptopPage.screenshot({ path: laptopShotPath, fullPage: true });
-    console.log(`Laptop skärmbild sparad till: ${laptopShotPath}`);
-    await laptopContext.close();
+    await sleep(1500);
 
+    const laptopIdagPath = path.join(artifactDir, 'fas-3-laptop-idag-1440x900.png');
+    await laptopPage.screenshot({ path: laptopIdagPath });
+    console.log(`Laptop Idag sparad till: ${laptopIdagPath}`);
+
+    // Klicka in på Lopp 4
+    console.log('Laptop: Navigerar in i Lopp 4...');
+    const laptopRaceBtn = laptopPage.locator('button:has-text("Lopp 4")').first();
+    await laptopRaceBtn.click();
+    await sleep(1500);
+
+    const laptopLoppPath = path.join(artifactDir, 'fas-3-laptop-lopp-1440x900.png');
+    await laptopPage.screenshot({ path: laptopLoppPath });
+    console.log(`Laptop Loppkort sparad till: ${laptopLoppPath}`);
+
+    await laptopContext.close();
     await browser.close();
-    console.log('UI-verifiering slutförd!');
+    console.log('UI-verifiering slutförd med alla skärmbilder!');
   } finally {
     console.log('Stänger ner processer...');
     serverProcess.kill();

@@ -1,7 +1,9 @@
 import { SourceAdapter } from '@stallbacken/shared';
 import { fakeSource } from './fake-source.js';
+import { atgRacingInfoAdapter } from './atg-racinginfo.js';
 
 export * from './fake-source.js';
+export * from './atg-racinginfo.js';
 
 /**
  * Register över samtliga aktiva källadaptrar i Stallbacken.
@@ -9,6 +11,7 @@ export * from './fake-source.js';
  */
 export const registeredAdapters: SourceAdapter<unknown>[] = [
   fakeSource,
+  atgRacingInfoAdapter,
 ];
 
 /**

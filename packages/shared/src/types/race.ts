@@ -16,6 +16,7 @@ export interface RaceDay {
   firstStart?: string;
   racesCount: number;
   isFavorite?: boolean;
+  races?: Race[];
 }
 
 export interface Race {
@@ -31,6 +32,7 @@ export interface Race {
   scheduledStart: string;
   actualStart?: string;
   trackCondition?: string;
+  trackName?: string;
 }
 
 export interface Start {
@@ -45,8 +47,10 @@ export interface Start {
   trainerName?: string;
   shoesFront?: boolean;
   shoesBack?: boolean;
+  shoesChanged?: boolean;
   sulkyType?: string;
   scratched?: boolean;
+  scratchReason?: string;
   record?: string;
   earnings?: number;
   winOdds?: number;

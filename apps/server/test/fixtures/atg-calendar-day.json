@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-29",
+  "tracks": [
+    {
+      "id": 5,
+      "name": "Åby",
+      "countryCode": "SE"
+    },
+    {
+      "id": 1,
+      "name": "Solvalla",
+      "countryCode": "SE"
+    }
+  ],
+  "games": {
+    "V75": [
+      {
+        "id": "V75_2026-10-29_5_5",
+        "startTime": "2026-10-29T16:20:00",
+        "trackId": 5,
+        "races": [
+          "2026-10-29_5_5",
+          "2026-10-29_5_6",
+          "2026-10-29_5_7"
+        ]
+      }
+    ],
+    "V86": [
+      {
+        "id": "V86_2026-10-29_1_4",
+        "startTime": "2026-10-29T19:30:00",
+        "trackId": 1,
+        "races": [
+          "2026-10-29_1_4",
+          "2026-10-29_1_5"
+        ]
+      }
+    ]
+  },
+  "races": [
+    {
+      "id": "2026-10-29_5_1",
+      "track": { "id": 5, "name": "Åby" },
+      "number": 1,
+      "name": "Treåringslopp",
+      "startTime": "2026-10-29T14:45:00",
+      "status": "upcoming",
+      "distance": 2140,
+      "startMethod": "volt"
+    },
+    {
+      "id": "2026-10-29_1_1",
+      "track": { "id": 1, "name": "Solvalla" },
+      "number": 1,
+      "name": "Fyraåringslopp",
+      "startTime": "2026-10-29T18:15:00",
+      "status": "upcoming",
+      "distance": 2140,
+      "startMethod": "auto"
+    },
+    {
+      "id": "2026-10-29_1_4",
+      "track": { "id": 1, "name": "Solvalla" },
+      "number": 4,
+      "name": "Solvalla Hästägarförenings Jubileumslopp",
+      "startTime": "2026-10-29T19:30:00",
+      "status": "upcoming",
+      "distance": 2140,
+      "startMethod": "auto"
+    }
+  ]
+}

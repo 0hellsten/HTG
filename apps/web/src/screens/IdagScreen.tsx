@@ -1,34 +1,50 @@
 import React, { useEffect, useState } from 'react';
+import { Calendar, ChevronRight } from 'lucide-react';
+import { RaceDay, Race, SourceStatus, ApiResponse } from '@stallbacken/shared';
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { formatSwedishDate, isEvening } from '../lib/date';
-import type { SourceStatus } from '@stallbacken/shared';
+import { formatDistance, formatStartMethod } from '../lib/format';
 
-export const IdagScreen: React.FC = () => {
-  const [connectionStatus, setConnectionStatus] = useState<SourceStatus>('ok');
-  const [isReady, setIsReady] = useState<boolean>(false);
+interface IdagScreenProps {
+  onOpenRace: (raceId: string, siblingRaces: Race[]) => void;
+}
+
+export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace }) => {
+  const [raceDays, setRaceDays] = useState<RaceDay[]>([]);
+  const [status, setStatus] = useState<SourceStatus>('ok');
+  const [statusMessage, setStatusMessage] = useState<string>('Allt är färskt och uppdaterat.');
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchIdag = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/dagar/idag');
+      const json: ApiResponse<RaceDay[]> = await res.json();
+      if (json && json.data) {
+        setRaceDays(json.data);
+        setStatus(json.status);
+        setStatusMessage(json.message);
+      } else {
+        setStatus('failed');
+        setStatusMessage('Kunde inte läsa in dagens omgångar.');
+      }
+    } catch {
+      setStatus('failed');
+      setStatusMessage('Uppgifterna uppdateras inte just nu.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Kontrollera anslutning mot backend enligt Fas 1
-    fetch('/halsa')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.ok) {
-          setIsReady(true);
-          setConnectionStatus('ok');
-        } else {
-          setConnectionStatus('degraded');
-        }
-      })
-      .catch(() => {
-        setConnectionStatus('failed');
-      });
+    fetchIdag();
   }, []);
 
   const heading = isEvening() ? 'Kvällens omgång' : 'Dagens omgång';
   const todayFormatted = formatSwedishDate();
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto pb-12">
+    <div className="space-y-6 max-w-4xl mx-auto pb-16">
       {/* Rubrikrad med datum och färskhetsprick */}
       <div className="flex items-start justify-between border-b border-slate-200 pb-4">
         <div>
@@ -41,57 +57,106 @@ export const IdagScreen: React.FC = () => {
         </div>
         <div className="pt-1">
           <FarskhetsPrick
-            status={connectionStatus}
-            explanation={
-              connectionStatus === 'ok'
-                ? 'Allt är färskt och i full gång.'
-                : 'Uppgifterna uppdateras inte just nu. Senast sparade uppgifter visas.'
-            }
+            status={status}
+            explanation={statusMessage}
+            onRetry={fetchIdag}
           />
         </div>
       </div>
 
-      {/* Lugnt välkomstkort och status i Fas 1 */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-sm">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-          <h2 className="text-xl font-semibold text-slate-900">
-            Stallbacken är igång
-          </h2>
+      {loading && (
+        <div className="p-12 text-center bg-white rounded-xl border border-slate-200 text-slate-500">
+          Hämtar dagens banor och tävlingar...
         </div>
+      )}
 
-        <p className="text-slate-700 leading-relaxed text-base sm:text-lg mb-4">
-          Allt är på plats för att börja hämta dagens banor, lopp och startlistor i Fas 3.
-        </p>
+      {!loading && raceDays.length === 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 p-8 text-center space-y-3">
+          <Calendar className="w-10 h-10 text-slate-400 mx-auto" />
+          <h2 className="text-xl font-bold text-slate-900">Inga lopp idag</h2>
+          <p className="text-slate-600 text-base max-w-md mx-auto">
+            Det körs inga tävlingar just idag. Nästa omgång visas här så snart anmälningslistorna är klara.
+          </p>
+        </div>
+      )}
 
-        <div className="bg-slate-50 rounded-lg p-4 border border-slate-200 text-sm text-slate-600 space-y-1.5">
-          <div className="flex justify-between items-center">
-            <span className="font-medium text-slate-800">Status:</span>
-            <span className={isReady ? 'text-emerald-700 font-semibold' : 'text-slate-500'}>
-              {isReady ? 'I full gång' : 'Söker kontakt...'}
-            </span>
+      {/* Kort per bana */}
+      {!loading && raceDays.length > 0 && (
+        <div className="space-y-6">
+          {raceDays.map((day) => (
+            <BanaKort
+              key={day.id}
+              day={day}
+              onOpenRace={onOpenRace}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface BanaKortProps {
+  day: RaceDay;
+  onOpenRace: (raceId: string, siblingRaces: Race[]) => void;
+}
+
+const BanaKort: React.FC<BanaKortProps> = ({ day, onOpenRace }) => {
+  const races = day.races || [];
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
+      {/* Banans toppinfo */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-950">
+              {day.trackName}
+            </h2>
+            {day.biggestGame && (
+              <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-bold text-xs uppercase tracking-wider">
+                {day.biggestGame}
+              </span>
+            )}
           </div>
-          <div className="flex justify-between items-center">
-            <span className="font-medium text-slate-800">Spelformer i fokus:</span>
-            <span>V75 · V86 · Dagens Dubbel</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="font-medium text-slate-800">Installationsläge:</span>
-            <span>Redo för hemskärm på mobil och dator</span>
-          </div>
+          <p className="text-sm text-slate-600 mt-0.5">
+            Första start kl. {day.firstStart || '–'} · {day.racesCount} lopp
+          </p>
         </div>
       </div>
 
-      {/* Kort som visar strukturen för en tävlingsdag */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-900 mb-2">
-          Kommande omgångar
-        </h3>
-        <p className="text-slate-600 text-base leading-relaxed">
-          I nästa fas kopplar vi in tävlingskalendern. Då visas dagens och kvällens banor här
-          som stora, lugna kort med första start, antal lopp och väder.
+      {/* Lista över lopp på banan */}
+      {races.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+          {races.map((race) => (
+            <button
+              key={race.id}
+              onClick={() => onOpenRace(race.id, races)}
+              className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100/90 text-left transition-colors cursor-pointer group"
+            >
+              <div>
+                <div className="font-bold text-slate-900 group-hover:text-amber-800 transition-colors">
+                  Lopp {race.number}
+                  {race.scheduledStart && (
+                    <span className="font-normal text-slate-500 text-sm ml-2">
+                      kl. {race.scheduledStart.slice(11, 16)}
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-slate-600 mt-0.5">
+                  {formatDistance(race.distanceM)} · {formatStartMethod(race.startMethod)}
+                  {race.name ? ` · ${race.name}` : ''}
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-slate-800 transition-colors shrink-0" />
+            </button>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-slate-500 italic">
+          Lopplistan laddas upp inom kort.
         </p>
-      </div>
+      )}
     </div>
   );
 };
