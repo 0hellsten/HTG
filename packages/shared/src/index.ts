@@ -6,3 +6,5 @@ export * from './types/horse.js';
 export * from './types/tips.js';
 export * from './types/track.js';
 export * from './types/stall.js';
+export * from './types/bong.js';
+export * from './bong/index.js';
