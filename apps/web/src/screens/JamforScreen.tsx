@@ -44,7 +44,9 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
     try {
       const [raceRes, oddsRes] = await Promise.all([
         fetch(`/api/lopp/${raceId}`).then((r) => r.json()),
-        fetch(`/api/lopp/${raceId}/odds`).then((r) => r.json()).catch(() => null),
+        fetch(`/api/lopp/${raceId}/odds`)
+          .then((r) => r.json())
+          .catch(() => null),
       ]);
 
       if (raceRes?.data) {
@@ -209,8 +211,8 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
               {showHelp && (
                 <div className="mt-2.5 p-3.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 space-y-1.5 leading-relaxed">
                   <p>
-                    • Det <strong>bästa värdet</strong> på varje rad är diskret markerat med en
-                    mjuk gul ton.
+                    • Det <strong>bästa värdet</strong> på varje rad är diskret markerat med en mjuk
+                    gul ton.
                   </p>
                   <p>
                     • För kilometertider betyder en lägre siffra snabbare tid. För segerprocent och

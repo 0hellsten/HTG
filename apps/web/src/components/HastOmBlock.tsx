@@ -57,18 +57,14 @@ export const HastOmBlock: React.FC<HastOmBlockProps> = ({
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-1">
               Ägare
             </span>
-            <span className="font-semibold text-slate-900">
-              {horse.owner || '–'}
-            </span>
+            <span className="font-semibold text-slate-900">{horse.owner || '–'}</span>
           </div>
 
           <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-100">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-1">
               Uppfödare
             </span>
-            <span className="font-semibold text-slate-900">
-              {horse.breeder || '–'}
-            </span>
+            <span className="font-semibold text-slate-900">{horse.breeder || '–'}</span>
           </div>
 
           <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-100">
@@ -102,10 +98,12 @@ export const HastOmBlock: React.FC<HastOmBlockProps> = ({
                 {horse.starts} starter: {horse.wins}-{horse.seconds}-{horse.thirds}
               </span>
               <span className="text-slate-600 font-medium">
-                Segerprocent: <strong className="text-slate-900">{formatPercent(horse.winPercentage)}</strong>
+                Segerprocent:{' '}
+                <strong className="text-slate-900">{formatPercent(horse.winPercentage)}</strong>
               </span>
               <span className="text-slate-600 font-medium">
-                Platsprocent: <strong className="text-slate-900">{formatPercent(horse.placePercentage)}</strong>
+                Platsprocent:{' '}
+                <strong className="text-slate-900">{formatPercent(horse.placePercentage)}</strong>
               </span>
             </div>
             {horse.earningsPerStart > 0 && (
@@ -117,9 +115,7 @@ export const HastOmBlock: React.FC<HastOmBlockProps> = ({
 
           {/* Stamtavla */}
           <div className="space-y-2">
-            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
-              Stamtavla
-            </h3>
+            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Stamtavla</h3>
             <div className="space-y-1.5 text-base">
               <div className="flex justify-between items-center py-1 border-b border-slate-100">
                 <span className="text-slate-500 text-sm">Far:</span>
@@ -131,7 +127,9 @@ export const HastOmBlock: React.FC<HastOmBlockProps> = ({
               </div>
               <div className="flex justify-between items-center py-1">
                 <span className="text-slate-500 text-sm">Morfar:</span>
-                <span className="font-semibold text-slate-900">{horse.pedigree.grandfather || '–'}</span>
+                <span className="font-semibold text-slate-900">
+                  {horse.pedigree.grandfather || '–'}
+                </span>
               </div>
             </div>
           </div>

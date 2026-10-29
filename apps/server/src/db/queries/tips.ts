@@ -81,12 +81,14 @@ export function getLatestTipArticles(db: Database.Database, limit = 20): TipItem
   }
 
   const rows = db
-    .prepare(`
+    .prepare(
+      `
       SELECT id, provider, author, title, summary, url, published_at, source_id
       FROM tip_articles
       ORDER BY published_at DESC
       LIMIT ?
-    `)
+    `
+    )
     .all(limit) as ArticleRow[];
 
   return rows.map((r) => ({
@@ -166,7 +168,8 @@ export function getTipsForRace(db: Database.Database, raceId: string): TipItem[]
   }
 
   const rows = db
-    .prepare(`
+    .prepare(
+      `
       SELECT 
         t.id,
         t.race_id,
@@ -183,7 +186,8 @@ export function getTipsForRace(db: Database.Database, raceId: string): TipItem[]
       LEFT JOIN horses h ON s.horse_id = h.id
       WHERE t.race_id = ?
       ORDER BY t.rank ASC, t.provider ASC
-    `)
+    `
+    )
     .all(raceId) as TipRow[];
 
   return rows.map((r) => ({
@@ -221,7 +225,8 @@ export function getAllRaceTips(db: Database.Database): TipItem[] {
   }
 
   const rows = db
-    .prepare(`
+    .prepare(
+      `
       SELECT 
         t.id,
         t.race_id,
@@ -243,7 +248,8 @@ export function getAllRaceTips(db: Database.Database): TipItem[] {
       LEFT JOIN tracks tr ON rd.track_id = tr.id
       ORDER BY t.published_at DESC, t.rank ASC
       LIMIT 50
-    `)
+    `
+    )
     .all() as TipRow[];
 
   return rows.map((r) => ({

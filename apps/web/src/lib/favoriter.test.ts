@@ -1,12 +1,25 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
+  getFavoriteTracks,
   getFavoriteTrackIds,
   isFavoriteTrack,
   toggleFavoriteTrack,
+  removeFavoriteTrack,
   sortRaceDaysWithFavorites,
+  getFavoriteHorses,
   getFavoriteHorseIds,
   isFavoriteHorse,
   toggleFavoriteHorse,
+  removeFavoriteHorse,
+  getFavoriteDrivers,
+  isFavoriteDriver,
+  toggleFavoriteDriver,
+  removeFavoriteDriver,
+  getFavoriteTrainers,
+  isFavoriteTrainer,
+  toggleFavoriteTrainer,
+  removeFavoriteTrainer,
+  getTotalFavoritesCount,
 } from './favoriter';
 
 // Mock av localStorage för Node-miljö
@@ -39,18 +52,23 @@ describe('favoriter', () => {
   it('börjar med tom lista av favoriter', () => {
     expect(getFavoriteTrackIds()).toEqual([]);
     expect(isFavoriteTrack('solvalla')).toBe(false);
+    expect(getTotalFavoritesCount()).toBe(0);
   });
 
-  it('kan lägga till och ta bort en favoritbana', () => {
-    const res1 = toggleFavoriteTrack('solvalla');
+  it('kan lägga till och ta bort en favoritbana med namn', () => {
+    const res1 = toggleFavoriteTrack('1', 'Solvalla');
     expect(res1).toBe(true);
-    expect(isFavoriteTrack('solvalla')).toBe(true);
-    expect(getFavoriteTrackIds()).toEqual(['solvalla']);
+    expect(isFavoriteTrack('1')).toBe(true);
+    expect(getFavoriteTracks()).toEqual([{ id: '1', name: 'Solvalla' }]);
 
-    const res2 = toggleFavoriteTrack('solvalla');
+    const res2 = toggleFavoriteTrack('1');
     expect(res2).toBe(false);
-    expect(isFavoriteTrack('solvalla')).toBe(false);
+    expect(isFavoriteTrack('1')).toBe(false);
     expect(getFavoriteTrackIds()).toEqual([]);
+
+    toggleFavoriteTrack('1', 'Solvalla');
+    removeFavoriteTrack('1');
+    expect(isFavoriteTrack('1')).toBe(false);
   });
 
   it('sorterar favoritbanor överst i listan av tävlingsdagar', () => {
@@ -60,23 +78,43 @@ describe('favoriter', () => {
       { id: '3', trackId: 'bergsaker', trackName: 'Bergsåker' },
     ];
 
-    // Markera Solvalla som favorit
     const sorted = sortRaceDaysWithFavorites(raceDays, ['solvalla']);
     expect(sorted.map((r) => r.trackId)).toEqual(['solvalla', 'aby', 'bergsaker']);
   });
 
-  it('kan lägga till och ta bort favorithästar', () => {
+  it('kan lägga till, kontrollera och ta bort favorithästar med namn', () => {
     expect(getFavoriteHorseIds()).toEqual([]);
     expect(isFavoriteHorse('783840')).toBe(false);
 
-    const added = toggleFavoriteHorse('783840');
+    const added = toggleFavoriteHorse('783840', 'San Moteur');
     expect(added).toBe(true);
     expect(isFavoriteHorse('783840')).toBe(true);
-    expect(getFavoriteHorseIds()).toEqual(['783840']);
+    expect(getFavoriteHorses()).toEqual([{ id: '783840', name: 'San Moteur' }]);
 
-    const removed = toggleFavoriteHorse('783840');
-    expect(removed).toBe(false);
+    removeFavoriteHorse('783840');
     expect(isFavoriteHorse('783840')).toBe(false);
-    expect(getFavoriteHorseIds()).toEqual([]);
+    expect(getFavoriteHorses()).toEqual([]);
+  });
+
+  it('kan hantera kuskar och tränare som favoriter', () => {
+    expect(getFavoriteDrivers()).toEqual([]);
+    expect(isFavoriteDriver('Örjan Kihlström')).toBe(false);
+
+    toggleFavoriteDriver('Örjan Kihlström');
+    expect(isFavoriteDriver('örjan kihlström')).toBe(true);
+    expect(getFavoriteDrivers()).toEqual(['Örjan Kihlström']);
+
+    toggleFavoriteTrainer('Daniel Redén');
+    expect(isFavoriteTrainer('daniel redén')).toBe(true);
+    expect(getFavoriteTrainers()).toEqual(['Daniel Redén']);
+
+    expect(getTotalFavoritesCount()).toBe(2);
+
+    removeFavoriteDriver('Örjan Kihlström');
+    expect(isFavoriteDriver('Örjan Kihlström')).toBe(false);
+
+    removeFavoriteTrainer('Daniel Redén');
+    expect(isFavoriteTrainer('Daniel Redén')).toBe(false);
+    expect(getTotalFavoritesCount()).toBe(0);
   });
 });

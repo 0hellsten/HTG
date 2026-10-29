@@ -114,7 +114,7 @@ export function getHorseResults(
     trackName: r.track_name,
     raceNumber: r.race_number || undefined,
     raceType: (r.race_type as 'regular' | 'qualifier') || 'regular',
-    startMethod: (r.start_method === 'volte' || r.start_method === 'volt') ? 'volt' : 'auto',
+    startMethod: r.start_method === 'volte' || r.start_method === 'volt' ? 'volt' : 'auto',
     distanceM: r.distance_m,
     postPosition: r.post_position || undefined,
     driverName: r.driver_name || undefined,
@@ -128,10 +128,7 @@ export function getHorseResults(
   }));
 }
 
-export function getTrackPositionStats(
-  db: Database.Database,
-  horseId: string
-): TrackPositionStat[] {
+export function getTrackPositionStats(db: Database.Database, horseId: string): TrackPositionStat[] {
   const query = `
     SELECT 
       start_method,
@@ -152,7 +149,7 @@ export function getTrackPositionStats(
     const wins = r.wins || 0;
     const places = r.places || 0;
     const winPercent = totalStarts > 0 ? Math.round((wins / totalStarts) * 100) : 0;
-    const method = (r.start_method === 'volte' || r.start_method === 'volt') ? 'volt' : 'auto';
+    const method = r.start_method === 'volte' || r.start_method === 'volt' ? 'volt' : 'auto';
 
     return {
       startMethod: method,

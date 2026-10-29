@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Compass,
-  CloudSun,
-  TrendingUp,
-  MapPin,
-  Clock,
-  ArrowLeft,
-  ChevronDown,
-} from 'lucide-react';
+import { Compass, CloudSun, TrendingUp, MapPin, Clock, ArrowLeft, ChevronDown } from 'lucide-react';
 import {
   ApiResponse,
   TrackProfile,
@@ -18,6 +10,8 @@ import {
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
 import { IdagSkelett } from '../components/SkelettKort';
+import { HastsKoIkon } from '../components/HastsKoIkon';
+import { isFavoriteTrack, toggleFavoriteTrack } from '../lib/favoriter';
 import { formatDistance } from '../lib/format';
 
 interface BanvisarenScreenProps {
@@ -38,6 +32,11 @@ export const BanvisarenScreen: React.FC<BanvisarenScreenProps> = ({
   const [weatherMessage, setWeatherMessage] = useState<string>('Färskt väder från SMHI.');
   const [loading, setLoading] = useState<boolean>(true);
   const [startMethodTab, setStartMethodTab] = useState<'auto' | 'volt'>('auto');
+  const [isFavTrack, setIsFavTrack] = useState<boolean>(() => isFavoriteTrack(initialTrackId));
+
+  useEffect(() => {
+    setIsFavTrack(isFavoriteTrack(selectedTrackId));
+  }, [selectedTrackId]);
 
   // Hämta alla banor vid start
   useEffect(() => {
@@ -117,7 +116,8 @@ export const BanvisarenScreen: React.FC<BanvisarenScreenProps> = ({
   };
 
   const currentTrackName = profile?.name || 'Välj bana';
-  const postStats = startMethodTab === 'auto' ? stats?.postStatsAuto || [] : stats?.postStatsVolt || [];
+  const postStats =
+    startMethodTab === 'auto' ? stats?.postStatsAuto || [] : stats?.postStatsVolt || [];
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-16">
@@ -147,24 +147,45 @@ export const BanvisarenScreen: React.FC<BanvisarenScreenProps> = ({
           </p>
         </div>
 
-        {/* Dropdown för att välja bana */}
-        <div className="relative min-w-[220px]">
-          <label htmlFor="bana-select" className="sr-only">
-            Välj travbana
-          </label>
-          <select
-            id="bana-select"
-            value={selectedTrackId}
-            onChange={(e) => handleTrackChange(e.target.value)}
-            className="w-full min-h-[48px] pl-4 pr-10 py-2.5 bg-white border border-slate-300 rounded-xl text-base font-bold text-slate-900 shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+        {/* Dropdown för att välja bana och favoritknapp */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              const currentName =
+                tracks.find((t) => t.id === selectedTrackId)?.name || profile?.name;
+              const next = toggleFavoriteTrack(selectedTrackId, currentName);
+              setIsFavTrack(next);
+            }}
+            className="min-h-[48px] px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm flex items-center gap-2 shadow-sm transition-colors cursor-pointer"
+            title={isFavTrack ? 'Ta bort banan från Mitt stall' : 'Spara banan i Mitt stall'}
+            aria-label={isFavTrack ? 'Ta bort banan från Mitt stall' : 'Spara banan i Mitt stall'}
           >
-            {tracks.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="w-5 h-5 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <HastsKoIkon
+              filled={isFavTrack}
+              className={`w-5 h-5 ${isFavTrack ? 'text-amber-500' : 'text-slate-400'}`}
+            />
+            <span className="hidden sm:inline">{isFavTrack ? 'I Mitt stall' : 'Mitt stall'}</span>
+          </button>
+
+          <div className="relative min-w-[200px]">
+            <label htmlFor="bana-select" className="sr-only">
+              Välj travbana
+            </label>
+            <select
+              id="bana-select"
+              value={selectedTrackId}
+              onChange={(e) => handleTrackChange(e.target.value)}
+              className="w-full min-h-[48px] pl-4 pr-10 py-2.5 bg-white border border-slate-300 rounded-xl text-base font-bold text-slate-900 shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+            >
+              {tracks.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-5 h-5 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
         </div>
       </div>
 
@@ -233,9 +254,7 @@ export const BanvisarenScreen: React.FC<BanvisarenScreenProps> = ({
                     <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-1">
                       Underlag
                     </span>
-                    <span className="text-lg font-extrabold text-slate-900">
-                      {profile.surface}
-                    </span>
+                    <span className="text-lg font-extrabold text-slate-900">{profile.surface}</span>
                   </div>
 
                   <div className="p-3 bg-slate-50 rounded-lg">
@@ -377,9 +396,7 @@ export const BanvisarenScreen: React.FC<BanvisarenScreenProps> = ({
                     <div
                       key={p.postPosition}
                       className={`p-3.5 rounded-xl border transition-colors ${
-                        isTop
-                          ? 'bg-amber-50/70 border-amber-300'
-                          : 'bg-slate-50 border-slate-200'
+                        isTop ? 'bg-amber-50/70 border-amber-300' : 'bg-slate-50 border-slate-200'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1.5">
@@ -392,9 +409,7 @@ export const BanvisarenScreen: React.FC<BanvisarenScreenProps> = ({
                           </span>
                         )}
                       </div>
-                      <div className="text-xl font-extrabold text-slate-950 mb-1">
-                        {percent}
-                      </div>
+                      <div className="text-xl font-extrabold text-slate-950 mb-1">{percent}</div>
                       <div className="text-xs text-slate-500">
                         {p.starts > 0 ? `${p.wins} vinster / ${p.starts} lopp` : 'Inga starter'}
                       </div>
@@ -432,7 +447,8 @@ export const BanvisarenScreen: React.FC<BanvisarenScreenProps> = ({
                     {stats?.leaderWinPercent !== null ? `${stats?.leaderWinPercent} %` : '–'}
                   </div>
                   <p className="text-slate-700 text-base leading-relaxed">
-                    av loppen på {currentTrackName} vinns av den häst som tar ledningen och leder vid sista sväng.
+                    av loppen på {currentTrackName} vinns av den häst som tar ledningen och leder
+                    vid sista sväng.
                   </p>
                 </div>
 

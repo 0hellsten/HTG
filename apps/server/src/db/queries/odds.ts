@@ -83,10 +83,7 @@ export function saveRaceOdds(
 /**
  * Hämtar senaste sparade odds och streck för ett lopp.
  */
-export function getLatestOddsForRace(
-  db: Database.Database,
-  raceId: string
-): RaceOddsData | null {
+export function getLatestOddsForRace(db: Database.Database, raceId: string): RaceOddsData | null {
   const stmt = db.prepare(`
     SELECT
       s.id as start_id,
@@ -115,11 +112,12 @@ export function getLatestOddsForRace(
     return null;
   }
 
-  const latestRecordedAt = rows
-    .map((r) => r.recorded_at)
-    .filter((d): d is string => d !== null)
-    .sort()
-    .reverse()[0] || new Date().toISOString();
+  const latestRecordedAt =
+    rows
+      .map((r) => r.recorded_at)
+      .filter((d): d is string => d !== null)
+      .sort()
+      .reverse()[0] || new Date().toISOString();
 
   // Formatera t.ex. "2026-10-29T18:42:00" -> "18:42"
   const timeFormatted = latestRecordedAt.includes('T')

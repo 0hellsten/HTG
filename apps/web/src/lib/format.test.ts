@@ -104,4 +104,3 @@ describe('Svensk travformatering', () => {
     expect(formatDateShort(null)).toBe('–');
   });
 });
-

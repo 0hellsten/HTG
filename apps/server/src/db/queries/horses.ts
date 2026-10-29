@@ -167,14 +167,18 @@ interface DbHorseRow {
 }
 
 export function getHorseById(db: Database.Database, id: string): HorseDetail | null {
-  const row = db.prepare(`
+  const row = db
+    .prepare(
+      `
     SELECT 
       h.*,
       p.name AS trainer_name
     FROM horses h
     LEFT JOIN people p ON p.id = h.trainer_id
     WHERE h.id = ?
-  `).get(id) as DbHorseRow | undefined;
+  `
+    )
+    .get(id) as DbHorseRow | undefined;
 
   if (!row) return null;
 
@@ -215,15 +219,13 @@ export function getHorseById(db: Database.Database, id: string): HorseDetail | n
   };
 }
 
-export function searchHorses(
-  db: Database.Database,
-  query: string,
-  limit = 20
-): HorseDetail[] {
+export function searchHorses(db: Database.Database, query: string, limit = 20): HorseDetail[] {
   const trimmed = query.trim();
   if (!trimmed) return [];
 
-  const rows = db.prepare(`
+  const rows = db
+    .prepare(
+      `
     SELECT 
       h.*,
       p.name AS trainer_name
@@ -232,7 +234,9 @@ export function searchHorses(
     WHERE h.name LIKE ?
     ORDER BY h.earnings_total DESC, h.name ASC
     LIMIT ?
-  `).all(`%${trimmed}%`, limit) as DbHorseRow[];
+  `
+    )
+    .all(`%${trimmed}%`, limit) as DbHorseRow[];
 
   const currentYear = new Date().getFullYear();
 

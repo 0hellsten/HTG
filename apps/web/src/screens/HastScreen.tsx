@@ -48,12 +48,15 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
       } else {
         setStatus('failed');
         setStatusMessage(
-          json?.message || 'Den här hästens tidigare lopp går inte att hämta för tillfället. Resten stämmer.'
+          json?.message ||
+            'Den här hästens tidigare lopp går inte att hämta för tillfället. Resten stämmer.'
         );
       }
     } catch {
       setStatus('failed');
-      setStatusMessage('Den här hästens tidigare lopp går inte att hämta för tillfället. Resten stämmer.');
+      setStatusMessage(
+        'Den här hästens tidigare lopp går inte att hämta för tillfället. Resten stämmer.'
+      );
     } finally {
       setLoading(false);
     }
@@ -118,11 +121,11 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
         <div className="space-y-6">
           {/* Header information om hästen */}
           <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-md">
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              {horse.name}
-            </h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{horse.name}</h1>
             <p className="text-slate-300 text-sm sm:text-base mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
-              <span>{[horse.sex, horse.age ? `${horse.age} år` : ''].filter(Boolean).join(' · ')}</span>
+              <span>
+                {[horse.sex, horse.age ? `${horse.age} år` : ''].filter(Boolean).join(' · ')}
+              </span>
               {horse.trainerName && <span>Tränare: {horse.trainerName}</span>}
               {horse.homeTrack && <span>Bana: {horse.homeTrack}</span>}
             </p>
@@ -171,7 +174,11 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
                 className="w-full min-h-[48px] py-3 px-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold text-base shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
                 <span>{showAllStarts ? 'Dölj alla starter' : 'Visa alla starter'}</span>
-                {showAllStarts ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                {showAllStarts ? (
+                  <ChevronUp className="w-5 h-5" />
+                ) : (
+                  <ChevronDown className="w-5 h-5" />
+                )}
               </button>
 
               {showAllStarts && (
@@ -188,9 +195,7 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center max-w-lg mx-auto">
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">
-            Hästen saknas
-          </h2>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">Hästen saknas</h2>
           <p className="text-slate-600 text-base leading-relaxed">
             Den här hästen kunde inte hittas i databasen.
           </p>

@@ -10,7 +10,8 @@ interface LogContext {
 class Logger {
   private formatMessage(level: LogLevel, message: string, context?: LogContext): string {
     const timestamp = new Date().toISOString();
-    const ctxString = context && Object.keys(context).length > 0 ? ` ${JSON.stringify(context)}` : '';
+    const ctxString =
+      context && Object.keys(context).length > 0 ? ` ${JSON.stringify(context)}` : '';
     return `[${timestamp}] [${level.toUpperCase()}] ${message}${ctxString}`;
   }
 
@@ -29,9 +30,10 @@ class Logger {
   }
 
   error(message: string, error?: unknown, context?: LogContext): void {
-    const errorDetails = error instanceof Error 
-      ? { errorMessage: error.message, stack: error.stack, ...context } 
-      : { rawError: String(error), ...context };
+    const errorDetails =
+      error instanceof Error
+        ? { errorMessage: error.message, stack: error.stack, ...context }
+        : { rawError: String(error), ...context };
 
     process.stderr.write(this.formatMessage('error', message, errorDetails) + '\n');
   }

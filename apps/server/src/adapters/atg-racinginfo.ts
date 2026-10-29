@@ -9,7 +9,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Database from 'better-sqlite3';
-import { SourceAdapter, SourceResult, FetchContext, HorseProfileResponse } from '@stallbacken/shared';
+import {
+  SourceAdapter,
+  SourceResult,
+  FetchContext,
+  HorseProfileResponse,
+} from '@stallbacken/shared';
 import { fetchWithPolicy, FetchOptions } from '../collect/queue.js';
 import { HealthManager } from '../health/health-manager.js';
 import { logger } from '../lib/logger.js';
@@ -69,7 +74,14 @@ export class AtgRacingInfoAdapter implements SourceAdapter<unknown> {
     const nowIso = new Date().toISOString();
 
     if (!forceRefresh) {
-      const cached = getCachedCalendar(this.db, this.healthManager, this.id, this.ttlSeconds, date, nowIso);
+      const cached = getCachedCalendar(
+        this.db,
+        this.healthManager,
+        this.id,
+        this.ttlSeconds,
+        date,
+        nowIso
+      );
       if (cached) return cached;
     }
 
@@ -120,10 +132,7 @@ export class AtgRacingInfoAdapter implements SourceAdapter<unknown> {
     }
   }
 
-  async fetchRace(
-    raceId: string,
-    forceRefresh = false
-  ): Promise<SourceResult<RaceDetailData>> {
+  async fetchRace(raceId: string, forceRefresh = false): Promise<SourceResult<RaceDetailData>> {
     const nowIso = new Date().toISOString();
 
     if (!forceRefresh) {
@@ -224,7 +233,11 @@ export class AtgRacingInfoAdapter implements SourceAdapter<unknown> {
     }
   }
 
-  private handleDegraded(rawJson: unknown, date: string, nowIso: string): SourceResult<RacingDayData> {
+  private handleDegraded(
+    rawJson: unknown,
+    date: string,
+    nowIso: string
+  ): SourceResult<RacingDayData> {
     const detail = JSON.stringify(rawJson).slice(0, 2000);
     logger.warn('Valideringsfel för kalenderdata från ATG', { detail });
     this.healthManager.recordAttempt({
@@ -245,7 +258,11 @@ export class AtgRacingInfoAdapter implements SourceAdapter<unknown> {
     };
   }
 
-  private handleRaceDegraded(rawJson: unknown, raceId: string, nowIso: string): SourceResult<RaceDetailData> {
+  private handleRaceDegraded(
+    rawJson: unknown,
+    raceId: string,
+    nowIso: string
+  ): SourceResult<RaceDetailData> {
     const detail = JSON.stringify(rawJson).slice(0, 2000);
     logger.warn('Valideringsfel för loppdata från ATG', { detail });
     this.healthManager.recordAttempt({

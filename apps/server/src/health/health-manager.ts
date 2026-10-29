@@ -77,17 +77,7 @@ export class HealthManager {
           message, detail, consecutive_failures, paused_until
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
-      .run(
-        sourceId,
-        'ok',
-        now,
-        succeededAt,
-        0,
-        '',
-        'Kretsbrytare manuellt återställd',
-        0,
-        null
-      );
+      .run(sourceId, 'ok', now, succeededAt, 0, '', 'Kretsbrytare manuellt återställd', 0, null);
   }
 
   /**
@@ -119,11 +109,12 @@ export class HealthManager {
       pausedUntil = null;
     }
 
-    const ageSeconds = input.ageSeconds !== undefined
-      ? input.ageSeconds
-      : succeededAt
-      ? Math.max(0, Math.floor((Date.now() - new Date(succeededAt).getTime()) / 1000))
-      : 0;
+    const ageSeconds =
+      input.ageSeconds !== undefined
+        ? input.ageSeconds
+        : succeededAt
+          ? Math.max(0, Math.floor((Date.now() - new Date(succeededAt).getTime()) / 1000))
+          : 0;
 
     const message = input.message || (input.status === 'failed' ? 'Uppdateras inte just nu' : '');
 

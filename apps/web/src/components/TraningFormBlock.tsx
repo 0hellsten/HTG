@@ -63,10 +63,10 @@ export const TraningFormBlock: React.FC<TraningFormBlockProps> = ({
                         isWin
                           ? 'bg-amber-400 text-slate-950'
                           : isPodium
-                          ? 'bg-slate-200 text-slate-900'
-                          : isGallop
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-slate-100 text-slate-700'
+                            ? 'bg-slate-200 text-slate-900'
+                            : isGallop
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-slate-100 text-slate-700'
                       }`}
                     >
                       {s.place || '–'}
@@ -91,7 +91,8 @@ export const TraningFormBlock: React.FC<TraningFormBlockProps> = ({
               {trainingForm.trainerName || 'Tränare saknas'}
             </div>
             <div className="text-sm text-slate-600 mt-0.5">
-              {trainingForm.trainerWinPercent !== null && trainingForm.trainerWinPercent !== undefined
+              {trainingForm.trainerWinPercent !== null &&
+              trainingForm.trainerWinPercent !== undefined
                 ? `Segerprocent: ${formatPercent(trainingForm.trainerWinPercent)}`
                 : 'För få lopp för att säga något säkert'}
             </div>
@@ -129,16 +130,12 @@ export const TraningFormBlock: React.FC<TraningFormBlockProps> = ({
                   className="p-3 bg-amber-50/60 border border-amber-200/50 rounded-lg flex items-center justify-between text-sm"
                 >
                   <div>
-                    <span className="font-semibold text-slate-900">
-                      Kvallopp {q.trackName}
-                    </span>
+                    <span className="font-semibold text-slate-900">Kvallopp {q.trackName}</span>
                     <span className="text-slate-500 ml-2">
                       {formatDateShort(q.date)} ({q.startMethod})
                     </span>
                   </div>
-                  <div className="font-bold text-slate-900">
-                    {q.kmTime || 'Godkänd'}
-                  </div>
+                  <div className="font-bold text-slate-900">{q.kmTime || 'Godkänd'}</div>
                 </div>
               ))}
             </div>

@@ -22,6 +22,7 @@ Läggs i `docs/` i repot.
 Appen är klar när **varje** punkt nedan stämmer.
 
 ### Funktion
+
 - [ ] Dagens och kvällens banor syns på startsidan, favoritbanor överst
 - [ ] Ett lopp öppnas och visar hela startlistan med kusk, tränare, skor, sulky, rekord
 - [ ] Odds och streckprocent visas med tidsstämpel
@@ -34,6 +35,7 @@ Appen är klar när **varje** punkt nedan stämmer.
 - [ ] Sidan "Hur färskt är det här?" listar alla källor på svenska
 
 ### Tålighet — projektets viktigaste krav
+
 - [ ] Med **odds avstängt** fungerar hela resten av appen
 - [ ] Med **tips avstängt** fungerar hela resten av appen
 - [ ] Med **historik avstängt** fungerar hela resten av appen
@@ -46,6 +48,7 @@ Appen är klar när **varje** punkt nedan stämmer.
 - [ ] Ingen källa anropas parallellt mot samma domän
 
 ### Språk och UI
+
 - [ ] Inget tekniskt ord syns någonstans i gränssnittet
 - [ ] Ingen felkod, ingen stacktrace, inget engelskt felmeddelande
 - [ ] Varje källberoende block har en färskhetsprick med svensk förklaring och "Försök igen"
@@ -54,6 +57,7 @@ Appen är klar när **varje** punkt nedan stämmer.
 - [ ] Ingen text om insatser, inga vinstlöften, aldrig "säker" eller "garanterad"
 
 ### Mobil och laptop
+
 - [ ] Installerbar som app på Android, med egen ikon och startskärm
 - [ ] Öppnas utan webbläsarens adressfält när den är installerad
 - [ ] Fungerar i stående och liggande läge
@@ -62,6 +66,7 @@ Appen är klar när **varje** punkt nedan stämmer.
 - [ ] Textstorleksvalet påverkar hela appen
 
 ### Data
+
 - [ ] Inget värde i appen är påhittat — allt går att spåra till en källa och en tidpunkt
 - [ ] Statistik med tunt underlag märks med antal lopp
 - [ ] Ny hämtning skriver aldrig över bra data med sämre
@@ -71,11 +76,13 @@ Appen är klar när **varje** punkt nedan stämmer.
 ## Obligatoriska tester
 
 **Enhet (Vitest)**
+
 - Varje adapter: lyckat svar · trasigt svar · oväntat format · timeout
 - Hälsologiken: varje övergång mellan `ok`, `stale`, `degraded`, `failed` · circuit breaker
 - Formatering: tid · datum · kilometertid · pengar · odds · placeringskoder
 
 **Flöde (Playwright) — får aldrig tas bort**
+
 1. `degradering.spec.ts` — stäng av två källor, gå igenom hela appen, verifiera att allt annat
    fungerar och att rätt prickar och texter visas.
 2. `offline.spec.ts` — koppla bort nätet, verifiera att appen öppnas med sparad data och rätt remsa.
@@ -98,6 +105,7 @@ Rullande fil, 7 dagar. Varje hämtförsök loggas med källa, status, svarstid o
 Inga personuppgifter.
 
 **Att hålla ögonen på**
+
 - Källor som gått till `failed` och stannat där i mer än 24 timmar
 - Källor som ofta går till `degraded` — det betyder att formatet håller på att ändras
 - Databasfilens storlek
@@ -107,24 +115,29 @@ Inga personuppgifter.
 ## Felsökningsprompter
 
 **En källa har slutat fungera**
+
 > Källan `<id>` har stått på `failed` sedan igår. Undersök vad som hänt: svarar domänen,
 > har formatet ändrats, blockeras vi? Visa det faktiska svaret. Uppdatera zod-schemat och
 > normaliseringen om formatet ändrats, och lägg till ett testfall. Rör inget annat.
 > Är källan permanent borta: föreslå en ersättare ur källregistret och visa vad vi förlorar.
 
 **Något ser fel ut i appen**
+
 > På sidan `<vy>` ser `<sak>` fel ut. Ta en skärmbild, hitta orsaken och fixa **bara** det.
 > Ändra inget annat. Visa före- och efterbild.
 
 **En siffra ser konstig ut**
+
 > Värdet `<x>` på `<plats>` ser fel ut. Spåra det bakåt: vilken källa, vilken hämtning, vilket råsvar.
 > Visa kedjan. Är det källans fel ska vi visa det som saknat, inte som ett värde.
 
 **Appen känns långsam**
+
 > Mät var tiden går: databasfrågor, antal anrop, storlek på svaren, renderingstid.
 > Visa de fem värsta. Föreslå åtgärder i ordning efter effekt. Ändra inget än.
 
 **Pappa-testet — kör inför överlämning**
+
 > Gå igenom hela appen som om du vore min pappa: 72 år, kan trav utan och innan, kan ingenting om teknik.
 > Lista allt som skulle kunna förvirra honom, varje tekniskt ord som läckt ut, varje ställe som kräver
 > en förklaring han inte får. Fixa det. Visa listan före och efter.

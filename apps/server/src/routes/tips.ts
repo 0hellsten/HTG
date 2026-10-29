@@ -2,17 +2,9 @@
 // Stallbacken — HTG
 
 import { FastifyPluginAsync } from 'fastify';
-import {
-  ApiResponse,
-  TipsOverviewData,
-  RaceTipsData,
-} from '@stallbacken/shared';
+import { ApiResponse, TipsOverviewData, RaceTipsData } from '@stallbacken/shared';
 import { getDb } from '../db/connection.js';
-import {
-  getLatestTipArticles,
-  getTipsForRace,
-  getAllRaceTips,
-} from '../db/queries/tips.js';
+import { getLatestTipArticles, getTipsForRace, getAllRaceTips } from '../db/queries/tips.js';
 import { tipsExpressenAdapter } from '../adapters/tips-expressen.js';
 import { tipsTravrondenAdapter } from '../adapters/tips-travronden.js';
 import { logger } from '../lib/logger.js';
@@ -86,10 +78,7 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
         data: overviewData,
         status: overallStatus,
         fetchedAt: new Date().toISOString(),
-        message:
-          overallStatus === 'ok'
-            ? 'Alla tips är färska.'
-            : 'Delvis uppdaterat.',
+        message: overallStatus === 'ok' ? 'Alla tips är färska.' : 'Delvis uppdaterat.',
       };
 
       return reply.status(200).send(response);

@@ -30,19 +30,19 @@ Skriv som en lugn, kunnig vän på stallbacken. Inte som ett spelbolag. Inte som
 
 Använd travspråk i rubriker och etiketter, sparsamt och med precision. Det ska kännas hemtamt, inte tillgjort.
 
-| Plats i appen | Använd |
-|---|---|
-| Dagens översikt | "Dagens omgång", "Kvällens banor" |
-| Mest spelade i loppet | "Dagens spik" |
-| Lågt streckad med bra form | "Skrällkandidat" |
-| Hästens senaste starter | "Form i backspegeln" |
-| Spår och positionsstatistik | "Ryggar och lägen" |
-| Bansidan | "Banvisaren" |
-| Jämförvyn | "Ställ dem mot varandra" |
-| Favoriter | "Mitt stall" |
-| Tipsvyn | "Vad tycker stallbacken?" |
-| Tränarform | "Hur går det i träningen?" |
-| Statussidan | "Hur färskt är det här?" |
+| Plats i appen               | Använd                            |
+| --------------------------- | --------------------------------- |
+| Dagens översikt             | "Dagens omgång", "Kvällens banor" |
+| Mest spelade i loppet       | "Dagens spik"                     |
+| Lågt streckad med bra form  | "Skrällkandidat"                  |
+| Hästens senaste starter     | "Form i backspegeln"              |
+| Spår och positionsstatistik | "Ryggar och lägen"                |
+| Bansidan                    | "Banvisaren"                      |
+| Jämförvyn                   | "Ställ dem mot varandra"          |
+| Favoriter                   | "Mitt stall"                      |
+| Tipsvyn                     | "Vad tycker stallbacken?"         |
+| Tränarform                  | "Hur går det i träningen?"        |
+| Statussidan                 | "Hur färskt är det här?"          |
 
 Sporttermer i data skrivs rakt av, utan förklaring: volt, auto, galopp, diskad, struken, barfota fram/bak,
 amerikansk sulky, kilometertid, rekord, tillägg, streck, vinnarodds, plats, grundlopp, upplopp, dödens, rygg.
@@ -50,16 +50,16 @@ amerikansk sulky, kilometertid, rekord, tillägg, streck, vinnarodds, plats, gru
 
 ## Formatering
 
-| Sak | Format | Exempel |
-|---|---|---|
-| Tid | `HH:mm` | `14:35` |
-| Datum | `vd d mån` | `lör 8 nov` |
-| Kilometertid | `m.ss,t` + startsätt | `1.12,3a` |
-| Pengar | mellanslag som tusental | `1 245 300 kr` |
-| Odds | en decimal | `4,8` |
-| Streck | heltal + procent | `23 %` |
-| Placering | siffra, galopp `g`, diskad `d`, struken `str` | `2`, `g`, `d` |
-| Distans | meter med mellanslag | `2 140 m` |
+| Sak          | Format                                        | Exempel        |
+| ------------ | --------------------------------------------- | -------------- |
+| Tid          | `HH:mm`                                       | `14:35`        |
+| Datum        | `vd d mån`                                    | `lör 8 nov`    |
+| Kilometertid | `m.ss,t` + startsätt                          | `1.12,3a`      |
+| Pengar       | mellanslag som tusental                       | `1 245 300 kr` |
+| Odds         | en decimal                                    | `4,8`          |
+| Streck       | heltal + procent                              | `23 %`         |
+| Placering    | siffra, galopp `g`, diskad `d`, struken `str` | `2`, `g`, `d`  |
+| Distans      | meter med mellanslag                          | `2 140 m`      |
 
 Decimalkomma, inte punkt. Svenska veckodagsförkortningar.
 
@@ -74,6 +74,7 @@ Varje block som bygger på en hämtad källa har en liten prick i rubrikraden. D
 Vid tryck öppnas en liten rad under rubriken med **en mening på svenska** och en **"Försök igen"**-knapp.
 
 Exempel på meningar:
+
 - "Oddsen uppdateras inte just nu. Allt annat på sidan är färskt."
 - "Tipsen är från i morse. De brukar komma in på nytt vid lunch."
 - "Den här hästens tidigare lopp går inte att hämta för tillfället. Resten stämmer."

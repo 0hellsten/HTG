@@ -29,16 +29,16 @@ Tre krav som aldrig får brytas:
 
 ## Stack
 
-| Lager | Val |
-|---|---|
-| Frontend | React 18 + TypeScript + Vite, installerbar PWA |
-| Styling | Tailwind CSS |
-| State/data | TanStack Query |
-| Backend | Node 20 + TypeScript + Fastify |
-| Databas | SQLite via `better-sqlite3` |
-| Schemaläggning | Intern scheduler i backend |
-| Paketering | pnpm workspaces |
-| Tester | Vitest (enhet), Playwright (flöde) |
+| Lager          | Val                                            |
+| -------------- | ---------------------------------------------- |
+| Frontend       | React 18 + TypeScript + Vite, installerbar PWA |
+| Styling        | Tailwind CSS                                   |
+| State/data     | TanStack Query                                 |
+| Backend        | Node 20 + TypeScript + Fastify                 |
+| Databas        | SQLite via `better-sqlite3`                    |
+| Schemaläggning | Intern scheduler i backend                     |
+| Paketering     | pnpm workspaces                                |
+| Tester         | Vitest (enhet), Playwright (flöde)             |
 
 ## Mappstruktur
 
@@ -66,19 +66,19 @@ Varje datakälla är en adapter. Alla ser likadana ut utåt:
 type SourceStatus = 'ok' | 'stale' | 'degraded' | 'failed';
 
 interface SourceResult<T> {
-  sourceId: string;        // 'atg-racinginfo', 'svensk-travsport', ...
+  sourceId: string; // 'atg-racinginfo', 'svensk-travsport', ...
   status: SourceStatus;
-  data: T | null;          // null endast vid 'failed'
-  fetchedAt: string;       // ISO 8601
+  data: T | null; // null endast vid 'failed'
+  fetchedAt: string; // ISO 8601
   ageSeconds: number;
-  message: string;         // kort, svensk, begriplig för en icke-tekniker
-  detail?: string;         // teknisk orsak — loggas, visas aldrig i UI
+  message: string; // kort, svensk, begriplig för en icke-tekniker
+  detail?: string; // teknisk orsak — loggas, visas aldrig i UI
 }
 
 interface SourceAdapter<T> {
   id: string;
-  label: string;           // visningsnamn på svenska
-  ttlSeconds: number;      // hur länge data räknas som färskt
+  label: string; // visningsnamn på svenska
+  ttlSeconds: number; // hur länge data räknas som färskt
   staleAfterSeconds: number;
   fetch(ctx: FetchContext): Promise<SourceResult<T>>;
 }
@@ -94,13 +94,13 @@ Regler för adaptrar:
 
 ## Statuslogik i gränssnittet
 
-| Status | Prick | Text i UI |
-|---|---|---|
-| `ok` | ● grön | Inget visas — färskt är normalläget |
-| `stale` | ● gul | "Uppdaterat för X minuter sedan" |
-| `degraded` | ● gul | "Delvis uppdaterat" |
-| `failed` | ○ grå | "Uppdateras inte just nu" |
-| saknas helt | ○ grå | "Den här uppgiften saknas" |
+| Status      | Prick  | Text i UI                           |
+| ----------- | ------ | ----------------------------------- |
+| `ok`        | ● grön | Inget visas — färskt är normalläget |
+| `stale`     | ● gul  | "Uppdaterat för X minuter sedan"    |
+| `degraded`  | ● gul  | "Delvis uppdaterat"                 |
+| `failed`    | ○ grå  | "Uppdateras inte just nu"           |
+| saknas helt | ○ grå  | "Den här uppgiften saknas"          |
 
 Pricken sitter diskret i blockets rubrikrad. Vid tryck/klick öppnas en kort mening på svenska plus en
 **"Försök igen"**-knapp. Ingen modal, ingen varningsfärg, inget utropstecken. Det ska kännas som en

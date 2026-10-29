@@ -10,20 +10,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import Database from 'better-sqlite3';
-import {
-  SourceAdapter,
-  SourceResult,
-  FetchContext,
-  TrackWeather,
-} from '@stallbacken/shared';
+import { SourceAdapter, SourceResult, FetchContext, TrackWeather } from '@stallbacken/shared';
 import { fetchWithPolicy, FetchOptions } from '../collect/queue.js';
 import { HealthManager } from '../health/health-manager.js';
 import { logger } from '../lib/logger.js';
 import { getDb } from '../db/connection.js';
-import {
-  saveWeatherObservation,
-  getLatestWeatherForTrack,
-} from '../db/queries/weather.js';
+import { saveWeatherObservation, getLatestWeatherForTrack } from '../db/queries/weather.js';
 import { getTrackProfile } from '../db/queries/track-stats.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -177,13 +169,10 @@ export class SmhiWeatherAdapter implements SourceAdapter<TrackWeather | null> {
     const url = `${this.baseUrl}/geotype/point/lon/${lon.toFixed(3)}/lat/${lat.toFixed(3)}/data.json`;
 
     try {
-      const response = await fetchWithPolicy(
-        url,
-        {
-          headers: { Accept: 'application/json' },
-          ...this.fetchOptions,
-        }
-      );
+      const response = await fetchWithPolicy(url, {
+        headers: { Accept: 'application/json' },
+        ...this.fetchOptions,
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);

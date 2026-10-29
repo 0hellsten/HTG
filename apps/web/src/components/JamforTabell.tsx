@@ -44,9 +44,7 @@ export const JamforTabell: React.FC<JamforTabellProps> = ({
   const canRemove = starts.length > 2;
 
   // 1. Form senaste 5
-  const formScores = starts.map((s) =>
-    calculateFormScore(profiles[s.horseId]?.pastStarts)
-  );
+  const formScores = starts.map((s) => calculateFormScore(profiles[s.horseId]?.pastStarts));
   const bestForm = getBestIndices(formScores, 'high');
 
   // 2. Bästa km-tid (lägst i sekunder är bäst)
@@ -82,15 +80,11 @@ export const JamforTabell: React.FC<JamforTabellProps> = ({
   const bestTrackIndices = getBestIndices(trackPercents, 'high');
 
   // 5. Intjänat per start
-  const earningsPerStart = starts.map(
-    (s) => profiles[s.horseId]?.horse?.earningsPerStart || null
-  );
+  const earningsPerStart = starts.map((s) => profiles[s.horseId]?.horse?.earningsPerStart || null);
   const bestEarningsIndices = getBestIndices(earningsPerStart, 'high');
 
   // 6. Segerprocent
-  const winPercents = starts.map(
-    (s) => profiles[s.horseId]?.horse?.winPercentage || null
-  );
+  const winPercents = starts.map((s) => profiles[s.horseId]?.horse?.winPercentage || null);
   const bestWinIndices = getBestIndices(winPercents, 'high');
 
   // 8. Kuskens form
@@ -116,9 +110,7 @@ export const JamforTabell: React.FC<JamforTabellProps> = ({
       sublabel: 'Placering i lopp',
       bestIndices: bestForm,
       render: (_s, prof) => (
-        <span className="font-semibold tracking-wide">
-          {formatFormRecent(prof?.pastStarts)}
-        </span>
+        <span className="font-semibold tracking-wide">{formatFormRecent(prof?.pastStarts)}</span>
       ),
     },
     {
@@ -225,9 +217,7 @@ export const JamforTabell: React.FC<JamforTabellProps> = ({
               shoesBack={s.shoesBack}
               shoesChanged={s.shoesChanged}
             />
-            <span className="text-xs text-slate-600 block">
-              {desc.text}
-            </span>
+            <span className="text-xs text-slate-600 block">{desc.text}</span>
           </div>
         );
       },
@@ -333,9 +323,7 @@ export const JamforTabell: React.FC<JamforTabellProps> = ({
                     {row.label}
                   </div>
                   {row.sublabel && (
-                    <div className="text-xs text-slate-500 font-normal mt-0.5">
-                      {row.sublabel}
-                    </div>
+                    <div className="text-xs text-slate-500 font-normal mt-0.5">{row.sublabel}</div>
                   )}
                 </th>
 

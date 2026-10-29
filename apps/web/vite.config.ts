@@ -11,7 +11,8 @@ export default defineConfig({
       manifest: {
         name: 'HTG — Hellstens Trav och Galopp',
         short_name: 'HTG',
-        description: 'Hellstens Trav och Galopp — En lugn travapp med dagens omgång, startlistor och tips.',
+        description:
+          'Hellstens Trav och Galopp — En lugn travapp med dagens omgång, startlistor och tips.',
         theme_color: '#1e293b',
         background_color: '#f8fafc',
         display: 'standalone',
@@ -33,6 +34,25 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable',
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'stallbacken-api-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24, // 24 timmar
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
           },
         ],
       },

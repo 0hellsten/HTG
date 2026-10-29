@@ -47,8 +47,8 @@ export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({
           {isOddsFailed
             ? 'Oddsen uppdateras inte just nu'
             : oddsTimestamp
-            ? `Odds från ${oddsTimestamp}`
-            : 'Vinnarodds och streckprocent'}
+              ? `Odds från ${oddsTimestamp}`
+              : 'Vinnarodds och streckprocent'}
         </span>
         <span className="hidden sm:inline">
           {starts.filter((s) => !s.scratched).length} startande hästar

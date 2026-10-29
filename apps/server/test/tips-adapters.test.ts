@@ -48,7 +48,9 @@ describe('Tip-adaptrar (Fas 8)', () => {
     expect(result.data?.[0].provider).toContain('Tips från Expressen');
 
     // Kontrollera databasen
-    const articles = db.prepare('SELECT * FROM tip_articles WHERE source_id = ?').all('tips-expressen');
+    const articles = db
+      .prepare('SELECT * FROM tip_articles WHERE source_id = ?')
+      .all('tips-expressen');
     expect(articles.length).toBeGreaterThan(0);
   });
 

@@ -12,6 +12,7 @@ import {
 } from '../lib/favoriter';
 import { formatSwedishDate, isEvening } from '../lib/date';
 import { formatDistance, formatStartMethod } from '../lib/format';
+import { saveLastSyncTime } from '../components/OfflineRemsa';
 
 interface IdagScreenProps {
   onOpenRace: (raceId: string, siblingRaces: Race[]) => void;
@@ -34,6 +35,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace, onOpenTrack 
         setRaceDays(json.data);
         setStatus(json.status);
         setStatusMessage(json.message);
+        saveLastSyncTime(json.fetchedAt ? new Date(json.fetchedAt) : new Date());
       } else {
         setStatus('failed');
         setStatusMessage('Uppgifterna uppdateras inte just nu.');
@@ -68,16 +70,10 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace, onOpenTrack 
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
             {heading}
           </h1>
-          <p className="text-base text-slate-600 mt-0.5 capitalize">
-            {todayFormatted}
-          </p>
+          <p className="text-base text-slate-600 mt-0.5 capitalize">{todayFormatted}</p>
         </div>
         <div className="pt-1">
-          <FarskhetsPrick
-            status={status}
-            explanation={statusMessage}
-            onRetry={fetchIdag}
-          />
+          <FarskhetsPrick status={status} explanation={statusMessage} onRetry={fetchIdag} />
         </div>
       </div>
 
@@ -88,9 +84,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace, onOpenTrack 
       {!loading && sortedRaceDays.length === 0 && (
         <div className="bg-white rounded-xl border border-slate-200 p-8 sm:p-12 text-center space-y-3">
           <Calendar className="w-12 h-12 text-slate-400 mx-auto" />
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
-            Inga lopp idag
-          </h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Inga lopp idag</h2>
           <p className="text-slate-600 text-base sm:text-lg max-w-md mx-auto leading-relaxed">
             Inga lopp idag. Nästa omgång visas här så snart anmälningslistorna är klara.
           </p>
@@ -159,9 +153,7 @@ const BanaKort: React.FC<BanaKortProps> = ({
       <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-950">
-              {day.trackName}
-            </h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-950">{day.trackName}</h2>
             {isFavorite && (
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-semibold">
                 <HastsKoIkon className="w-3.5 h-3.5" filled />
@@ -175,13 +167,18 @@ const BanaKort: React.FC<BanaKortProps> = ({
             )}
           </div>
           <p className="text-sm sm:text-base text-slate-600 mt-1 flex items-center gap-2 flex-wrap">
-            <span>Första start kl. {day.firstStart || '–'} · {day.racesCount} lopp</span>
+            <span>
+              Första start kl. {day.firstStart || '–'} · {day.racesCount} lopp
+            </span>
             {weather && (
               <>
                 <span>·</span>
                 <span className="inline-flex items-center gap-1 text-slate-700 font-medium">
                   <CloudSun className="w-4 h-4 text-amber-600" />
-                  <span>{weather.tempC > 0 ? `+${weather.tempC}` : weather.tempC} °C, {weather.description}</span>
+                  <span>
+                    {weather.tempC > 0 ? `+${weather.tempC}` : weather.tempC} °C,{' '}
+                    {weather.description}
+                  </span>
                 </span>
               </>
             )}
@@ -214,11 +211,7 @@ const BanaKort: React.FC<BanaKortProps> = ({
               ? `Ta bort ${day.trackName} från dina favoriter`
               : `Lägg till ${day.trackName} som favoritbana`
           }
-          title={
-            isFavorite
-              ? 'Ta bort från dina favoriter'
-              : 'Lägg till som favoritbana'
-          }
+          title={isFavorite ? 'Ta bort från dina favoriter' : 'Lägg till som favoritbana'}
         >
           <HastsKoIkon className="w-5 h-5" filled={isFavorite} />
         </button>

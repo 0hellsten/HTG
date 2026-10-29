@@ -10,12 +10,15 @@ import { z } from 'zod';
 
 type AtgKmTime = z.infer<typeof AtgKmTimeSchema>;
 
-export function formatAtgKmTime(kmTime?: AtgKmTime | null, startMethod?: string): string | undefined {
+export function formatAtgKmTime(
+  kmTime?: AtgKmTime | null,
+  startMethod?: string
+): string | undefined {
   if (!kmTime || kmTime.seconds === undefined) return undefined;
   const mins = kmTime.minutes ?? 1;
   const secs = String(kmTime.seconds).padStart(2, '0');
   const tenths = kmTime.tenths ?? 0;
-  const suffix = (startMethod === 'auto' || startMethod === 'a') ? 'a' : '';
+  const suffix = startMethod === 'auto' || startMethod === 'a' ? 'a' : '';
   return `${mins}.${secs},${tenths}${suffix}`;
 }
 
@@ -39,7 +42,10 @@ export function saveHorseProfileToDb(
       const formatted = formatAtgKmTime(rec.time, rec.startMethod);
       if (rec.startMethod === 'auto' && (!recordAuto || (formatted && formatted < recordAuto))) {
         recordAuto = formatted;
-      } else if (rec.startMethod !== 'auto' && (!recordVolt || (formatted && formatted < recordVolt))) {
+      } else if (
+        rec.startMethod !== 'auto' &&
+        (!recordVolt || (formatted && formatted < recordVolt))
+      ) {
         recordVolt = formatted;
       }
     }
@@ -47,7 +53,8 @@ export function saveHorseProfileToDb(
 
   // Tränare
   if (profile.trainer?.id) {
-    const trainerName = profile.trainer.name ||
+    const trainerName =
+      profile.trainer.name ||
       [profile.trainer.firstName, profile.trainer.lastName].filter(Boolean).join(' ') ||
       'Tränare';
     upsertPerson(db, {
@@ -64,7 +71,11 @@ export function saveHorseProfileToDb(
   const starts = life?.starts ?? 0;
   const winPercent = life?.winPercentage ? Math.round(life.winPercentage / 100) : 0;
   const placePercent = life?.placePercentage ? Math.round(life.placePercentage / 100) : 0;
-  const earningsPerStart = life?.earningsPerStart ? Math.round(life.earningsPerStart / 100) : (starts > 0 ? Math.round(earningsTotal / starts) : 0);
+  const earningsPerStart = life?.earningsPerStart
+    ? Math.round(life.earningsPerStart / 100)
+    : starts > 0
+      ? Math.round(earningsTotal / starts)
+      : 0;
 
   const currentYear = new Date().getFullYear();
   const birthYear = profile.age ? currentYear - profile.age : undefined;
@@ -110,7 +121,7 @@ export function saveHorseResultsToDb(
   for (const rec of resultsData.records) {
     const raceType = rec.race?.type === 'qualifier' ? 'qualifier' : 'regular';
     const rawStartMethod = rec.race?.startMethod;
-    const startMethod = (rawStartMethod === 'volte' || rawStartMethod === 'volt') ? 'volt' : 'auto';
+    const startMethod = rawStartMethod === 'volte' || rawStartMethod === 'volt' ? 'volt' : 'auto';
     const raceNumber = rec.race?.number ?? 1;
     const id = `${horseId}_${rec.date}_${raceNumber}`;
 

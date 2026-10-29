@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Award, ExternalLink, RefreshCw } from 'lucide-react';
-import {
-  ApiResponse,
-  TipsOverviewData,
-  SourceStatus,
-} from '@stallbacken/shared';
+import { ApiResponse, TipsOverviewData, SourceStatus } from '@stallbacken/shared';
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
 import { IdagSkelett } from '../components/SkelettKort';
@@ -60,16 +56,10 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
               Vad tycker stallbacken?
             </h1>
           </div>
-          <p className="text-base text-slate-600">
-            Samlade tips och analyser från flera experter.
-          </p>
+          <p className="text-base text-slate-600">Samlade tips och analyser från flera experter.</p>
         </div>
         <div className="pt-1">
-          <FarskhetsPrick
-            status={status}
-            explanation={statusMessage}
-            onRetry={fetchTips}
-          />
+          <FarskhetsPrick status={status} explanation={statusMessage} onRetry={fetchTips} />
         </div>
       </div>
 
@@ -94,11 +84,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
                   </span>
                 </div>
                 <div className="shrink-0">
-                  <FarskhetsPrick
-                    status={p.status}
-                    explanation={p.message}
-                    onRetry={fetchTips}
-                  />
+                  <FarskhetsPrick status={p.status} explanation={p.message} onRetry={fetchTips} />
                 </div>
               </div>
             ))}
@@ -152,7 +138,8 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
             Inga tips har kommit in än
           </h2>
           <p className="text-slate-600 text-base sm:text-lg max-w-md mx-auto leading-relaxed">
-            Tipsen brukar komma in under förmiddagen på tävlingsdagen. Tryck på knappen nedan för att kontrollera på nytt.
+            Tipsen brukar komma in under förmiddagen på tävlingsdagen. Tryck på knappen nedan för
+            att kontrollera på nytt.
           </p>
           <div className="pt-2">
             <button
@@ -175,9 +162,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
               <h2 id="ranking-rubrik" className="text-xl font-bold text-slate-950">
                 Lopprankingar & drag
               </h2>
-              <span className="text-sm font-medium text-slate-500">
-                {raceTips.length} tips
-              </span>
+              <span className="text-sm font-medium text-slate-500">{raceTips.length} tips</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -193,9 +178,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
                           {tip.trackName}
                         </span>
                       )}
-                      <h3 className="text-lg font-bold text-slate-950">
-                        {tip.title}
-                      </h3>
+                      <h3 className="text-lg font-bold text-slate-950">{tip.title}</h3>
                     </div>
                     {typeof tip.rank === 'number' && (
                       <span className="px-2.5 py-1 bg-amber-100 text-amber-950 rounded-md text-sm font-extrabold shrink-0">
@@ -205,15 +188,11 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
                   </div>
 
                   {tip.summary && (
-                    <p className="text-slate-700 text-base leading-relaxed">
-                      {tip.summary}
-                    </p>
+                    <p className="text-slate-700 text-base leading-relaxed">{tip.summary}</p>
                   )}
 
                   <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 pt-1">
-                    <span className="font-semibold text-slate-700">
-                      {tip.provider}
-                    </span>
+                    <span className="font-semibold text-slate-700">{tip.provider}</span>
                     {tip.raceId && onOpenRace && (
                       <button
                         type="button"
@@ -239,9 +218,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
               <h2 id="artiklar-rubrik" className="text-xl font-bold text-slate-950">
                 Experternas analyser och rapporter
               </h2>
-              <span className="text-sm font-medium text-slate-500">
-                {articles.length} artiklar
-              </span>
+              <span className="text-sm font-medium text-slate-500">{articles.length} artiklar</span>
             </div>
 
             <div className="space-y-3">
@@ -260,15 +237,11 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
                   </div>
 
                   {art.summary && (
-                    <p className="text-slate-700 text-base leading-relaxed">
-                      {art.summary}
-                    </p>
+                    <p className="text-slate-700 text-base leading-relaxed">{art.summary}</p>
                   )}
 
                   <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 pt-2 border-t border-slate-100">
-                    <span>
-                      Publicerat {art.publishedAt.slice(0, 16).replace('T', ' ')}
-                    </span>
+                    <span>Publicerat {art.publishedAt.slice(0, 16).replace('T', ' ')}</span>
                     {art.url && (
                       <a
                         href={art.url}
@@ -290,12 +263,11 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
 
       {/* Upplysningsruta längst ner */}
       <div className="bg-slate-100 rounded-xl p-5 text-slate-700 text-sm sm:text-base leading-relaxed border border-slate-200">
-        <p className="font-semibold text-slate-900 mb-1">
-          Om tipsen på stallbacken
-        </p>
+        <p className="font-semibold text-slate-900 mb-1">Om tipsen på stallbacken</p>
         <p>
           Appen samlar in tips från oberoende källor för att ge en samlad bild av förutsättningarna.
-          Alla tips anges med sin ursprungliga avsändare. Stallbacken garanterar inga resultat och rekommenderar aldrig insatsstorlekar.
+          Alla tips anges med sin ursprungliga avsändare. Stallbacken garanterar inga resultat och
+          rekommenderar aldrig insatsstorlekar.
         </p>
       </div>
     </div>

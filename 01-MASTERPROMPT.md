@@ -35,7 +35,7 @@ Det här är inte ett undantagsfall. **Det är arkitekturen.** Bygg efter den pr
 - Varje datakälla är en **adapter** bakom ett gemensamt kontrakt. Adaptrar är utbytbara, isolerade och får aldrig kunna krascha appen.
 - Varje adapter rapporterar sin **hälsa**: `ok`, `stale`, `degraded` eller `failed`, med tidsstämpel och ett begripligt svenskt meddelande.
 - **Appen ska alltid vara användbar med det den har.** Om oddsen inte går att hämta ska startlistan, formen, statistiken och tipsen fungera precis som vanligt.
-- Varje block i gränssnittet som bygger på en källa visar en **liten diskret färskhetsprick**. Grön = färskt. Gul = lite gammalt, med ålder. Grå = uppdateras inte just nu. Trycker man på pricken får man en mening på vanlig svenska: *"Oddsen uppdateras inte just nu. Allt annat på sidan är färskt."*
+- Varje block i gränssnittet som bygger på en källa visar en **liten diskret färskhetsprick**. Grön = färskt. Gul = lite gammalt, med ålder. Grå = uppdateras inte just nu. Trycker man på pricken får man en mening på vanlig svenska: _"Oddsen uppdateras inte just nu. Allt annat på sidan är färskt."_
 - Aldrig en tom skärm. Aldrig en felkod. Aldrig en stacktrace. Aldrig ordet "API" eller "fetch" i gränssnittet.
 - Senast hämtade data sparas lokalt och visas när nätet är borta, märkt med när det hämtades.
 

@@ -78,7 +78,9 @@ describe('Databas och migrationer (Fas 2)', () => {
 
     expect(result.changes).toBe(1);
 
-    const row = db.prepare('SELECT * FROM source_health WHERE id = ?').get(result.lastInsertRowid) as {
+    const row = db
+      .prepare('SELECT * FROM source_health WHERE id = ?')
+      .get(result.lastInsertRowid) as {
       source_id: string;
       status: string;
       created_at: string;

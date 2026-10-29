@@ -23,27 +23,27 @@ Reglerna står i `.agents/rules/10-datakallor-och-etik.md` och de går före all
 
 ### Kandidatkällor — agenten verifierar var och en i Fas 0
 
-| id | Domän | Status | Täcker | Anmärkning |
-|---|---|---|---|---|
-| `atg-racinginfo` | `atg.se` | Inofficiell JSON-tjänst som driver atg.se | Kalender, banor, lopp, startlistor, hästar, resultat, spelformer | Utan autentisering men odokumenterad. ID-format: lopp `YYYY-MM-DD_{banId}_{loppNr}`, spel `{spelform}_YYYY-MM-DD_{banId}_{loppNr}`. Loppstatus observerade: `upcoming`, `bettable`, `results`. Arkivet sträcker sig flera år bakåt. Dagsgranularitet — månadsuppslag finns inte. |
-| `atg-odds` | `atg.se` | Samma tjänst, egen adapter | Vinnarodds, streckprocent, spelfördelning | **Egen adapter med egen status** även om domänen är densamma — odds har helt annan uppdateringstakt och ska kunna falla ensamt. |
-| `svensk-travsport` | `travsport.se` / `sportapp.travsport.se` | Officiell sajt, inget stött API | Hästsök, sportdata, licenser, lopp utan spel, avelsdata | Hästsök finns på `sportapp.travsport.se/sportinfo/horse`. Behandlas som **sekundär** källa och komplement där atg-källan har luckor. Extra försiktig hämttakt. |
-| `tips-*` | Flera | Publika tipssidor och RSS | Experttips, rankingar | En adapter per tipsgivare, alla **valfria**. Avsändaren visas alltid i appen. Faller en, visas de andra. |
-| `smhi` | `opendata.smhi.se` | Officiellt öppet API | Väder vid banan | Dokumenterat och öppet. Den enda helt bekymmersfria källan i registret. Bra att börja med i Fas 3 om de andra krånglar. |
-| `fake-source` | — | Intern testadapter | Inget | Går att tvinga till valfri status. Används för att testa degradering. **Tas aldrig bort.** |
+| id                 | Domän                                    | Status                                    | Täcker                                                           | Anmärkning                                                                                                                                                                                                                                                                       |
+| ------------------ | ---------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `atg-racinginfo`   | `atg.se`                                 | Inofficiell JSON-tjänst som driver atg.se | Kalender, banor, lopp, startlistor, hästar, resultat, spelformer | Utan autentisering men odokumenterad. ID-format: lopp `YYYY-MM-DD_{banId}_{loppNr}`, spel `{spelform}_YYYY-MM-DD_{banId}_{loppNr}`. Loppstatus observerade: `upcoming`, `bettable`, `results`. Arkivet sträcker sig flera år bakåt. Dagsgranularitet — månadsuppslag finns inte. |
+| `atg-odds`         | `atg.se`                                 | Samma tjänst, egen adapter                | Vinnarodds, streckprocent, spelfördelning                        | **Egen adapter med egen status** även om domänen är densamma — odds har helt annan uppdateringstakt och ska kunna falla ensamt.                                                                                                                                                  |
+| `svensk-travsport` | `travsport.se` / `sportapp.travsport.se` | Officiell sajt, inget stött API           | Hästsök, sportdata, licenser, lopp utan spel, avelsdata          | Hästsök finns på `sportapp.travsport.se/sportinfo/horse`. Behandlas som **sekundär** källa och komplement där atg-källan har luckor. Extra försiktig hämttakt.                                                                                                                   |
+| `tips-*`           | Flera                                    | Publika tipssidor och RSS                 | Experttips, rankingar                                            | En adapter per tipsgivare, alla **valfria**. Avsändaren visas alltid i appen. Faller en, visas de andra.                                                                                                                                                                         |
+| `smhi`             | `opendata.smhi.se`                       | Officiellt öppet API                      | Väder vid banan                                                  | Dokumenterat och öppet. Den enda helt bekymmersfria källan i registret. Bra att börja med i Fas 3 om de andra krånglar.                                                                                                                                                          |
+| `fake-source`      | —                                        | Intern testadapter                        | Inget                                                            | Går att tvinga till valfri status. Används för att testa degradering. **Tas aldrig bort.**                                                                                                                                                                                       |
 
 ### Källprioritering per datatyp
 
-| Datatyp | Primär | Sekundär | Faller allt |
-|---|---|---|---|
-| Dagens banor och lopp | `atg-racinginfo` | `svensk-travsport` | Visa senast sparade, grå prick |
-| Startlistor | `atg-racinginfo` | `svensk-travsport` | Visa senast sparade |
-| Odds och streck | `atg-odds` | — | Kolumn visar `–`, grå prick, resten intakt |
-| Hästens tidigare lopp | `atg-racinginfo` | `svensk-travsport` | Visa det vi redan sparat |
-| Tränar- och kuskform | Beräknas ur egen historik | — | Visa "Bygger på för få lopp" |
-| Banstatistik | Beräknas ur egen historik | — | Visa antal lopp statistiken bygger på |
-| Tips | `tips-*` var för sig | — | Visa de som svarar |
-| Väder | `smhi` | — | Dölj väderraden |
+| Datatyp               | Primär                    | Sekundär           | Faller allt                                |
+| --------------------- | ------------------------- | ------------------ | ------------------------------------------ |
+| Dagens banor och lopp | `atg-racinginfo`          | `svensk-travsport` | Visa senast sparade, grå prick             |
+| Startlistor           | `atg-racinginfo`          | `svensk-travsport` | Visa senast sparade                        |
+| Odds och streck       | `atg-odds`                | —                  | Kolumn visar `–`, grå prick, resten intakt |
+| Hästens tidigare lopp | `atg-racinginfo`          | `svensk-travsport` | Visa det vi redan sparat                   |
+| Tränar- och kuskform  | Beräknas ur egen historik | —                  | Visa "Bygger på för få lopp"               |
+| Banstatistik          | Beräknas ur egen historik | —                  | Visa antal lopp statistiken bygger på      |
+| Tips                  | `tips-*` var för sig      | —                  | Visa de som svarar                         |
+| Väder                 | `smhi`                    | —                  | Dölj väderraden                            |
 
 **Viktigt:** statistik som räknas ur vår egen sparade historik blir bättre ju längre appen varit igång.
 Visa alltid hur många lopp en siffra bygger på. En procent från 12 lopp ska inte se ut som en sanning.

@@ -124,4 +124,3 @@ describe('Lopp API-rutter', () => {
     expect(body.message).toBe('Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.');
   });
 });
-

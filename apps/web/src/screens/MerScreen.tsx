@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Compass,
-  Activity,
-  HelpCircle,
-  Type,
-  ChevronRight,
-  ShieldCheck,
-} from 'lucide-react';
+import { Compass, Activity, HelpCircle, Type, ChevronRight, ShieldCheck } from 'lucide-react';
 
 interface MerScreenProps {
   onSelectOption: (option: 'banvisaren' | 'status' | 'hjalp' | 'textstorlek') => void;
@@ -44,12 +37,8 @@ export const MerScreen: React.FC<MerScreenProps> = ({ onSelectOption }) => {
   return (
     <div className="space-y-6 max-w-3xl mx-auto pb-16">
       <div className="border-b border-slate-200 pb-4">
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">
-          Mer
-        </h1>
-        <p className="text-base text-slate-600 mt-0.5">
-          Verktyg, statistik och inställningar.
-        </p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">Mer</h1>
+        <p className="text-base text-slate-600 mt-0.5">Verktyg, statistik och inställningar.</p>
       </div>
 
       <div className="space-y-3">
@@ -65,9 +54,7 @@ export const MerScreen: React.FC<MerScreenProps> = ({ onSelectOption }) => {
               <div className="flex items-start gap-4">
                 <div
                   className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                    opt.highlight
-                      ? 'bg-amber-100 text-amber-900'
-                      : 'bg-slate-100 text-slate-700'
+                    opt.highlight ? 'bg-amber-100 text-amber-900' : 'bg-slate-100 text-slate-700'
                   }`}
                 >
                   <Icon className="w-6 h-6" />

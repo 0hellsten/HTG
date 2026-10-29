@@ -88,9 +88,7 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
 
       {/* Resultatlista */}
       {loading ? (
-        <div className="py-8 text-center text-slate-500 text-base">
-          Söker...
-        </div>
+        <div className="py-8 text-center text-slate-500 text-base">Söker...</div>
       ) : results.length > 0 ? (
         <div className="space-y-3">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block px-1">
@@ -105,11 +103,11 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
                 className="w-full text-left p-4 sm:p-5 hover:bg-slate-50 transition-colors flex items-center justify-between gap-4 cursor-pointer focus:outline-none focus:bg-slate-50"
               >
                 <div className="space-y-1">
-                  <div className="text-lg font-bold text-slate-900">
-                    {horse.name}
-                  </div>
+                  <div className="text-lg font-bold text-slate-900">{horse.name}</div>
                   <div className="text-sm text-slate-600 flex flex-wrap gap-x-2.5">
-                    <span>{[horse.sex, horse.age ? `${horse.age} år` : ''].filter(Boolean).join(' · ')}</span>
+                    <span>
+                      {[horse.sex, horse.age ? `${horse.age} år` : ''].filter(Boolean).join(' · ')}
+                    </span>
                     {horse.trainerName && <span>Tränare: {horse.trainerName}</span>}
                   </div>
                   {horse.earningsTotal > 0 && (

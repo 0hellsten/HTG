@@ -31,15 +31,7 @@ export function saveWeatherObservation(db: Database.Database, w: DbWeatherInput)
       updated_at = datetime('now')
   `);
 
-  stmt.run(
-    w.trackId,
-    w.observedAt,
-    w.tempC,
-    w.windMs,
-    w.precipMm,
-    w.description,
-    w.sourceId
-  );
+  stmt.run(w.trackId, w.observedAt, w.tempC, w.windMs, w.precipMm, w.description, w.sourceId);
 }
 
 /**
@@ -61,7 +53,8 @@ export function getLatestWeatherForTrack(
   }
 
   const row = db
-    .prepare(`
+    .prepare(
+      `
       SELECT 
         w.track_id,
         t.name as track_name,
@@ -76,7 +69,8 @@ export function getLatestWeatherForTrack(
       WHERE w.track_id = ?
       ORDER BY w.observed_at DESC
       LIMIT 1
-    `)
+    `
+    )
     .get(trackId) as WeatherRow | undefined;
 
   if (!row) return null;

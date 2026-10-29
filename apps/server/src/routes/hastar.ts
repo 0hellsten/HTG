@@ -30,7 +30,10 @@ export const hastarRoutes = async (fastify: FastifyInstance): Promise<void> => {
         data: results,
         status: 'ok',
         fetchedAt: new Date().toISOString(),
-        message: results.length > 0 ? `${results.length} hästar hittades` : 'Hittade ingen häst med det namnet. Prova med en del av namnet.',
+        message:
+          results.length > 0
+            ? `${results.length} hästar hittades`
+            : 'Hittade ingen häst med det namnet. Prova med en del av namnet.',
       };
 
       return reply.status(200).send(response);
@@ -62,7 +65,8 @@ export const hastarRoutes = async (fastify: FastifyInstance): Promise<void> => {
           data: null,
           status: 'failed',
           fetchedAt: new Date().toISOString(),
-          message: 'Den här hästens tidigare lopp går inte att hämta för tillfället. Resten stämmer.',
+          message:
+            'Den här hästens tidigare lopp går inte att hämta för tillfället. Resten stämmer.',
         };
         return reply.status(200).send(response);
       }
@@ -110,8 +114,7 @@ export const hastarRoutes = async (fastify: FastifyInstance): Promise<void> => {
           data: failedMap,
           status: 'failed',
           fetchedAt: new Date().toISOString(),
-          message:
-            'Tidigare lopp och historik går inte att hämta för tillfället. Resten stämmer.',
+          message: 'Tidigare lopp och historik går inte att hämta för tillfället. Resten stämmer.',
         };
         return reply.status(200).send(response);
       }

@@ -31,7 +31,9 @@ describe('API-rutt /api/kallor och degradering (Fas 2)', () => {
     expect(body.status).toBe('ok');
     expect(Array.isArray(body.data)).toBe(true);
 
-    const fakeSourceHealth = body.data.find((s: { sourceId: string }) => s.sourceId === 'fake-source');
+    const fakeSourceHealth = body.data.find(
+      (s: { sourceId: string }) => s.sourceId === 'fake-source'
+    );
     expect(fakeSourceHealth).toBeDefined();
     expect(fakeSourceHealth.label).toBe('Testkälla');
   });

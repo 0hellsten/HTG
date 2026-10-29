@@ -2,12 +2,7 @@
 // Stallbacken — HTG
 
 import Database from 'better-sqlite3';
-import {
-  TrackProfile,
-  TrackStats,
-  PostPositionStat,
-  CommonWinningTime,
-} from '@stallbacken/shared';
+import { TrackProfile, TrackStats, PostPositionStat, CommonWinningTime } from '@stallbacken/shared';
 
 interface TrackRow {
   id: string;
@@ -27,9 +22,7 @@ interface TrackRow {
  * Hämtar fullständig banprofil för en given bana.
  */
 export function getTrackProfile(db: Database.Database, trackId: string): TrackProfile | null {
-  const row = db
-    .prepare('SELECT * FROM tracks WHERE id = ?')
-    .get(trackId) as TrackRow | undefined;
+  const row = db.prepare('SELECT * FROM tracks WHERE id = ?').get(trackId) as TrackRow | undefined;
 
   if (!row) return null;
 
@@ -52,9 +45,7 @@ export function getTrackProfile(db: Database.Database, trackId: string): TrackPr
  * Hämtar samtliga banor i systemet sorterade alfabetiskt.
  */
 export function getAllTrackProfiles(db: Database.Database): TrackProfile[] {
-  const rows = db
-    .prepare('SELECT * FROM tracks ORDER BY name ASC')
-    .all() as TrackRow[];
+  const rows = db.prepare('SELECT * FROM tracks ORDER BY name ASC').all() as TrackRow[];
 
   return rows.map((row) => ({
     id: row.id,
@@ -91,7 +82,8 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
   // Räkna antal lopp och starter för denna bana ur horse_results och starts
   // 1. Spårstatistik för autostart ur horse_results
   const autoRows = db
-    .prepare(`
+    .prepare(
+      `
       SELECT 
         post_position,
         COUNT(*) as total_starts,
@@ -103,12 +95,14 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
         AND post_position > 0
       GROUP BY post_position
       ORDER BY post_position ASC
-    `)
+    `
+    )
     .all(trackName, trackId) as StatRow[];
 
   // 2. Spårstatistik för voltstart ur horse_results
   const voltRows = db
-    .prepare(`
+    .prepare(
+      `
       SELECT 
         post_position,
         COUNT(*) as total_starts,
@@ -120,16 +114,19 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
         AND post_position > 0
       GROUP BY post_position
       ORDER BY post_position ASC
-    `)
+    `
+    )
     .all(trackName, trackId) as StatRow[];
 
   // Räkna totalt antal lopp på denna bana i historiken
   const raceCountRow = db
-    .prepare(`
+    .prepare(
+      `
       SELECT COUNT(DISTINCT date || '_' || race_number) as race_count
       FROM horse_results
       WHERE track_name = ? OR track_id = ?
-    `)
+    `
+    )
     .get(trackName, trackId) as { race_count: number } | undefined;
 
   const totalRaces = raceCountRow?.race_count || 0;
@@ -178,7 +175,8 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
   // eller total vinstprocent för framspår (spår 1-3) i lopp på banan
   let leaderWinPercent: number | null = null;
   const leaderRow = db
-    .prepare(`
+    .prepare(
+      `
       SELECT 
         COUNT(*) as total_starts,
         SUM(CASE WHEN place = '1' THEN 1 ELSE 0 END) as total_wins
@@ -186,7 +184,8 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
       WHERE (track_name = ? OR track_id = ?)
         AND post_position IN (1, 2)
         AND start_method = 'auto'
-    `)
+    `
+    )
     .get(trackName, trackId) as { total_starts: number; total_wins: number } | undefined;
 
   if (leaderRow && leaderRow.total_starts >= 5) {
@@ -205,7 +204,8 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
   }
 
   const winTimeRows = db
-    .prepare(`
+    .prepare(
+      `
       SELECT 
         distance_m,
         start_method,
@@ -218,7 +218,8 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
         AND km_time != ''
       GROUP BY distance_m, start_method
       ORDER BY distance_m ASC
-    `)
+    `
+    )
     .all(trackName, trackId) as WinTimeRow[];
 
   const commonWinningTimes: CommonWinningTime[] = winTimeRows.map((r) => ({

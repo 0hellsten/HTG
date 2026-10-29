@@ -32,9 +32,7 @@ export const RyggarLagenBlock: React.FC<RyggarLagenBlockProps> = ({
 
     return (
       <div className="space-y-2">
-        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
-          {groupTitle}
-        </h3>
+        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">{groupTitle}</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
           {list.map((st) => (
             <div

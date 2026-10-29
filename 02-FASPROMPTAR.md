@@ -81,6 +81,7 @@ Efter varje fas: kör verifieringsprompten i `docs/05-TEST-VERIFIERING-DRIFT.md`
 > **Loppkort** — ett lopp: nummer, distans, startsätt, pris, och startlistan med nummer, häst, kusk, tränare, skor, sulky, rekord, intjänat. Strukna hästar syns tydligt men nedtonat.
 >
 > Krav:
+>
 > - **Färskhetspricken i varje blockrubrik**, enligt regelfilen. Diskret, med "Försök igen"-knapp vid tryck.
 > - Felgräns per block, inte per sida.
 > - Skelettkort vid laddning, aldrig spinner mitt på skärmen.
@@ -141,12 +142,14 @@ Efter varje fas: kör verifieringsprompten i `docs/05-TEST-VERIFIERING-DRIFT.md`
 > Två delar.
 >
 > **"Vad tycker stallbacken?"** — samlade tips och rankingar från de källor källregistret godkänt.
+>
 > - **Alltid synlig avsändare** på varje tips: "Tips från X".
 > - Aldrig presenterat som sanning. Aldrig sammanvägt till ett eget "rätt svar" utan att det tydligt står att det är appens egen hopslagning.
 > - Varje tipskälla har egen prick. Faller en, visas de andra.
 > - Inga insatsråd, inga vinstlöften, aldrig "säker" eller "garanterad".
 >
 > **"Banvisaren"** — per travbana: banlängd, öppen/täckt, underlag, hur ofta ledaren vinner, vinstprocent per startspår, vanliga vinnartider, och väder vid banan på tävlingsdagen.
+>
 > - Statistiken räknas ur vår egen sparade historik där den finns — visa hur många lopp den bygger på. Bygger den på få lopp, säg det: "Bygger på 34 lopp".
 
 ---
@@ -171,20 +174,24 @@ Efter varje fas: kör verifieringsprompten i `docs/05-TEST-VERIFIERING-DRIFT.md`
 ## Extraprompter att ha i bakfickan
 
 **När en källa dör på riktigt:**
+
 > Källan `<id>` svarar inte längre som förut. Undersök vad som ändrats, uppdatera zod-schemat och
 > normaliseringen, och lägg till ett testfall för det nya formatet. Rör inget annat. Om källan är
 > permanent borta: föreslå en ersättare från källregistret och visa vad vi förlorar.
 
 **När något ser konstigt ut i appen:**
+
 > På sidan `<vy>` ser `<sak>` fel ut. Ta en skärmbild, hitta orsaken, och fixa **bara** det.
 > Ändra inget annat. Visa före- och efterbild.
 
 **När du vill lägga till en källa:**
+
 > Lägg till en ny adapter för `<källa>` för datatypen `<typ>`. Följ artighetsreglerna, för in den i
 > `docs/kallregister.md` med robots.txt-besked och anropsbudget, och koppla den som **sekundär** källa
 > under den befintliga. Ingen annan fil än adapterregistret får ändras.
 
 **Inför överlämning:**
+
 > Gå igenom hela appen som om du vore min pappa: 72 år, kan trav, kan inte teknik.
 > Lista allt som skulle kunna förvirra honom, allt tekniskt ord som läckt ut, allt som kräver
 > förklaring. Fixa det. Visa listan före och efter.

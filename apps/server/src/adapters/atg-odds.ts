@@ -167,11 +167,7 @@ export class AtgOddsAdapter implements SourceAdapter<RaceOddsData | null> {
     }
   }
 
-  private normalizeOdds(
-    data: AtgOddsResponse,
-    raceId: string,
-    nowIso: string
-  ): RaceOddsData {
+  private normalizeOdds(data: AtgOddsResponse, raceId: string, nowIso: string): RaceOddsData {
     const recordedAt = data.recordedAt || nowIso;
     const timeFormatted = recordedAt.includes('T')
       ? recordedAt.split('T')[1].slice(0, 5)
@@ -248,7 +244,11 @@ export class AtgOddsAdapter implements SourceAdapter<RaceOddsData | null> {
         const fixturePath = path.resolve(__dirname, `../../test/fixtures/${fixtureFilename}`);
         if (fs.existsSync(fixturePath)) {
           const fixtureData = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
-          if (!expectedRaceId || fixtureData.raceId === expectedRaceId || fixtureData.id?.includes(expectedRaceId)) {
+          if (
+            !expectedRaceId ||
+            fixtureData.raceId === expectedRaceId ||
+            fixtureData.id?.includes(expectedRaceId)
+          ) {
             logger.info(`Använder lokal fixtur ${fixtureFilename} som reserv för odds`);
             return fixtureData;
           }

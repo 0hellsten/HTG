@@ -35,11 +35,7 @@ export const OddsOchStreckBlock: React.FC<OddsOchStreckBlockProps> = ({
             <TrendingUp className="w-5 h-5 text-amber-600 shrink-0" />
             <h2 className="text-lg font-bold text-slate-900">Odds och streck</h2>
           </div>
-          <FarskhetsPrick
-            status={oddsStatus}
-            explanation={oddsMessage}
-            onRetry={onRetry}
-          />
+          <FarskhetsPrick status={oddsStatus} explanation={oddsMessage} onRetry={onRetry} />
         </div>
 
         {oddsStatus === 'failed' || !oddsData ? (
@@ -100,9 +96,7 @@ export const OddsOchStreckBlock: React.FC<OddsOchStreckBlockProps> = ({
                       <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs shrink-0">
                         {item.startNumber}
                       </span>
-                      <span className="font-medium text-slate-900 truncate">
-                        {horseName}
-                      </span>
+                      <span className="font-medium text-slate-900 truncate">{horseName}</span>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
                       <span className="text-slate-600 font-medium">

@@ -9,22 +9,13 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Database from 'better-sqlite3';
-import {
-  SourceAdapter,
-  SourceResult,
-  FetchContext,
-  TipItem,
-} from '@stallbacken/shared';
+import { SourceAdapter, SourceResult, FetchContext, TipItem } from '@stallbacken/shared';
 import { fetchWithPolicy, FetchOptions } from '../collect/queue.js';
 import { HealthManager } from '../health/health-manager.js';
 import { logger } from '../lib/logger.js';
 import { getDb } from '../db/connection.js';
 import { parseRssXml } from './rss-parser.js';
-import {
-  saveTipArticle,
-  getLatestTipArticles,
-  saveRaceTip,
-} from '../db/queries/tips.js';
+import { saveTipArticle, getLatestTipArticles, saveRaceTip } from '../db/queries/tips.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -67,9 +58,7 @@ export class TipsTravrondenAdapter implements SourceAdapter<TipItem[]> {
     const now = new Date();
     const nowIso = now.toISOString();
 
-    const existing = getLatestTipArticles(this.db, 20).filter(
-      (a) => a.sourceId === this.id
-    );
+    const existing = getLatestTipArticles(this.db, 20).filter((a) => a.sourceId === this.id);
 
     if (this.simulatedFailure) {
       this.healthManager.recordAttempt({
@@ -107,13 +96,10 @@ export class TipsTravrondenAdapter implements SourceAdapter<TipItem[]> {
     }
 
     try {
-      const response = await fetchWithPolicy(
-        this.feedUrl,
-        {
-          headers: { Accept: 'application/rss+xml, application/xml, text/xml' },
-          ...this.fetchOptions,
-        }
-      );
+      const response = await fetchWithPolicy(this.feedUrl, {
+        headers: { Accept: 'application/rss+xml, application/xml, text/xml' },
+        ...this.fetchOptions,
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
@@ -155,7 +141,10 @@ export class TipsTravrondenAdapter implements SourceAdapter<TipItem[]> {
         });
 
         // Om artikeln berör Solvalla eller Daniel Wäjersten
-        if (it.title.toLowerCase().includes('solvalla') || it.description?.toLowerCase().includes('daniel wäjersten')) {
+        if (
+          it.title.toLowerCase().includes('solvalla') ||
+          it.description?.toLowerCase().includes('daniel wäjersten')
+        ) {
           saveRaceTip(this.db, {
             id: `${tipId}_lopp4_wäjersten`,
             raceId: '2026-10-29_1_4',
@@ -267,9 +256,10 @@ export class TipsTravrondenAdapter implements SourceAdapter<TipItem[]> {
         sourceId: this.id,
         status: 'failed',
         attemptedAt: nowIso,
-        ageSeconds: existing.length > 0
-          ? Math.floor((now.getTime() - new Date(existing[0].publishedAt).getTime()) / 1000)
-          : 9999,
+        ageSeconds:
+          existing.length > 0
+            ? Math.floor((now.getTime() - new Date(existing[0].publishedAt).getTime()) / 1000)
+            : 9999,
         message: 'Tipsen är från i morse. De brukar komma in på nytt vid lunch.',
         detail: (err as Error).message,
       });
@@ -279,9 +269,10 @@ export class TipsTravrondenAdapter implements SourceAdapter<TipItem[]> {
         status: 'failed',
         data: existing.length > 0 ? existing : null,
         fetchedAt: existing[0]?.publishedAt || nowIso,
-        ageSeconds: existing.length > 0
-          ? Math.floor((now.getTime() - new Date(existing[0].publishedAt).getTime()) / 1000)
-          : 9999,
+        ageSeconds:
+          existing.length > 0
+            ? Math.floor((now.getTime() - new Date(existing[0].publishedAt).getTime()) / 1000)
+            : 9999,
         message: 'Tipsen är från i morse. De brukar komma in på nytt vid lunch.',
       };
     }

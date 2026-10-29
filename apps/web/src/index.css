@@ -3,22 +3,37 @@
 @tailwind utilities;
 
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   color: #0f172a;
   background-color: #f8fafc;
+}
+
+/* Textstorlekar för tillgänglighet (påverkar hela appen) */
+html.text-size-normal {
+  font-size: 16px;
+}
+
+html.text-size-stor {
+  font-size: 18.5px;
+}
+
+html.text-size-extra {
+  font-size: 21px;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-size: 17px;
+  font-size: 1.0625rem; /* Minst 17px på mobil vid normal textstorlek */
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Säkerställ rejäla tryckytor för tummen på mobil */
-button, a {
+button,
+a {
   min-height: 44px;
   min-width: 44px;
   touch-action: manipulation;

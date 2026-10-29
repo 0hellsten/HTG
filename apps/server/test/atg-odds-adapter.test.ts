@@ -134,7 +134,9 @@ describe('AtgOddsAdapter', () => {
     const failedResult = await adapter.fetchOddsForRace('2026-10-29_1_4', true);
 
     expect(failedResult.status).toBe('failed');
-    expect(failedResult.message).toBe('Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.');
+    expect(failedResult.message).toBe(
+      'Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.'
+    );
     // Senast sparade data finns kvar
     expect(failedResult.data).toBeDefined();
     expect(failedResult.data?.odds.length).toBe(4);
@@ -157,6 +159,8 @@ describe('AtgOddsAdapter', () => {
     expect(healthManager.isCircuitBreakerActive(adapter.id)).toBe(true);
     const resultAfterBreak = await adapter.fetchOddsForRace('2026-10-29_1_4', false);
     expect(resultAfterBreak.status).toBe('failed');
-    expect(resultAfterBreak.message).toBe('Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.');
+    expect(resultAfterBreak.message).toBe(
+      'Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.'
+    );
   });
 });

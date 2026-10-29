@@ -7,9 +7,15 @@ import { HastScreen } from './screens/HastScreen';
 import { HastarScreen } from './screens/HastarScreen';
 import { TipsScreen } from './screens/TipsScreen';
 import { BanvisarenScreen } from './screens/BanvisarenScreen';
+import { StallScreen } from './screens/StallScreen';
+import { StatusScreen } from './screens/StatusScreen';
+import { TextstorlekScreen, TextSize } from './screens/TextstorlekScreen';
+import { HjalpScreen } from './screens/HjalpScreen';
 import { MerScreen } from './screens/MerScreen';
+import { OfflineRemsa } from './components/OfflineRemsa';
 
 type Tab = 'idag' | 'hastar' | 'tips' | 'stall' | 'mer';
+type MerSubscreen = 'none' | 'status' | 'hjalp' | 'textstorlek';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -21,8 +27,31 @@ export const App: React.FC = () => {
   const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
   const [selectedHorseId, setSelectedHorseId] = useState<string | null>(null);
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
+  const [merSubscreen, setMerSubscreen] = useState<MerSubscreen>('none');
   const [siblingRaces, setSiblingRaces] = useState<Race[]>([]);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  const [textSize, setTextSize] = useState<TextSize>(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const saved = window.localStorage.getItem('stallbacken_text_size');
+      if (saved === 'stor' || saved === 'extra') return saved;
+    }
+    return 'normal';
+  });
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.remove(
+        'text-size-normal',
+        'text-size-stor',
+        'text-size-extra'
+      );
+      document.documentElement.classList.add(`text-size-${textSize}`);
+    }
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem('stallbacken_text_size', textSize);
+    }
+  }, [textSize]);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -49,6 +78,7 @@ export const App: React.FC = () => {
     setActiveTab(tab);
     setSelectedHorseId(null);
     setSelectedTrackId(null);
+    setMerSubscreen('none');
     if (tab === 'idag') {
       setSelectedRaceId(null);
     }
@@ -71,9 +101,7 @@ export const App: React.FC = () => {
             HTG
           </div>
           <div>
-            <span className="text-xl font-bold tracking-tight text-white block">
-              HTG
-            </span>
+            <span className="text-xl font-bold tracking-tight text-white block">HTG</span>
             <span className="text-xs text-slate-400 block font-normal">
               Hellstens Trav och Galopp
             </span>
@@ -114,6 +142,9 @@ export const App: React.FC = () => {
 
       {/* Huvudinnehåll */}
       <div className="flex-1 flex flex-col min-w-0">
+        {/* Offline-remsa visas överst vid nätverksbortfall */}
+        <OfflineRemsa />
+
         {/* Mobil: Topprad */}
         <header className="lg:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-0 z-10 shadow-sm">
           <div className="flex items-center gap-2.5">
@@ -149,9 +180,16 @@ export const App: React.FC = () => {
               onBack={() => setSelectedTrackId(null)}
             />
           ) : selectedHorseId ? (
-            <HastScreen
-              horseId={selectedHorseId}
-              onBack={() => setSelectedHorseId(null)}
+            <HastScreen horseId={selectedHorseId} onBack={() => setSelectedHorseId(null)} />
+          ) : merSubscreen === 'status' ? (
+            <StatusScreen onBack={() => setMerSubscreen('none')} />
+          ) : merSubscreen === 'hjalp' ? (
+            <HjalpScreen onBack={() => setMerSubscreen('none')} />
+          ) : merSubscreen === 'textstorlek' ? (
+            <TextstorlekScreen
+              currentSize={textSize}
+              onSelectSize={(newSize) => setTextSize(newSize)}
+              onBack={() => setMerSubscreen('none')}
             />
           ) : activeTab === 'idag' ? (
             selectedRaceId ? (
@@ -173,9 +211,7 @@ export const App: React.FC = () => {
               />
             )
           ) : activeTab === 'hastar' ? (
-            <HastarScreen
-              onSelectHorse={(id) => setSelectedHorseId(id)}
-            />
+            <HastarScreen onSelectHorse={(id) => setSelectedHorseId(id)} />
           ) : activeTab === 'tips' ? (
             <TipsScreen
               onOpenRace={(raceId) => {
@@ -183,24 +219,27 @@ export const App: React.FC = () => {
                 setActiveTab('idag');
               }}
             />
+          ) : activeTab === 'stall' ? (
+            <StallScreen
+              onSelectHorse={(id) => setSelectedHorseId(id)}
+              onSelectTrack={(id) => setSelectedTrackId(id)}
+              onSelectRace={(raceId) => {
+                setSelectedRaceId(raceId);
+                setActiveTab('idag');
+              }}
+              onGoToSearchHorses={() => setActiveTab('hastar')}
+            />
           ) : activeTab === 'mer' ? (
             <MerScreen
               onSelectOption={(opt) => {
                 if (opt === 'banvisaren') {
                   setSelectedTrackId('1');
+                } else {
+                  setMerSubscreen(opt);
                 }
               }}
             />
-          ) : (
-            <div className="bg-white rounded-xl border border-slate-200 p-8 text-center max-w-lg mx-auto mt-8">
-              <h2 className="text-xl font-semibold text-slate-900 mb-2">
-                {navItems.find((n) => n.id === activeTab)?.label}
-              </h2>
-              <p className="text-slate-600 text-base leading-relaxed">
-                Den här delen kopplas in i en kommande fas enligt planen.
-              </p>
-            </div>
-          )}
+          ) : null}
         </main>
 
         {/* Mobil: Bottennavigering */}

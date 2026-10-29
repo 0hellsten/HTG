@@ -81,7 +81,9 @@ describe('Hästar API-rutter', () => {
     const body = JSON.parse(res.body);
 
     expect(body.status).toBe('failed');
-    expect(body.message).toBe('Den här hästens tidigare lopp går inte att hämta för tillfället. Resten stämmer.');
+    expect(body.message).toBe(
+      'Den här hästens tidigare lopp går inte att hämta för tillfället. Resten stämmer.'
+    );
   });
 
   it('GET /api/hastar/sok söker efter hästar på namn', async () => {
@@ -148,8 +150,9 @@ describe('Hästar API-rutter', () => {
     const body = JSON.parse(res.body);
 
     expect(body.status).toBe('failed');
-    expect(body.message).toBe('Tidigare lopp och historik går inte att hämta för tillfället. Resten stämmer.');
+    expect(body.message).toBe(
+      'Tidigare lopp och historik går inte att hämta för tillfället. Resten stämmer.'
+    );
     expect(body.data['783840']).toBeNull();
   });
 });
-

@@ -89,4 +89,3 @@ export interface HorseProfileResponse {
 }
 
 export type HorseBatchResponse = Record<string, HorseProfileResponse | null>;
-

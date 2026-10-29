@@ -1,7 +1,13 @@
 import { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { ApiResponse, SourceHealthRecord, SourceStatus } from '@stallbacken/shared';
 import { HealthManager } from '../health/health-manager.js';
-import { registeredAdapters, fakeSource } from '../adapters/index.js';
+import {
+  registeredAdapters,
+  fakeSource,
+  atgRacingInfoAdapter,
+  tipsExpressenAdapter,
+  tipsTravrondenAdapter,
+} from '../adapters/index.js';
 import { logger } from '../lib/logger.js';
 
 interface FakeSourceBody {
@@ -30,7 +36,6 @@ export const kallorRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
       });
     } catch (err) {
       logger.error('Kunde inte läsa källhälsa', err);
-      // Returnerar alltid 200 med statusobjekt enligt projektets regler
       return reply.status(200).send({
         data: [],
         status: 'failed',
@@ -39,6 +44,43 @@ export const kallorRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
       });
     }
   });
+
+  /**
+   * POST /api/kallor/uppdatera-allt
+   * Forcerar en ny hämtning för alla aktiva datakällor och returnerar uppdaterad status.
+   */
+  app.post<{ Reply: ApiResponse<SourceHealthRecord[]> }>(
+    '/api/kallor/uppdatera-allt',
+    async (_req, reply) => {
+      try {
+        logger.info('Manuell uppdatering av alla datakällor startad');
+
+        await Promise.allSettled([
+          atgRacingInfoAdapter.fetchCalendar(undefined, true),
+          tipsExpressenAdapter.fetch({ forceRefresh: true }),
+          tipsTravrondenAdapter.fetch({ forceRefresh: true }),
+        ]);
+
+        const records = healthManager.getAllSourcesHealth(registeredAdapters);
+
+        return reply.status(200).send({
+          data: records,
+          status: 'ok',
+          fetchedAt: new Date().toISOString(),
+          message: 'Alla källor uppdaterades',
+        });
+      } catch (err) {
+        logger.error('Kunde inte uppdatera alla källor', err);
+        const records = healthManager.getAllSourcesHealth(registeredAdapters);
+        return reply.status(200).send({
+          data: records,
+          status: 'degraded',
+          fetchedAt: new Date().toISOString(),
+          message: 'Kunde inte uppdatera samtliga källor just nu',
+        });
+      }
+    }
+  );
 
   /**
    * POST /api/test/fake-source

@@ -27,8 +27,8 @@ export const SkoVisare: React.FC<SkoVisareProps> = ({
           shoe.code === 'C/C'
             ? 'bg-amber-100 text-amber-900 border border-amber-300'
             : shoe.code.includes('C')
-            ? 'bg-amber-50 text-amber-800 border border-amber-200'
-            : 'bg-slate-100 text-slate-700'
+              ? 'bg-amber-50 text-amber-800 border border-amber-200'
+              : 'bg-slate-100 text-slate-700'
         }`}
       >
         {shoe.code}

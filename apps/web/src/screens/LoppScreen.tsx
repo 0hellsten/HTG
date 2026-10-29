@@ -237,7 +237,9 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
                       className="text-sm font-bold text-amber-700 uppercase tracking-wider mb-1 hover:text-amber-900 inline-flex items-center gap-1 cursor-pointer"
                     >
                       <span>{race?.trackName || 'Bana'}</span>
-                      <span className="text-xs font-normal text-slate-500 normal-case underline ml-1">Visa Banvisaren &rarr;</span>
+                      <span className="text-xs font-normal text-slate-500 normal-case underline ml-1">
+                        Visa Banvisaren &rarr;
+                      </span>
                     </button>
                   ) : (
                     <div className="text-sm font-semibold text-amber-700 uppercase tracking-wider mb-1">
@@ -282,10 +284,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
             </div>
 
             {/* Block 1: Startlista */}
-            <BlockErrorBoundary
-              fallbackTitle="Startlistan saknas just nu"
-              onRetry={fetchRaceData}
-            >
+            <BlockErrorBoundary fallbackTitle="Startlistan saknas just nu" onRetry={fetchRaceData}>
               <section className="space-y-3" aria-labelledby="startlista-rubrik">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
@@ -334,9 +333,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2">
                     <Award className="w-5 h-5 text-amber-600 shrink-0" />
-                    <h2 className="text-lg font-bold text-slate-900">
-                      Vad tycker stallbacken?
-                    </h2>
+                    <h2 className="text-lg font-bold text-slate-900">Vad tycker stallbacken?</h2>
                   </div>
                   <FarskhetsPrick
                     status={tipsStatus}
@@ -354,7 +351,10 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
                     )}
                     <div className="space-y-2.5">
                       {tipsData.tips.map((tip) => (
-                        <div key={tip.id} className="p-3.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1.5">
+                        <div
+                          key={tip.id}
+                          className="p-3.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1.5"
+                        >
                           <div className="flex items-center justify-between">
                             <span className="font-bold text-slate-900 text-base">
                               {tip.horseName || `Häst ${tip.horseNumber || '–'}`}
@@ -367,9 +367,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
                             )}
                           </div>
                           {tip.summary && (
-                            <p className="text-slate-600 text-sm leading-relaxed">
-                              {tip.summary}
-                            </p>
+                            <p className="text-slate-600 text-sm leading-relaxed">{tip.summary}</p>
                           )}
                           <div className="text-xs text-slate-500 font-semibold pt-1">
                             {tip.provider}
@@ -406,10 +404,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
 
       {/* Flytande snabbknapp på mobil om hästar valts för jämförelse */}
       {selectedForCompare.length >= 2 && !loading && (
-        <aside
-          aria-label="Jämförelseval"
-          className="lg:hidden fixed bottom-16 left-4 right-4 z-20"
-        >
+        <aside aria-label="Jämförelseval" className="lg:hidden fixed bottom-16 left-4 right-4 z-20">
           <button
             type="button"
             onClick={() => setIsComparing(true)}

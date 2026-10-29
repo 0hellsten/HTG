@@ -2,12 +2,7 @@
 // Stallbacken — HTG
 
 import { FastifyPluginAsync } from 'fastify';
-import {
-  ApiResponse,
-  TrackProfile,
-  TrackStats,
-  TrackWeather,
-} from '@stallbacken/shared';
+import { ApiResponse, TrackProfile, TrackStats, TrackWeather } from '@stallbacken/shared';
 import { getDb } from '../db/connection.js';
 import {
   getAllTrackProfiles,

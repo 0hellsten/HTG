@@ -8,7 +8,7 @@
     "vinnare": {
       "odds": [
         { "startNumber": 1, "odds": 3.45 },
-        { "startNumber": 2, "odds": 6.80 },
+        { "startNumber": 2, "odds": 6.8 },
         { "startNumber": 3, "odds": 2.15 },
         { "startNumber": 4, "odds": null }
       ]
@@ -16,8 +16,8 @@
     "plats": {
       "odds": [
         { "startNumber": 1, "minOdds": 1.45, "maxOdds": 1.95 },
-        { "startNumber": 2, "minOdds": 2.10, "maxOdds": 2.90 },
-        { "startNumber": 3, "minOdds": 1.15, "maxOdds": 1.40 },
+        { "startNumber": 2, "minOdds": 2.1, "maxOdds": 2.9 },
+        { "startNumber": 3, "minOdds": 1.15, "maxOdds": 1.4 },
         { "startNumber": 4, "minOdds": null, "maxOdds": null }
       ]
     },

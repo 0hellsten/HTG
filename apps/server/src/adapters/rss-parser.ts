@@ -28,7 +28,10 @@ function cleanText(raw: string): string {
     .replace(/&gt;/gi, '>');
 
   // Ta bort HTML-taggar t.ex. <img ...> eller <p>
-  cleaned = cleaned.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  cleaned = cleaned
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
   // Klipp bort kommersiella andels-/annonstexter
   const annonsIdx = cleaned.search(/\bANNONS:/i);

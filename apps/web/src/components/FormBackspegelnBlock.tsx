@@ -98,10 +98,12 @@ const MobilLoppKort: React.FC<{ item: HorsePastStart }> = ({ item }) => {
       <div className="flex items-start justify-between">
         <div>
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
-            {formatDateShort(item.date)} · {item.trackName} {item.raceNumber ? `lopp ${item.raceNumber}` : ''}
+            {formatDateShort(item.date)} · {item.trackName}{' '}
+            {item.raceNumber ? `lopp ${item.raceNumber}` : ''}
           </span>
           <span className="text-sm text-slate-700">
-            {item.postPosition ? `Spår ${item.postPosition}` : ''} · {formatDistance(item.distanceM)} ({item.startMethod})
+            {item.postPosition ? `Spår ${item.postPosition}` : ''} ·{' '}
+            {formatDistance(item.distanceM)} ({item.startMethod})
           </span>
         </div>
 
@@ -111,10 +113,10 @@ const MobilLoppKort: React.FC<{ item: HorsePastStart }> = ({ item }) => {
             isWin
               ? 'bg-amber-400 text-slate-950 shadow-sm'
               : isPodium
-              ? 'bg-slate-200 text-slate-900'
-              : isGallop
-              ? 'bg-red-100 text-red-800'
-              : 'bg-white border border-slate-300 text-slate-700'
+                ? 'bg-slate-200 text-slate-900'
+                : isGallop
+                  ? 'bg-red-100 text-red-800'
+                  : 'bg-white border border-slate-300 text-slate-700'
           }`}
         >
           {item.place || '–'}
@@ -149,44 +151,41 @@ const LaptopLoppRad: React.FC<{ item: HorsePastStart }> = ({ item }) => {
 
   return (
     <tr className="hover:bg-slate-50/80 transition-colors">
-      <td className="py-3 px-3 font-medium text-slate-900">
-        {formatDateShort(item.date)}
-      </td>
+      <td className="py-3 px-3 font-medium text-slate-900">{formatDateShort(item.date)}</td>
       <td className="py-3 px-3">
         <span className="font-semibold text-slate-950">{item.trackName}</span>
-        {item.raceNumber && <span className="text-slate-500 text-sm ml-1.5">lopp {item.raceNumber}</span>}
+        {item.raceNumber && (
+          <span className="text-slate-500 text-sm ml-1.5">lopp {item.raceNumber}</span>
+        )}
       </td>
       <td className="py-3 px-3 text-slate-700">
-        {formatDistance(item.distanceM)} {item.postPosition ? `(spår ${item.postPosition})` : ''} · {item.startMethod}
+        {formatDistance(item.distanceM)} {item.postPosition ? `(spår ${item.postPosition})` : ''} ·{' '}
+        {item.startMethod}
       </td>
-      <td className="py-3 px-3 text-slate-800 font-medium">
-        {item.driverName || '–'}
-      </td>
+      <td className="py-3 px-3 text-slate-800 font-medium">{item.driverName || '–'}</td>
       <td className="py-3 px-3 text-center">
         <span
           className={`inline-flex items-center justify-center w-7 h-7 rounded font-bold text-sm ${
             isWin
               ? 'bg-amber-400 text-slate-950'
               : isPodium
-              ? 'bg-slate-200 text-slate-900'
-              : isGallop
-              ? 'bg-red-100 text-red-800'
-              : 'text-slate-700'
+                ? 'bg-slate-200 text-slate-900'
+                : isGallop
+                  ? 'bg-red-100 text-red-800'
+                  : 'text-slate-700'
           }`}
         >
           {item.place || '–'}
         </span>
       </td>
-      <td className="py-3 px-3 text-right font-semibold text-slate-900">
-        {item.kmTime || '–'}
-      </td>
-      <td className="py-3 px-3 text-right font-medium text-slate-800">
-        {formatOdds(item.odds)}
-      </td>
+      <td className="py-3 px-3 text-right font-semibold text-slate-900">{item.kmTime || '–'}</td>
+      <td className="py-3 px-3 text-right font-medium text-slate-800">{formatOdds(item.odds)}</td>
       <td className="py-3 px-3">
         <div className="flex items-center gap-2">
           <SkoVisare shoesFront={item.shoesFront} shoesBack={item.shoesBack} />
-          <span className="text-xs text-slate-500 truncate max-w-[120px]">{item.sulkyType || ''}</span>
+          <span className="text-xs text-slate-500 truncate max-w-[120px]">
+            {item.sulkyType || ''}
+          </span>
         </div>
       </td>
     </tr>

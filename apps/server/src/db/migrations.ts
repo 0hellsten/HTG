@@ -56,7 +56,9 @@ export function runMigrations(database?: Database.Database): void {
 
       const applyMigration = db.transaction(() => {
         db.exec(sql);
-        db.prepare('INSERT INTO schema_migrations (version, applied_at) VALUES (?, datetime(\'now\'))').run(file);
+        db.prepare(
+          "INSERT INTO schema_migrations (version, applied_at) VALUES (?, datetime('now'))"
+        ).run(file);
       });
 
       applyMigration();

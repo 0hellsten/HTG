@@ -54,17 +54,17 @@ och föreslå antingen en annan källa, ett manuellt inmatningsfält i appen, el
 
 ## Hämtfrekvenser
 
-| Datatyp | Intervall |
-|---|---|
-| Dagens kalender och banor | var 30:e minut |
-| Startlistor | var 15:e minut tävlingsdagen |
-| Odds och streckprocent | var 2:a minut från 60 min före start, annars var 15:e |
-| Strukna hästar, kuskbyten, skoändringar | var 5:e minut tävlingsdagen |
-| Tips och expertrankingar | 2 gånger per dag |
-| Resultat | var 5:e minut från 15 min efter start, i 2 timmar |
-| Hästhistorik | vid behov, max 1 gång per dygn per häst |
-| Banstatistik | 1 gång per dygn |
-| Väder vid banan | var 60:e minut tävlingsdagen |
+| Datatyp                                 | Intervall                                             |
+| --------------------------------------- | ----------------------------------------------------- |
+| Dagens kalender och banor               | var 30:e minut                                        |
+| Startlistor                             | var 15:e minut tävlingsdagen                          |
+| Odds och streckprocent                  | var 2:a minut från 60 min före start, annars var 15:e |
+| Strukna hästar, kuskbyten, skoändringar | var 5:e minut tävlingsdagen                           |
+| Tips och expertrankingar                | 2 gånger per dag                                      |
+| Resultat                                | var 5:e minut från 15 min efter start, i 2 timmar     |
+| Hästhistorik                            | vid behov, max 1 gång per dygn per häst               |
+| Banstatistik                            | 1 gång per dygn                                       |
+| Väder vid banan                         | var 60:e minut tävlingsdagen                          |
 
 Utanför tävlingsdagar: allt går ner i lågvarv. Nattetid (01–07) hämtas ingenting utom historik-backfill.
 

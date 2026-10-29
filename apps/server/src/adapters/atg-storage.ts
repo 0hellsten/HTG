@@ -4,12 +4,7 @@
 import Database from 'better-sqlite3';
 import { AtgCalendarDay, AtgRaceDetail } from './atg-schemas.js';
 import { upsertTrack, upsertRaceDay } from '../db/queries/tracks.js';
-import {
-  upsertRace,
-  upsertHorse,
-  upsertPerson,
-  upsertStart,
-} from '../db/queries/races.js';
+import { upsertRace, upsertHorse, upsertPerson, upsertStart } from '../db/queries/races.js';
 
 /**
  * Sparar ATG:s kalenderdata (banor, tävlingsdagar och lopp) i SQLite.

@@ -108,10 +108,7 @@ export interface FetchOptions {
  * - 10 s timeout
  * - Upp till 3 försök med backoff
  */
-export async function fetchWithPolicy(
-  url: string,
-  options: FetchOptions = {}
-): Promise<Response> {
+export async function fetchWithPolicy(url: string, options: FetchOptions = {}): Promise<Response> {
   const {
     timeoutMs = 10000,
     maxRetries = 3,
@@ -157,7 +154,9 @@ export async function fetchWithPolicy(
       if (res.status === 429 || (res.status >= 500 && res.status < 600)) {
         if (attempt < maxRetries - 1) {
           const delay = backoffDelays[attempt] ?? 2000;
-          logger.warn(`Server svarade med HTTP ${res.status}. Väntar ${delay} ms (försök ${attempt + 1}/${maxRetries}).`);
+          logger.warn(
+            `Server svarade med HTTP ${res.status}. Väntar ${delay} ms (försök ${attempt + 1}/${maxRetries}).`
+          );
           await new Promise((resolve) => setTimeout(resolve, delay));
           continue;
         }
@@ -167,7 +166,9 @@ export async function fetchWithPolicy(
     } catch (err) {
       if (attempt < maxRetries - 1) {
         const delay = backoffDelays[attempt] ?? 2000;
-        logger.warn(`Nätverksfel vid anrop mot ${url}: ${String(err)}. Nytt försök om ${delay} ms.`);
+        logger.warn(
+          `Nätverksfel vid anrop mot ${url}: ${String(err)}. Nytt försök om ${delay} ms.`
+        );
         await new Promise((resolve) => setTimeout(resolve, delay));
       } else {
         throw err;

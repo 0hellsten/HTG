@@ -5,7 +5,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Database from 'better-sqlite3';
-import { SourceResult, HorseProfileResponse, TrainingAndDriverForm, SourceStatus } from '@stallbacken/shared';
+import {
+  SourceResult,
+  HorseProfileResponse,
+  TrainingAndDriverForm,
+  SourceStatus,
+} from '@stallbacken/shared';
 import { fetchWithPolicy, FetchOptions } from '../collect/queue.js';
 import { HealthManager } from '../health/health-manager.js';
 import { logger } from '../lib/logger.js';
@@ -40,7 +45,15 @@ export async function fetchHorseProfileData(
 
   if (!forceRefresh && existingHorse && existingResults.length > 0) {
     const ageSeconds = 300; // färskt i cachen
-    return buildHorseResponse(db, horseId, 'ok', nowIso, ageSeconds, 'Allt är färskt och uppdaterat', sourceId);
+    return buildHorseResponse(
+      db,
+      horseId,
+      'ok',
+      nowIso,
+      ageSeconds,
+      'Allt är färskt och uppdaterat',
+      sourceId
+    );
   }
 
   // 2. Kretsbrytare
@@ -69,7 +82,9 @@ export async function fetchHorseProfileData(
     if (profileParse.success) {
       saveHorseProfileToDb(db, profileParse.data, sourceId, nowIso);
     } else {
-      logger.warn(`Valideringsavvikelse för hästprofil ${horseId}`, { error: profileParse.error.message });
+      logger.warn(`Valideringsavvikelse för hästprofil ${horseId}`, {
+        error: profileParse.error.message,
+      });
     }
 
     // 4. Hämta tidigare lopp (results)
@@ -84,7 +99,9 @@ export async function fetchHorseProfileData(
     if (resultsParse.success) {
       saveHorseResultsToDb(db, horseId, resultsParse.data, sourceId, nowIso);
     } else {
-      logger.warn(`Valideringsavvikelse för hästresultat ${horseId}`, { error: resultsParse.error.message });
+      logger.warn(`Valideringsavvikelse för hästresultat ${horseId}`, {
+        error: resultsParse.error.message,
+      });
     }
 
     healthManager.recordAttempt({
@@ -94,7 +111,15 @@ export async function fetchHorseProfileData(
       succeededAt: nowIso,
     });
 
-    return buildHorseResponse(db, horseId, 'ok', nowIso, 0, 'Allt är färskt och uppdaterat', sourceId);
+    return buildHorseResponse(
+      db,
+      horseId,
+      'ok',
+      nowIso,
+      0,
+      'Allt är färskt och uppdaterat',
+      sourceId
+    );
   } catch (err) {
     logger.error(`Kunde inte hämta hästdata för ${horseId}`, err);
     healthManager.recordAttempt({
@@ -171,7 +196,8 @@ function buildHorseResponse(
     driverName: pastStarts[0]?.driverName,
     driverWinPercent: null,
     driverStarts: 0,
-    qualifierNotes: qualifiers.length === 0 ? 'Inga kvallopp eller träningsnoteringar registrerade' : undefined,
+    qualifierNotes:
+      qualifiers.length === 0 ? 'Inga kvallopp eller träningsnoteringar registrerade' : undefined,
   };
 
   if (!horse) {

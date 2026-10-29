@@ -131,8 +131,18 @@ export function formatDateShort(dateStr?: string | null): string {
   if (!dateStr) return '–';
   try {
     const months = [
-      'jan', 'feb', 'mar', 'apr', 'maj', 'jun',
-      'jul', 'aug', 'sep', 'okt', 'nov', 'dec'
+      'jan',
+      'feb',
+      'mar',
+      'apr',
+      'maj',
+      'jun',
+      'jul',
+      'aug',
+      'sep',
+      'okt',
+      'nov',
+      'dec',
     ];
     const parts = dateStr.split('-');
     if (parts.length >= 3) {
@@ -151,5 +161,3 @@ export function formatDateShort(dateStr?: string | null): string {
     return dateStr;
   }
 }
-
-

@@ -1,11 +1,7 @@
 // Hjälpfunktioner för jämförvyn ("Ställ dem mot varandra")
 // Privat, icke-kommersiell användning. Allt på svenska.
 
-import {
-  HorseProfileResponse,
-  HorsePastStart,
-  TrackPositionStat,
-} from '@stallbacken/shared';
+import { HorseProfileResponse, HorsePastStart, TrackPositionStat } from '@stallbacken/shared';
 
 /**
  * Parsar en kilometertid (t.ex. "1.12,3a", "1.14,2", "1.16,0g") till sekunder.
@@ -78,10 +74,7 @@ export function getBestKmTime(profile?: HorseProfileResponse | null): string | n
 /**
  * Beräknar antal vilodagar mellan loppets tävlingsdag och hästens senaste start.
  */
-export function calculateRestDays(
-  raceDateStr?: string,
-  lastStartDateStr?: string
-): number | null {
+export function calculateRestDays(raceDateStr?: string, lastStartDateStr?: string): number | null {
   if (!raceDateStr || !lastStartDateStr) return null;
 
   try {
@@ -208,7 +201,10 @@ export function getBestIndices(
 
   const validEntries = values
     .map((val, idx) => ({ val, idx }))
-    .filter((e): e is { val: number; idx: number } => e.val !== null && e.val !== undefined && !isNaN(e.val));
+    .filter(
+      (e): e is { val: number; idx: number } =>
+        e.val !== null && e.val !== undefined && !isNaN(e.val)
+    );
 
   if (validEntries.length === 0) {
     return result;
