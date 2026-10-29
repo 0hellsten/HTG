@@ -98,6 +98,7 @@ export interface FetchOptions {
   backoffDelays?: number[];
   contactEmail?: string;
   rateLimiter?: DomainRateLimiter;
+  headers?: Record<string, string>;
 }
 
 /**
@@ -134,6 +135,7 @@ export async function fetchWithPolicy(
           headers: {
             'User-Agent': userAgent,
             Accept: 'application/json, text/plain, */*',
+            ...(options.headers || {}),
           },
           signal: controller.signal,
         });

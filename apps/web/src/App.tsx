@@ -5,6 +5,9 @@ import { IdagScreen } from './screens/IdagScreen';
 import { LoppScreen } from './screens/LoppScreen';
 import { HastScreen } from './screens/HastScreen';
 import { HastarScreen } from './screens/HastarScreen';
+import { TipsScreen } from './screens/TipsScreen';
+import { BanvisarenScreen } from './screens/BanvisarenScreen';
+import { MerScreen } from './screens/MerScreen';
 
 type Tab = 'idag' | 'hastar' | 'tips' | 'stall' | 'mer';
 
@@ -17,6 +20,7 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('idag');
   const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
   const [selectedHorseId, setSelectedHorseId] = useState<string | null>(null);
+  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
   const [siblingRaces, setSiblingRaces] = useState<Race[]>([]);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
@@ -44,6 +48,7 @@ export const App: React.FC = () => {
   const handleTabChange = (tab: Tab) => {
     setActiveTab(tab);
     setSelectedHorseId(null);
+    setSelectedTrackId(null);
     if (tab === 'idag') {
       setSelectedRaceId(null);
     }
@@ -138,7 +143,12 @@ export const App: React.FC = () => {
 
         {/* Vy-yta */}
         <main className="flex-1 p-4 sm:p-6 lg:p-10 max-w-5xl w-full mx-auto pb-24 lg:pb-10">
-          {selectedHorseId ? (
+          {selectedTrackId ? (
+            <BanvisarenScreen
+              initialTrackId={selectedTrackId}
+              onBack={() => setSelectedTrackId(null)}
+            />
+          ) : selectedHorseId ? (
             <HastScreen
               horseId={selectedHorseId}
               onBack={() => setSelectedHorseId(null)}
@@ -150,6 +160,7 @@ export const App: React.FC = () => {
                 onBack={() => setSelectedRaceId(null)}
                 onSelectRace={(id) => setSelectedRaceId(id)}
                 onSelectHorse={(id) => setSelectedHorseId(id)}
+                onOpenTrack={(trackId) => setSelectedTrackId(trackId)}
                 siblingRaces={siblingRaces}
               />
             ) : (
@@ -158,11 +169,27 @@ export const App: React.FC = () => {
                   setSelectedRaceId(raceId);
                   setSiblingRaces(siblings);
                 }}
+                onOpenTrack={(trackId) => setSelectedTrackId(trackId)}
               />
             )
           ) : activeTab === 'hastar' ? (
             <HastarScreen
               onSelectHorse={(id) => setSelectedHorseId(id)}
+            />
+          ) : activeTab === 'tips' ? (
+            <TipsScreen
+              onOpenRace={(raceId) => {
+                setSelectedRaceId(raceId);
+                setActiveTab('idag');
+              }}
+            />
+          ) : activeTab === 'mer' ? (
+            <MerScreen
+              onSelectOption={(opt) => {
+                if (opt === 'banvisaren') {
+                  setSelectedTrackId('1');
+                }
+              }}
             />
           ) : (
             <div className="bg-white rounded-xl border border-slate-200 p-8 text-center max-w-lg mx-auto mt-8">

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Travronden Nyheter</title>
+    <link>https://www.travronden.se</link>
+    <description>Senaste travnyheterna, analyser och stallbacksrapporter.</description>
+    <item>
+      <title>Stallbacksrapport Solvalla: Daniel Wäjersten optimistisk</title>
+      <link>https://www.travronden.se/travsport/solvalla-rapport-1</link>
+      <description><![CDATA[Tränaren rapporterar mycket fin form på stallets stjärnor inför kvällens tävlingar på Solvalla.]]></description>
+      <pubDate>Thu, 29 Oct 2026 13:30:00 GMT</pubDate>
+      <guid>https://www.travronden.se/travsport/solvalla-rapport-1</guid>
+    </item>
+    <item>
+      <title>Inför V75: Banförhållanden och senaste skoändringarna</title>
+      <link>https://www.travronden.se/travsport/v75-forutsattningar</link>
+      <description><![CDATA[Genomgång av banunderlag, väderutsikter och viktiga utrustningsändringar inför helgens omgång.]]></description>
+      <pubDate>Thu, 29 Oct 2026 11:00:00 GMT</pubDate>
+      <guid>https://www.travronden.se/travsport/v75-forutsattningar</guid>
+    </item>
+  </channel>
+</rss>

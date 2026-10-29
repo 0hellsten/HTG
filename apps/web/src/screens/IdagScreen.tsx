@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, ChevronRight } from 'lucide-react';
+import { Calendar, ChevronRight, CloudSun, Compass } from 'lucide-react';
 import { RaceDay, Race, SourceStatus, ApiResponse } from '@stallbacken/shared';
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
@@ -15,9 +15,10 @@ import { formatDistance, formatStartMethod } from '../lib/format';
 
 interface IdagScreenProps {
   onOpenRace: (raceId: string, siblingRaces: Race[]) => void;
+  onOpenTrack?: (trackId: string) => void;
 }
 
-export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace }) => {
+export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace, onOpenTrack }) => {
   const [raceDays, setRaceDays] = useState<RaceDay[]>([]);
   const [favoriteTrackIds, setFavoriteTrackIds] = useState<string[]>([]);
   const [status, setStatus] = useState<SourceStatus>('ok');
@@ -112,6 +113,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace }) => {
                   isFavorite={isFavorite}
                   onToggleFavorite={() => handleToggleFavorite(day.trackId)}
                   onOpenRace={onOpenRace}
+                  onOpenTrack={onOpenTrack}
                 />
               </BlockErrorBoundary>
             );
@@ -127,6 +129,7 @@ interface BanaKortProps {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onOpenRace: (raceId: string, siblingRaces: Race[]) => void;
+  onOpenTrack?: (trackId: string) => void;
 }
 
 const BanaKort: React.FC<BanaKortProps> = ({
@@ -134,8 +137,21 @@ const BanaKort: React.FC<BanaKortProps> = ({
   isFavorite,
   onToggleFavorite,
   onOpenRace,
+  onOpenTrack,
 }) => {
   const races = day.races || [];
+  const [weather, setWeather] = useState<{ tempC: number; description: string } | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/banor/${day.trackId}/vader`)
+      .then((r) => r.json())
+      .then((j) => {
+        if (j && j.data && j.status === 'ok') {
+          setWeather({ tempC: j.data.tempC, description: j.data.description });
+        }
+      })
+      .catch(() => {});
+  }, [day.trackId]);
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
@@ -158,9 +174,30 @@ const BanaKort: React.FC<BanaKortProps> = ({
               </span>
             )}
           </div>
-          <p className="text-sm sm:text-base text-slate-600 mt-1">
-            Första start kl. {day.firstStart || '–'} · {day.racesCount} lopp
+          <p className="text-sm sm:text-base text-slate-600 mt-1 flex items-center gap-2 flex-wrap">
+            <span>Första start kl. {day.firstStart || '–'} · {day.racesCount} lopp</span>
+            {weather && (
+              <>
+                <span>·</span>
+                <span className="inline-flex items-center gap-1 text-slate-700 font-medium">
+                  <CloudSun className="w-4 h-4 text-amber-600" />
+                  <span>{weather.tempC > 0 ? `+${weather.tempC}` : weather.tempC} °C, {weather.description}</span>
+                </span>
+              </>
+            )}
           </p>
+          {onOpenTrack && (
+            <div className="mt-1.5">
+              <button
+                type="button"
+                onClick={() => onOpenTrack(day.trackId)}
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-amber-700 hover:text-amber-900 min-h-[36px] py-1 cursor-pointer"
+              >
+                <Compass className="w-3.5 h-3.5" />
+                <span>Banvisaren för {day.trackName} &rarr;</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Hästsko-knapp för att spara eller ta bort från favoritbanor */}

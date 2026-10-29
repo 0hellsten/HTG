@@ -1,0 +1,21 @@
+{
+  "approvedTime": "2026-10-29T15:00:00Z",
+  "referenceTime": "2026-10-29T15:00:00Z",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [17.939, 59.369]
+  },
+  "timeSeries": [
+    {
+      "time": "2026-10-29T16:00:00Z",
+      "data": {
+        "air_temperature": 9.5,
+        "wind_speed": 3.2,
+        "wind_from_direction": 220,
+        "relative_humidity": 92,
+        "precipitation_amount_mean": 0,
+        "symbol_code": 2
+      }
+    }
+  ]
+}

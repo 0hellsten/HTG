@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Expressen Trav</title>
+    <link>https://www.expressen.se/sport/trav/</link>
+    <description>Senaste nytt och experttips om travsport.</description>
+    <item>
+      <title>V75 Bergsåker: Här är Eskils bästa spikar och drag</title>
+      <link>https://www.expressen.se/sport/trav/eskil-tips-1</link>
+      <author>trav@expressen.se (Eskil Hellberg)</author>
+      <description><![CDATA[En mycket intressant omgång väntar på Bergsåker. Här bjuds på analys av favoriterna och lördagens hetaste spikförslag.]]></description>
+      <pubDate>Thu, 29 Oct 2026 12:00:00 GMT</pubDate>
+      <guid>https://www.expressen.se/sport/trav/eskil-tips-1</guid>
+    </item>
+    <item>
+      <title>Solvalla ikväll: Formstarka skrällbud i Jubileumsloppet</title>
+      <link>https://www.expressen.se/sport/trav/solvalla-tips-4</link>
+      <author>trav@expressen.se (Eskil Hellberg)</author>
+      <description><![CDATA[Global Badman har toppchans i lopp 4 från innerspåret, men se upp för Kentucky River vid minsta tempo.]]></description>
+      <pubDate>Thu, 29 Oct 2026 14:15:00 GMT</pubDate>
+      <guid>https://www.expressen.se/sport/trav/solvalla-tips-4</guid>
+    </item>
+  </channel>
+</rss>

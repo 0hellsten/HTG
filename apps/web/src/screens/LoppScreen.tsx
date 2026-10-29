@@ -6,6 +6,7 @@ import {
   SourceStatus,
   ApiResponse,
   RaceOddsData,
+  RaceTipsData,
 } from '@stallbacken/shared';
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
@@ -20,6 +21,7 @@ interface LoppScreenProps {
   onBack: () => void;
   onSelectRace?: (raceId: string) => void;
   onSelectHorse?: (horseId: string) => void;
+  onOpenTrack?: (trackId: string) => void;
   siblingRaces?: Race[];
 }
 
@@ -28,6 +30,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
   onBack,
   onSelectRace,
   onSelectHorse,
+  onOpenTrack,
   siblingRaces = [],
 }) => {
   const [race, setRace] = useState<Race | null>(null);
@@ -42,6 +45,11 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
   const [oddsMessage, setOddsMessage] = useState<string>(
     'Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.'
   );
+
+  // Egen state för tips (Vad tycker stallbacken?)
+  const [tipsData, setTipsData] = useState<RaceTipsData | null>(null);
+  const [tipsStatus, setTipsStatus] = useState<SourceStatus>('ok');
+  const [tipsMessage, setTipsMessage] = useState<string>('Tipsen är färska.');
 
   // Jämför-läge och valda hästar
   const [isComparing, setIsComparing] = useState<boolean>(false);
@@ -95,9 +103,30 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
     }
   };
 
+  const fetchTipsData = async () => {
+    try {
+      const res = await fetch(`/api/lopp/${raceId}/tips`);
+      const json: ApiResponse<RaceTipsData> = await res.json();
+      if (json && json.data) {
+        setTipsData(json.data);
+        setTipsStatus(json.status);
+        setTipsMessage(json.message);
+      } else {
+        setTipsData(null);
+        setTipsStatus('failed');
+        setTipsMessage('Tipsen är från i morse. De brukar komma in på nytt vid lunch.');
+      }
+    } catch {
+      setTipsData(null);
+      setTipsStatus('failed');
+      setTipsMessage('Tipsen är från i morse. De brukar komma in på nytt vid lunch.');
+    }
+  };
+
   useEffect(() => {
     fetchRaceData();
     fetchOddsData();
+    fetchTipsData();
     setSelectedForCompare([]);
   }, [raceId]);
 
@@ -198,9 +227,23 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
             <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div>
-                  <div className="text-sm font-semibold text-amber-700 uppercase tracking-wider mb-1">
-                    {race?.trackName || 'Bana'}
-                  </div>
+                  {onOpenTrack ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const trackId = raceId.split('_')[1] || '1';
+                        onOpenTrack(trackId);
+                      }}
+                      className="text-sm font-bold text-amber-700 uppercase tracking-wider mb-1 hover:text-amber-900 inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>{race?.trackName || 'Bana'}</span>
+                      <span className="text-xs font-normal text-slate-500 normal-case underline ml-1">Visa Banvisaren &rarr;</span>
+                    </button>
+                  ) : (
+                    <div className="text-sm font-semibold text-amber-700 uppercase tracking-wider mb-1">
+                      {race?.trackName || 'Bana'}
+                    </div>
+                  )}
                   <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">
                     Lopp {raceNumber} · {distanceStr} · {methodStr}
                   </h1>
@@ -286,9 +329,9 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
             />
 
             {/* Block 3: Vad tycker stallbacken? */}
-            <BlockErrorBoundary fallbackTitle="Vad tycker stallbacken?">
-              <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-3">
-                <div className="flex items-center justify-between">
+            <BlockErrorBoundary fallbackTitle="Vad tycker stallbacken?" onRetry={fetchTipsData}>
+              <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2">
                     <Award className="w-5 h-5 text-amber-600 shrink-0" />
                     <h2 className="text-lg font-bold text-slate-900">
@@ -296,13 +339,50 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
                     </h2>
                   </div>
                   <FarskhetsPrick
-                    status="failed"
-                    explanation="Tipsen är från i morse. De brukar komma in på nytt vid lunch."
+                    status={tipsStatus}
+                    explanation={tipsMessage}
+                    onRetry={fetchTipsData}
                   />
                 </div>
-                <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                  Inga tips har kommit in för det här loppet än.
-                </p>
+
+                {tipsData && tipsData.tips.length > 0 ? (
+                  <div className="space-y-3">
+                    {tipsData.aggregatedSummary && (
+                      <div className="p-3 bg-amber-50/70 rounded-lg text-xs sm:text-sm text-slate-700 font-medium border border-amber-200/60">
+                        {tipsData.aggregatedSummary}
+                      </div>
+                    )}
+                    <div className="space-y-2.5">
+                      {tipsData.tips.map((tip) => (
+                        <div key={tip.id} className="p-3.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-slate-900 text-base">
+                              {tip.horseName || `Häst ${tip.horseNumber || '–'}`}
+                              {tip.horseNumber ? ` (nr ${tip.horseNumber})` : ''}
+                            </span>
+                            {typeof tip.rank === 'number' && (
+                              <span className="px-2 py-0.5 bg-amber-100 text-amber-950 rounded text-xs font-bold">
+                                Rank {tip.rank}
+                              </span>
+                            )}
+                          </div>
+                          {tip.summary && (
+                            <p className="text-slate-600 text-sm leading-relaxed">
+                              {tip.summary}
+                            </p>
+                          )}
+                          <div className="text-xs text-slate-500 font-semibold pt-1">
+                            {tip.provider}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                    Inga tips har kommit in för det här loppet än.
+                  </p>
+                )}
               </section>
             </BlockErrorBoundary>
 
