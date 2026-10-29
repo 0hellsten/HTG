@@ -22,6 +22,7 @@ interface StartlistaTabellProps {
   oddsMap?: HorseOddsMap;
   oddsTimestamp?: string;
   oddsStatus?: SourceStatus;
+  onSelectHorse?: (horseId: string) => void;
 }
 
 export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({
@@ -29,6 +30,7 @@ export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({
   oddsMap,
   oddsTimestamp,
   oddsStatus,
+  onSelectHorse,
 }) => {
   if (!starts || starts.length === 0) {
     return (
@@ -64,6 +66,7 @@ export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({
             start={start}
             oddsInfo={oddsMap?.[start.startNumber]}
             isOddsFailed={isOddsFailed}
+            onSelectHorse={onSelectHorse}
           />
         ))}
       </div>
@@ -90,6 +93,7 @@ export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({
                 start={start}
                 oddsInfo={oddsMap?.[start.startNumber]}
                 isOddsFailed={isOddsFailed}
+                onSelectHorse={onSelectHorse}
               />
             ))}
           </tbody>
@@ -107,12 +111,14 @@ interface CardProps {
     stakePercent?: number;
   };
   isOddsFailed?: boolean;
+  onSelectHorse?: (horseId: string) => void;
 }
 
 const MobilStartKort: React.FC<CardProps> = ({
   start,
   oddsInfo,
   isOddsFailed,
+  onSelectHorse,
 }) => {
   const isScratched = Boolean(start.scratched);
 
@@ -138,13 +144,23 @@ const MobilStartKort: React.FC<CardProps> = ({
           </div>
 
           <div>
-            <h3
-              className={`text-lg font-bold ${
-                isScratched ? 'text-slate-500 line-through' : 'text-slate-950'
-              }`}
-            >
-              {start.horseName}
-            </h3>
+            {onSelectHorse && !isScratched ? (
+              <button
+                type="button"
+                onClick={() => onSelectHorse(start.horseId)}
+                className="text-lg font-bold text-slate-950 text-left hover:text-amber-700 transition-colors focus:outline-none focus:underline"
+              >
+                {start.horseName}
+              </button>
+            ) : (
+              <h3
+                className={`text-lg font-bold ${
+                  isScratched ? 'text-slate-500 line-through' : 'text-slate-950'
+                }`}
+              >
+                {start.horseName}
+              </h3>
+            )}
             <p className="text-sm text-slate-600 mt-0.5">
               Spår {start.postPosition} · {formatDistance(start.distanceM)}
             </p>
@@ -219,6 +235,7 @@ const LaptopStartRad: React.FC<CardProps> = ({
   start,
   oddsInfo,
   isOddsFailed,
+  onSelectHorse,
 }) => {
   const isScratched = Boolean(start.scratched);
 
@@ -242,13 +259,23 @@ const LaptopStartRad: React.FC<CardProps> = ({
 
       <td className="py-3.5 px-3">
         <div className="flex items-center gap-2">
-          <span
-            className={`font-semibold ${
-              isScratched ? 'line-through text-slate-500' : 'text-slate-950'
-            }`}
-          >
-            {start.horseName}
-          </span>
+          {onSelectHorse && !isScratched ? (
+            <button
+              type="button"
+              onClick={() => onSelectHorse(start.horseId)}
+              className="font-bold text-slate-950 text-left hover:text-amber-700 transition-colors focus:outline-none focus:underline"
+            >
+              {start.horseName}
+            </button>
+          ) : (
+            <span
+              className={`font-semibold ${
+                isScratched ? 'line-through text-slate-500' : 'text-slate-950'
+              }`}
+            >
+              {start.horseName}
+            </span>
+          )}
           {isScratched && (
             <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded">
               Struken {start.scratchReason ? `(${start.scratchReason})` : ''}

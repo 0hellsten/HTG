@@ -1,0 +1,268 @@
+{
+  "records": [
+    {
+      "date": "2026-10-12",
+      "place": "2",
+      "odds": 746,
+      "kmTime": { "minutes": 1, "seconds": 14, "tenths": 3 },
+      "race": {
+        "id": "2026-10-12_8_2",
+        "sport": "trot",
+        "type": "regular",
+        "number": 2,
+        "startMethod": "auto",
+        "firstPrize": 3500000
+      },
+      "track": { "id": 8, "name": "Axevalla" },
+      "start": {
+        "distance": 2140,
+        "postPosition": 8,
+        "driver": { "id": 145716, "firstName": "Stefan", "lastName": "Persson" },
+        "horse": {
+          "shoes": { "front": true, "back": true },
+          "sulky": { "type": { "code": "VA", "text": "Vanlig" } }
+        }
+      }
+    },
+    {
+      "date": "2026-09-28",
+      "place": "1",
+      "odds": 284,
+      "kmTime": { "minutes": 1, "seconds": 14, "tenths": 6 },
+      "race": {
+        "id": "2026-09-28_8_4",
+        "sport": "trot",
+        "type": "regular",
+        "number": 4,
+        "startMethod": "auto",
+        "firstPrize": 3000000
+      },
+      "track": { "id": 8, "name": "Axevalla" },
+      "start": {
+        "distance": 1640,
+        "postPosition": 3,
+        "driver": { "id": 145716, "firstName": "Stefan", "lastName": "Persson" },
+        "horse": {
+          "shoes": { "front": false, "back": false },
+          "sulky": { "type": { "code": "AS", "text": "Amerikansk sulky" } }
+        }
+      }
+    },
+    {
+      "date": "2026-09-14",
+      "place": "g",
+      "odds": 450,
+      "kmTime": null,
+      "race": {
+        "id": "2026-09-14_6_6",
+        "sport": "trot",
+        "type": "regular",
+        "number": 6,
+        "startMethod": "volte",
+        "firstPrize": 4000000
+      },
+      "track": { "id": 6, "name": "Åby" },
+      "start": {
+        "distance": 2140,
+        "postPosition": 4,
+        "driver": { "id": 145716, "firstName": "Stefan", "lastName": "Persson" },
+        "horse": {
+          "shoes": { "front": true, "back": true },
+          "sulky": { "type": { "code": "VA", "text": "Vanlig" } }
+        }
+      }
+    },
+    {
+      "date": "2026-08-30",
+      "place": "3",
+      "odds": 610,
+      "kmTime": { "minutes": 1, "seconds": 14, "tenths": 9 },
+      "race": {
+        "id": "2026-08-30_1_7",
+        "sport": "trot",
+        "type": "regular",
+        "number": 7,
+        "startMethod": "auto",
+        "firstPrize": 5000000
+      },
+      "track": { "id": 1, "name": "Solvalla" },
+      "start": {
+        "distance": 2140,
+        "postPosition": 5,
+        "driver": { "id": 145716, "firstName": "Stefan", "lastName": "Persson" },
+        "horse": {
+          "shoes": { "front": false, "back": true },
+          "sulky": { "type": { "code": "VA", "text": "Vanlig" } }
+        }
+      }
+    },
+    {
+      "date": "2026-08-12",
+      "place": "1",
+      "odds": 320,
+      "kmTime": { "minutes": 1, "seconds": 15, "tenths": 1 },
+      "race": {
+        "id": "2026-08-12_8_3",
+        "sport": "trot",
+        "type": "regular",
+        "number": 3,
+        "startMethod": "auto",
+        "firstPrize": 3000000
+      },
+      "track": { "id": 8, "name": "Axevalla" },
+      "start": {
+        "distance": 2140,
+        "postPosition": 2,
+        "driver": { "id": 5169, "firstName": "Morgan", "lastName": "Wilhelmsson" },
+        "horse": {
+          "shoes": { "front": true, "back": true },
+          "sulky": { "type": { "code": "VA", "text": "Vanlig" } }
+        }
+      }
+    },
+    {
+      "date": "2026-07-25",
+      "place": "2",
+      "odds": 540,
+      "kmTime": { "minutes": 1, "seconds": 15, "tenths": 4 },
+      "race": {
+        "id": "2026-07-25_7_5",
+        "sport": "trot",
+        "type": "regular",
+        "number": 5,
+        "startMethod": "volte",
+        "firstPrize": 3500000
+      },
+      "track": { "id": 7, "name": "Halmstad" },
+      "start": {
+        "distance": 2140,
+        "postPosition": 1,
+        "driver": { "id": 145716, "firstName": "Stefan", "lastName": "Persson" },
+        "horse": {
+          "shoes": { "front": true, "back": true },
+          "sulky": { "type": { "code": "VA", "text": "Vanlig" } }
+        }
+      }
+    },
+    {
+      "date": "2026-07-08",
+      "place": "d",
+      "odds": 1890,
+      "kmTime": null,
+      "race": {
+        "id": "2026-07-08_6_8",
+        "sport": "trot",
+        "type": "regular",
+        "number": 8,
+        "startMethod": "auto",
+        "firstPrize": 10000000
+      },
+      "track": { "id": 6, "name": "Åby" },
+      "start": {
+        "distance": 2140,
+        "postPosition": 11,
+        "driver": { "id": 145716, "firstName": "Stefan", "lastName": "Persson" },
+        "horse": {
+          "shoes": { "front": false, "back": false },
+          "sulky": { "type": { "code": "AS", "text": "Amerikansk sulky" } }
+        }
+      }
+    },
+    {
+      "date": "2026-06-20",
+      "place": "4",
+      "odds": 890,
+      "kmTime": { "minutes": 1, "seconds": 15, "tenths": 6 },
+      "race": {
+        "id": "2026-06-20_8_5",
+        "sport": "trot",
+        "type": "regular",
+        "number": 5,
+        "startMethod": "auto",
+        "firstPrize": 3000000
+      },
+      "track": { "id": 8, "name": "Axevalla" },
+      "start": {
+        "distance": 2140,
+        "postPosition": 6,
+        "driver": { "id": 5169, "firstName": "Morgan", "lastName": "Wilhelmsson" },
+        "horse": {
+          "shoes": { "front": true, "back": true },
+          "sulky": { "type": { "code": "VA", "text": "Vanlig" } }
+        }
+      }
+    },
+    {
+      "date": "2026-06-02",
+      "place": "2",
+      "odds": 420,
+      "kmTime": { "minutes": 1, "seconds": 15, "tenths": 8 },
+      "race": {
+        "id": "2026-06-02_8_2",
+        "sport": "trot",
+        "type": "regular",
+        "number": 2,
+        "startMethod": "volte",
+        "firstPrize": 2500000
+      },
+      "track": { "id": 8, "name": "Axevalla" },
+      "start": {
+        "distance": 2140,
+        "postPosition": 3,
+        "driver": { "id": 145716, "firstName": "Stefan", "lastName": "Persson" },
+        "horse": {
+          "shoes": { "front": true, "back": true },
+          "sulky": { "type": { "code": "VA", "text": "Vanlig" } }
+        }
+      }
+    },
+    {
+      "date": "2026-05-15",
+      "place": "1",
+      "odds": 195,
+      "kmTime": { "minutes": 1, "seconds": 16, "tenths": 1 },
+      "race": {
+        "id": "2026-05-15_8_1",
+        "sport": "trot",
+        "type": "regular",
+        "number": 1,
+        "startMethod": "auto",
+        "firstPrize": 2500000
+      },
+      "track": { "id": 8, "name": "Axevalla" },
+      "start": {
+        "distance": 2140,
+        "postPosition": 2,
+        "driver": { "id": 145716, "firstName": "Stefan", "lastName": "Persson" },
+        "horse": {
+          "shoes": { "front": true, "back": true },
+          "sulky": { "type": { "code": "VA", "text": "Vanlig" } }
+        }
+      }
+    },
+    {
+      "date": "2026-04-10",
+      "place": "k",
+      "odds": null,
+      "kmTime": { "minutes": 1, "seconds": 18, "tenths": 4 },
+      "race": {
+        "id": "2026-04-10_8_k",
+        "sport": "trot",
+        "type": "qualifier",
+        "number": 1,
+        "startMethod": "volte",
+        "firstPrize": 0
+      },
+      "track": { "id": 8, "name": "Axevalla" },
+      "start": {
+        "distance": 2140,
+        "postPosition": 1,
+        "driver": { "id": 5169, "firstName": "Morgan", "lastName": "Wilhelmsson" },
+        "horse": {
+          "shoes": { "front": true, "back": true },
+          "sulky": { "type": { "code": "VA", "text": "Vanlig" } }
+        }
+      }
+    }
+  ]
+}

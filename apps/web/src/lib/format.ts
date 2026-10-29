@@ -124,3 +124,32 @@ export function formatPercent(percent?: number | null): string {
   return `${Math.round(percent)} %`;
 }
 
+/**
+ * Formaterar datum till kort svenskt format (t.ex. "12 okt").
+ */
+export function formatDateShort(dateStr?: string | null): string {
+  if (!dateStr) return '–';
+  try {
+    const months = [
+      'jan', 'feb', 'mar', 'apr', 'maj', 'jun',
+      'jul', 'aug', 'sep', 'okt', 'nov', 'dec'
+    ];
+    const parts = dateStr.split('-');
+    if (parts.length >= 3) {
+      const day = parseInt(parts[2], 10);
+      const monthIdx = parseInt(parts[1], 10) - 1;
+      if (monthIdx >= 0 && monthIdx < 12 && !isNaN(day)) {
+        return `${day} ${months[monthIdx]}`;
+      }
+    }
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) {
+      return `${d.getDate()} ${months[d.getMonth()]}`;
+    }
+    return dateStr;
+  } catch {
+    return dateStr;
+  }
+}
+
+

@@ -5,7 +5,7 @@ import fs from 'fs';
 
 const artifactDir =
   process.env.ARTIFACT_DIR ||
-  'C:/Users/hells/.gemini/antigravity/brain/41fc27a5-c530-4154-94fc-7e8952e3926e';
+  'C:/Users/hells/.gemini/antigravity/brain/f24ef41b-2172-4e6f-abd4-7c5845855bd6';
 if (!fs.existsSync(artifactDir)) {
   fs.mkdirSync(artifactDir, { recursive: true });
 }
@@ -52,11 +52,11 @@ async function run() {
     const browser = await chromium.launch();
 
     // ========================================================
-    // DEL 1: NORMALLÄGE (ODDS AKTIVA)
+    // DEL 1: NORMALLÄGE — HÄSTKORTET I MOBIL & LAPTOP
     // ========================================================
 
-    // 1A. Mobil: 390x844 — Lopp 4 med aktiva odds och streck
-    console.log('Tar skärmbild för mobil (390x844) med aktiva odds...');
+    // 1A. Mobil: 390x844 — Hästkortet (via lopp eller sök)
+    console.log('Tar skärmbild för mobil (390x844) Hästkort...');
     const mobileContext = await browser.newContext({
       viewport: { width: 390, height: 844 },
       isMobile: true,
@@ -68,21 +68,35 @@ async function run() {
     await mobilePage.goto('http://localhost:5174', { waitUntil: 'networkidle' });
     await sleep(1000);
 
-    // Klicka in på Lopp 4
-    console.log('Mobil: Navigerar in i Lopp 4...');
-    const raceButton = mobilePage.locator('button:has-text("Lopp 4")').first();
-    await raceButton.scrollIntoViewIfNeeded();
-    await raceButton.click();
+    // Klicka in på fliken Hästar i bottenmenyn
+    console.log('Mobil: Navigerar till fliken Hästar...');
+    const hastarTab = mobilePage.locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Hästar")');
+    await hastarTab.click();
+    await sleep(1000);
+
+    // Sök efter Global
+    await mobilePage.fill('input[placeholder="Sök häst..."]', 'Global');
+    await sleep(800);
+
+    // Ta skärmbild på sökskärmen i mobil
+    const mobileSearchPath = path.join(artifactDir, 'fas-6-mobil-hastsok.png');
+    await mobilePage.screenshot({ path: mobileSearchPath, fullPage: false });
+    console.log(`Mobil Hästsök sparad till: ${mobileSearchPath}`);
+
+    // Klicka på hästen Global F.N.P. för att öppna Hästkortet
+    console.log('Mobil: Klickar på häst i söklistan...');
+    const horseBtn = mobilePage.locator('div.divide-y button').first();
+    await horseBtn.click();
     await sleep(1500);
 
-    const mobileActiveOddsPath = path.join(artifactDir, 'fas-5-mobil-odds-aktiv.png');
-    await mobilePage.screenshot({ path: mobileActiveOddsPath, fullPage: false });
-    console.log(`Mobil Loppkort med aktiva odds sparad till: ${mobileActiveOddsPath}`);
+    const mobileHastkortPath = path.join(artifactDir, 'fas-6-mobil-hastkort.png');
+    await mobilePage.screenshot({ path: mobileHastkortPath, fullPage: false });
+    console.log(`Mobil Hästkort sparad till: ${mobileHastkortPath}`);
 
     await mobileContext.close();
 
-    // 1B. Laptop: 1440x900 — Lopp 4 med tabellkolumner för odds & streck samt Dagens spik
-    console.log('Tar skärmbild för laptop (1440x900) med aktiva odds...');
+    // 1B. Laptop: 1440x900 — Hästkortet med full tabell & stamtavla
+    console.log('Tar skärmbild för laptop (1440x900) Hästkort...');
     const laptopContext = await browser.newContext({
       viewport: { width: 1440, height: 900 },
     });
@@ -90,89 +104,74 @@ async function run() {
     await laptopPage.goto('http://localhost:5174', { waitUntil: 'networkidle' });
     await sleep(1000);
 
-    const laptopRaceBtn = laptopPage.locator('button:has-text("Lopp 4")').first();
-    await laptopRaceBtn.scrollIntoViewIfNeeded();
-    await laptopRaceBtn.click();
+    // Klicka in på fliken Hästar på laptop
+    const laptopHastarBtn = laptopPage.locator('aside nav button:has-text("Hästar")').first();
+    await laptopHastarBtn.click();
+    await sleep(1000);
+
+    await laptopPage.fill('input[placeholder="Sök häst..."]', 'Global');
+    await sleep(800);
+
+    const firstHorse = laptopPage.locator('div.divide-y button').first();
+    await firstHorse.click();
     await sleep(1500);
 
-    const laptopActiveOddsPath = path.join(artifactDir, 'fas-5-laptop-odds-aktiv.png');
-    await laptopPage.screenshot({ path: laptopActiveOddsPath });
-    console.log(`Laptop Loppkort med aktiva odds sparad till: ${laptopActiveOddsPath}`);
+    const laptopHastkortPath = path.join(artifactDir, 'fas-6-laptop-hastkort.png');
+    await laptopPage.screenshot({ path: laptopHastkortPath });
+    console.log(`Laptop Hästkort sparad till: ${laptopHastkortPath}`);
 
     await laptopContext.close();
 
     // ========================================================
-    // DEL 2: DEGRADERINGSMODELLEN — ODDSKÄLLAN AVSTÄNGD
+    // DEL 2: DEGRADERINGSMODELLEN — HISTORIK AVSTÄNGD
     // ========================================================
-    console.log('\n--- Prov på arkitekturen: Testar avstängd oddskälla (simulateOddsDown=true) ---');
+    console.log('\n--- Prov på arkitekturen: Testar avstängd historik (simulateHistoryDown=true) ---');
 
-    // 2A. Mobil: 390x844 med oddskällan nere
-    const mobileDegradedContext = await browser.newContext({
-      viewport: { width: 390, height: 844 },
-      isMobile: true,
-      hasTouch: true,
-      userAgent:
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    const degradedContext = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
     });
-    const mobileDegradedPage = await mobileDegradedContext.newPage();
-    await mobileDegradedPage.goto('http://localhost:5174?simulateOddsDown=true', {
+    const degradedPage = await degradedContext.newPage();
+    await degradedPage.goto('http://localhost:5174?simulateHistoryDown=true', {
       waitUntil: 'networkidle',
     });
     await sleep(1000);
 
-    const degRaceBtn = mobileDegradedPage.locator('button:has-text("Lopp 4")').first();
-    await degRaceBtn.scrollIntoViewIfNeeded();
-    await degRaceBtn.click();
+    // Navigera till hästen
+    const degHastarBtn = degradedPage.locator('aside nav button:has-text("Hästar")').first();
+    await degHastarBtn.click();
+    await sleep(1000);
+
+    await degradedPage.fill('input[placeholder="Sök häst..."]', 'Global');
+    await sleep(800);
+
+    const degFirstHorse = degradedPage.locator('div.divide-y button').first();
+    await degFirstHorse.click();
     await sleep(1500);
 
-    const mobileDownPath = path.join(artifactDir, 'fas-5-mobil-odds-avstangd.png');
-    await mobileDegradedPage.screenshot({ path: mobileDownPath });
-    console.log(`Mobil Loppkort med oddskälla avstängd sparad till: ${mobileDownPath}`);
-
-    // Klicka på färskhetspricken för oddsen för att visa förklaringen
-    console.log('Mobil: Trycker på grå färskhetsprick vid oddsblocket...');
-    const oddsSection = mobileDegradedPage.locator('section:has-text("Odds och streck")');
-    const dotBtn = oddsSection.locator('button[aria-label="Visa information om uppgifternas färskhet"]').first();
+    // Klicka på färskhetspricken vid Form i backspegeln
+    console.log('Trycker på färskhetsprick för Form i backspegeln i degraderat läge...');
+    const formSection = degradedPage.locator('section:has-text("Form i backspegeln")');
+    const dotBtn = formSection.locator('button[aria-label="Visa information om uppgifternas färskhet"]').first();
     if (await dotBtn.isVisible()) {
       await dotBtn.click();
       await sleep(500);
-      const dotShotPath = path.join(artifactDir, 'fas-5-mobil-prick-klick.png');
-      await mobileDegradedPage.screenshot({ path: dotShotPath });
-      console.log(`Mobil Prick-klick med lugn svensk förklaring sparad till: ${dotShotPath}`);
     }
 
-    await mobileDegradedContext.close();
+    const degradedPath = path.join(artifactDir, 'fas-6-degradering-historik.png');
+    await degradedPage.screenshot({ path: degradedPath });
+    console.log(`Degraderingsskärmbild med sparad till: ${degradedPath}`);
 
-    // 2B. Laptop: 1440x900 med oddskällan nere
-    const laptopDegradedContext = await browser.newContext({
-      viewport: { width: 1440, height: 900 },
-    });
-    const laptopDegradedPage = await laptopDegradedContext.newPage();
-    await laptopDegradedPage.goto('http://localhost:5174?simulateOddsDown=true', {
-      waitUntil: 'networkidle',
-    });
-    await sleep(1000);
-
-    const degLaptopBtn = laptopDegradedPage.locator('button:has-text("Lopp 4")').first();
-    await degLaptopBtn.scrollIntoViewIfNeeded();
-    await degLaptopBtn.click();
-    await sleep(1500);
-
-    const laptopDownPath = path.join(artifactDir, 'fas-5-laptop-odds-avstangd.png');
-    await laptopDegradedPage.screenshot({ path: laptopDownPath });
-    console.log(`Laptop Loppkort med oddskälla avstängd sparad till: ${laptopDownPath}`);
-
-    await laptopDegradedContext.close();
+    await degradedContext.close();
     await browser.close();
-    console.log('\nUI-verifiering för Fas 5 slutförd med samtliga skärmbilder!');
+
+    console.log('\nSamtliga Playwright UI-verifieringar för Fas 6 slutförda!');
   } finally {
-    console.log('Stänger ner processer...');
-    serverProcess.kill();
-    webProcess.kill();
+    serverProcess.kill('SIGTERM');
+    webProcess.kill('SIGTERM');
   }
 }
 
 run().catch((err) => {
-  console.error('Fel under UI-verifiering:', err);
+  console.error('Fel under verifiering:', err);
   process.exit(1);
 });

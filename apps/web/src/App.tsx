@@ -3,6 +3,8 @@ import { Calendar, Search, Award, Star, Menu, Download } from 'lucide-react';
 import { Race } from '@stallbacken/shared';
 import { IdagScreen } from './screens/IdagScreen';
 import { LoppScreen } from './screens/LoppScreen';
+import { HastScreen } from './screens/HastScreen';
+import { HastarScreen } from './screens/HastarScreen';
 
 type Tab = 'idag' | 'hastar' | 'tips' | 'stall' | 'mer';
 
@@ -14,6 +16,7 @@ interface BeforeInstallPromptEvent extends Event {
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('idag');
   const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
+  const [selectedHorseId, setSelectedHorseId] = useState<string | null>(null);
   const [siblingRaces, setSiblingRaces] = useState<Race[]>([]);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
@@ -40,6 +43,7 @@ export const App: React.FC = () => {
 
   const handleTabChange = (tab: Tab) => {
     setActiveTab(tab);
+    setSelectedHorseId(null);
     if (tab === 'idag') {
       setSelectedRaceId(null);
     }
@@ -134,12 +138,18 @@ export const App: React.FC = () => {
 
         {/* Vy-yta */}
         <main className="flex-1 p-4 sm:p-6 lg:p-10 max-w-5xl w-full mx-auto pb-24 lg:pb-10">
-          {activeTab === 'idag' && (
+          {selectedHorseId ? (
+            <HastScreen
+              horseId={selectedHorseId}
+              onBack={() => setSelectedHorseId(null)}
+            />
+          ) : activeTab === 'idag' ? (
             selectedRaceId ? (
               <LoppScreen
                 raceId={selectedRaceId}
                 onBack={() => setSelectedRaceId(null)}
                 onSelectRace={(id) => setSelectedRaceId(id)}
+                onSelectHorse={(id) => setSelectedHorseId(id)}
                 siblingRaces={siblingRaces}
               />
             ) : (
@@ -150,9 +160,11 @@ export const App: React.FC = () => {
                 }}
               />
             )
-          )}
-
-          {activeTab !== 'idag' && (
+          ) : activeTab === 'hastar' ? (
+            <HastarScreen
+              onSelectHorse={(id) => setSelectedHorseId(id)}
+            />
+          ) : (
             <div className="bg-white rounded-xl border border-slate-200 p-8 text-center max-w-lg mx-auto mt-8">
               <h2 className="text-xl font-semibold text-slate-900 mb-2">
                 {navItems.find((n) => n.id === activeTab)?.label}

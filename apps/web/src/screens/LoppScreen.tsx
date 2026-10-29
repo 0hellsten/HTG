@@ -25,6 +25,7 @@ interface LoppScreenProps {
   raceId: string;
   onBack: () => void;
   onSelectRace?: (raceId: string) => void;
+  onSelectHorse?: (horseId: string) => void;
   siblingRaces?: Race[];
 }
 
@@ -32,6 +33,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
   raceId,
   onBack,
   onSelectRace,
+  onSelectHorse,
   siblingRaces = [],
 }) => {
   const [race, setRace] = useState<Race | null>(null);
@@ -252,6 +254,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
                   oddsMap={oddsMap}
                   oddsTimestamp={oddsData?.timeFormatted}
                   oddsStatus={oddsStatus}
+                  onSelectHorse={onSelectHorse}
                 />
               </section>
             </BlockErrorBoundary>

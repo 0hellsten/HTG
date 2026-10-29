@@ -4,6 +4,9 @@ import {
   isFavoriteTrack,
   toggleFavoriteTrack,
   sortRaceDaysWithFavorites,
+  getFavoriteHorseIds,
+  isFavoriteHorse,
+  toggleFavoriteHorse,
 } from './favoriter';
 
 // Mock av localStorage för Node-miljö
@@ -60,5 +63,20 @@ describe('favoriter', () => {
     // Markera Solvalla som favorit
     const sorted = sortRaceDaysWithFavorites(raceDays, ['solvalla']);
     expect(sorted.map((r) => r.trackId)).toEqual(['solvalla', 'aby', 'bergsaker']);
+  });
+
+  it('kan lägga till och ta bort favorithästar', () => {
+    expect(getFavoriteHorseIds()).toEqual([]);
+    expect(isFavoriteHorse('783840')).toBe(false);
+
+    const added = toggleFavoriteHorse('783840');
+    expect(added).toBe(true);
+    expect(isFavoriteHorse('783840')).toBe(true);
+    expect(getFavoriteHorseIds()).toEqual(['783840']);
+
+    const removed = toggleFavoriteHorse('783840');
+    expect(removed).toBe(false);
+    expect(isFavoriteHorse('783840')).toBe(false);
+    expect(getFavoriteHorseIds()).toEqual([]);
   });
 });

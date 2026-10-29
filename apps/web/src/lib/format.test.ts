@@ -8,6 +8,7 @@ import {
   formatSulky,
   formatOdds,
   formatPercent,
+  formatDateShort,
 } from './format';
 
 describe('Svensk travformatering', () => {
@@ -93,6 +94,14 @@ describe('Svensk travformatering', () => {
     expect(formatPercent(0)).toBe('0 %');
     expect(formatPercent(undefined)).toBe('–');
     expect(formatPercent(null)).toBe('–');
+  });
+
+  it('formaterar korta datum med svensk månad', () => {
+    expect(formatDateShort('2026-10-12')).toBe('12 okt');
+    expect(formatDateShort('2026-05-01')).toBe('1 maj');
+    expect(formatDateShort('2026-01-15')).toBe('15 jan');
+    expect(formatDateShort('')).toBe('–');
+    expect(formatDateShort(null)).toBe('–');
   });
 });
 

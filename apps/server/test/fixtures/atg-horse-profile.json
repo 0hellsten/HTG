@@ -1,0 +1,78 @@
+{
+  "id": 783840,
+  "name": "Global F.N.P.",
+  "age": 5,
+  "sex": "gelding",
+  "money": 240100,
+  "homeTrack": {
+    "id": 8,
+    "name": "Axevalla"
+  },
+  "owner": {
+    "id": 815024,
+    "name": "Vilhelmsson Morgan, m fl"
+  },
+  "breeder": {
+    "id": 215947,
+    "name": "Global Farm AB",
+    "location": "Nacka"
+  },
+  "statistics": {
+    "life": {
+      "starts": 23,
+      "earnings": 24010000,
+      "placement": {
+        "1": 3,
+        "2": 5,
+        "3": 1
+      },
+      "records": [
+        {
+          "code": "aM",
+          "startMethod": "auto",
+          "distance": "medium",
+          "time": {
+            "minutes": 1,
+            "seconds": 14,
+            "tenths": 3
+          },
+          "place": 2,
+          "year": "2026"
+        },
+        {
+          "code": "M",
+          "startMethod": "volte",
+          "distance": "medium",
+          "time": {
+            "minutes": 1,
+            "seconds": 15,
+            "tenths": 7
+          },
+          "place": 2,
+          "year": "2025"
+        }
+      ],
+      "winPercentage": 1304,
+      "placePercentage": 3913,
+      "earningsPerStart": 1043913,
+      "startPoints": 1650
+    }
+  },
+  "pedigree": {
+    "father": {
+      "id": 553396,
+      "name": "S.J.'s Caviar",
+      "nationality": "US"
+    },
+    "mother": {
+      "id": 766385,
+      "name": "Alberte Merci",
+      "nationality": "NO"
+    },
+    "grandfather": {
+      "id": 667295,
+      "name": "Ready Cash",
+      "nationality": "FR"
+    }
+  }
+}

@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Database from 'better-sqlite3';
-import { SourceAdapter, SourceResult, FetchContext } from '@stallbacken/shared';
+import { SourceAdapter, SourceResult, FetchContext, HorseProfileResponse } from '@stallbacken/shared';
 import { fetchWithPolicy, FetchOptions } from '../collect/queue.js';
 import { HealthManager } from '../health/health-manager.js';
 import { logger } from '../lib/logger.js';
@@ -20,6 +20,7 @@ import { AtgCalendarDaySchema, AtgRaceDetailSchema } from './atg-schemas.js';
 import { saveCalendarToDb, saveRaceDetailToDb } from './atg-storage.js';
 import { getCachedCalendar, getCachedRace } from './atg-cache.js';
 import { RacingDayData, RaceDetailData } from './atg-types.js';
+import { fetchHorseProfileData } from './atg-horse-fetcher.js';
 
 export * from './atg-types.js';
 
@@ -169,6 +170,24 @@ export class AtgRacingInfoAdapter implements SourceAdapter<unknown> {
         message: 'Uppdateras inte just nu',
       };
     }
+  }
+
+  async fetchHorseProfile(
+    horseId: string,
+    forceRefresh = false
+  ): Promise<SourceResult<HorseProfileResponse>> {
+    return fetchHorseProfileData(
+      {
+        db: this.db,
+        sourceId: this.id,
+        baseUrl: this.baseUrl,
+        healthManager: this.healthManager,
+        fetchOptions: this.fetchOptions,
+        allowFixtureFallback: this.allowFixtureFallback,
+      },
+      horseId,
+      forceRefresh
+    );
   }
 
   private async requestJson(

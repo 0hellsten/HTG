@@ -2,12 +2,21 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createServer } from '../src/index.js';
 import { FastifyInstance } from 'fastify';
 import fs from 'fs';
+import { HealthManager } from '../src/health/health-manager.js';
+import { getDb } from '../src/db/connection.js';
 
 describe('Lopp API-rutter', () => {
   let app: FastifyInstance;
   const testDbPath = `./data/test-lopp-${Date.now()}.db`;
 
   beforeEach(async () => {
+    try {
+      const hm = new HealthManager(getDb());
+      hm.resetCircuitBreaker('atg-odds');
+      hm.resetCircuitBreaker('atg-racinginfo');
+    } catch {
+      // Ignorera
+    }
     app = await createServer(testDbPath);
   });
 
