@@ -249,10 +249,6 @@ export const HjalpScreen: React.FC<HjalpScreenProps> = ({ onBack }) => {
 
       {/* Fotnot */}
       <div className="pt-6 border-t border-slate-200 text-center text-slate-500 text-sm space-y-1">
-        <p className="font-semibold text-slate-800">
-          Tangitza — Byggd för lugn och läsbar travinformation.
-        </p>
-        <p>Privat travapplikation för lugn och tydlig läsning.</p>
         <div className="pt-3">
           <span className="text-[11px] font-mono tracking-widest text-slate-400 select-none block">
             HTG™ Hellstens Trav &amp; Galopp

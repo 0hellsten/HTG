@@ -104,7 +104,6 @@ export const App: React.FC = () => {
           </div>
           <div>
             <span className="text-xl font-extrabold tracking-tight text-white block">Tangitza</span>
-            <span className="text-xs text-slate-400 block font-normal">En lugn travapp</span>
           </div>
         </div>
 
@@ -160,9 +159,6 @@ export const App: React.FC = () => {
             <div>
               <span className="text-base font-extrabold tracking-tight text-white block leading-tight">
                 Tangitza
-              </span>
-              <span className="text-[10px] text-slate-400 block font-normal leading-none">
-                En lugn travapp
               </span>
             </div>
           </div>
