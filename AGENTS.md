@@ -11,8 +11,6 @@ från flera källor och visar det i ett lugnt, läsbart gränssnitt.
 Den ska gå att använda på **Android-mobil** och **bärbar dator**. Den säljs inte, publiceras inte och
 har inga användarkonton.
 
-**Appen informerar. Den rekommenderar inte insatser.**
-
 ## Den bärande principen
 
 ATG har inget öppet, dokumenterat publikt API. Data kommer därför från flera håll, och **delar kommer
@@ -120,7 +118,6 @@ Det är den enda plats i appen där källor nämns vid namn.
   JSON, scraping, adapter, 404, 500.
 - Tider skrivs `14:35`, datum `lör 8 nov`, kilometertider `1.12,3a`, pengar `1 245 300 kr`.
 - Tips har **alltid** en synlig avsändare: "Tips från X".
-- Inga formuleringar om insatsstorlek, inga vinstlöften, aldrig orden "säker" eller "garanterad" om ett spel.
 
 ## Tillgänglighet (icke förhandlingsbart)
 

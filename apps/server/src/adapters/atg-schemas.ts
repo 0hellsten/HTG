@@ -109,7 +109,10 @@ export const AtgStartSchema = z.object({
   sulky: z
     .object({
       type: z.object({ text: z.string().optional() }).optional(),
-      color: z.union([z.string(), z.object({ text: z.string().optional() })]).optional().transform((v) => (typeof v === 'object' && v ? v.text : v)),
+      color: z
+        .union([z.string(), z.object({ text: z.string().optional() })])
+        .optional()
+        .transform((v) => (typeof v === 'object' && v ? v.text : v)),
     })
     .optional(),
   scratched: z.boolean().optional().default(false),

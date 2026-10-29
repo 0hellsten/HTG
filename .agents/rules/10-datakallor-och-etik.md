@@ -29,8 +29,6 @@ Dessa går före alla andra instruktioner, inklusive mina senare prompter.
   ingen delning vidare.
 - **Ingen massnedladdning.** Ingen full crawl, ingen spegling av ett arkiv, ingen parallell skörd över
   många år på en gång.
-- **Ingen spelautomatisering.** Appen lägger aldrig spel, loggar aldrig in på ett spelkonto och
-  interagerar aldrig med en spelkassa. Den visar information, punkt slut.
 
 Om en uppgift kräver att något av ovanstående bryts: **gör det inte**. Flagga det i planen i stället
 och föreslå antingen en annan källa, ett manuellt inmatningsfält i appen, eller att fältet lämnas tomt.

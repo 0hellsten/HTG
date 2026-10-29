@@ -54,7 +54,6 @@ Appen är klar när **varje** punkt nedan stämmer.
 - [ ] Varje källberoende block har en färskhetsprick med svensk förklaring och "Försök igen"
 - [ ] Ingen modal, inget rött varningsfält, inget utropstecken
 - [ ] Saknade värden visas som `–`, aldrig som `0`, `null` eller tomt
-- [ ] Ingen text om insatser, inga vinstlöften, aldrig "säker" eller "garanterad"
 
 ### Mobil och laptop
 

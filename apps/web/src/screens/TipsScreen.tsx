@@ -266,8 +266,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
         <p className="font-semibold text-slate-900 mb-1">Om tipsen på stallbacken</p>
         <p>
           Appen samlar in tips från oberoende källor för att ge en samlad bild av förutsättningarna.
-          Alla tips anges med sin ursprungliga avsändare. Stallbacken garanterar inga resultat och
-          rekommenderar aldrig insatsstorlekar.
+          Alla tips anges med sin ursprungliga avsändare.
         </p>
       </div>
     </div>

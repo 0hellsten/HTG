@@ -146,7 +146,6 @@ Efter varje fas: kör verifieringsprompten i `docs/05-TEST-VERIFIERING-DRIFT.md`
 > - **Alltid synlig avsändare** på varje tips: "Tips från X".
 > - Aldrig presenterat som sanning. Aldrig sammanvägt till ett eget "rätt svar" utan att det tydligt står att det är appens egen hopslagning.
 > - Varje tipskälla har egen prick. Faller en, visas de andra.
-> - Inga insatsråd, inga vinstlöften, aldrig "säker" eller "garanterad".
 >
 > **"Banvisaren"** — per travbana: banlängd, öppen/täckt, underlag, hur ofta ledaren vinner, vinstprocent per startspår, vanliga vinnartider, och väder vid banan på tävlingsdagen.
 >

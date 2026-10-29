@@ -57,10 +57,7 @@ och i regelfilen `.agents/rules/10-datakallor-och-etik.md`. **Läs båda innan d
 Allt i gränssnittet är på **svenska**. Texten ska låta som en lugn, kunnig vän på stallbacken — inte som
 ett spelbolag och inte som en databas. **Travord används diskret som krydda**, inte som hinder:
 "Dagens spik", "Skrällkandidat", "Form i backspegeln", "Ryggar och lägen", "Banvisaren".
-Ordlistan och färdig microcopy ligger i `docs/04-UX-ORDLISTA-MICROCOPY.md`. Använd den ordagrant där den finns.
-
-Appen **informerar — den rekommenderar inte insatser.** Inga rådgivande formuleringar om hur mycket man
-bör satsa, inga vinstlöften, ingen "säker" eller "garanterad". Tips presenteras alltid med avsändare.
+Ordlistan och färdig microcopy ligger i `docs/04-UX-ORDLISTA-MICROCOPY.md`. Använd den ordagrant där den finns. Tips presenteras alltid med avsändare.
 
 ## Så här vill jag att du arbetar
 

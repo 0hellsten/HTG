@@ -166,10 +166,6 @@ volt · auto · galopp (`g`) · diskad (`d`) · struken (`str`) · barfota fram/
 kilometertid · rekord · tillägg · streck · vinnarodds · plats · grundlopp · kvalitetslopp · upplopp ·
 dödens · rygg · spår · kusk · tränare · uppfödare · stamtavla
 
-**Används aldrig:**
-"säker" · "garanterad" · "kan inte förlora" · "satsa" · "insats" som råd · "vinstchans" som löfte ·
-allt som låter som en uppmaning att spela mer
-
 ---
 
 ## Tillgänglighet — checklista före överlämning

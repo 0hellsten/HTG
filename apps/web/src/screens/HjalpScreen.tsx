@@ -252,7 +252,7 @@ export const HjalpScreen: React.FC<HjalpScreenProps> = ({ onBack }) => {
         <p className="font-semibold text-slate-800">
           Tangitza — Byggd för lugn och läsbar travinformation.
         </p>
-        <p>Inga annonser, inga användarkonton och inga insatskrav.</p>
+        <p>Privat travapplikation för lugn och tydlig läsning.</p>
         <div className="pt-3">
           <span className="text-[11px] font-mono tracking-widest text-slate-400 select-none block">
             HTG™ Hellstens Trav &amp; Galopp

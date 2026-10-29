@@ -106,12 +106,6 @@ Om du är ute på stallbacken, sitter på tåget eller tappar mottagningen:
 
 ---
 
-## 7. En viktig grundregel
-
-Tangitza är byggd för att **informera och underlätta**, inte för att uppmana till spel. Appen ger inga insatsråd, inga löften om vinster och använder aldrig ord som "säker" eller "garanterad". Du avgör alltid själv vad du vill tro på.
-
----
-
 <div align="center">
 <span style="font-family: monospace; font-size: 11px; letter-spacing: 0.15em; color: #94a3b8;">
 HTG™ Hellstens Trav &amp; Galopp

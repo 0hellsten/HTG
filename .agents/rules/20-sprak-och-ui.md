@@ -23,8 +23,6 @@ Skriv som en lugn, kunnig vän på stallbacken. Inte som ett spelbolag. Inte som
 - **Inga engelska ord** där ett svenskt finns. Undantag: etablerade travtermer och namn.
 - **Ingen utropstecken-entusiasm.** Lugnt, sakligt, vänligt.
 - **Tips har alltid avsändare.** Aldrig "Dagens bästa häst" — alltid "Tips från X: ...".
-- **Aldrig insatsråd.** Inga formuleringar om hur mycket man bör satsa. Aldrig "säker", "garanterad",
-  "kan inte förlora". Appen informerar.
 
 ## Travord — diskret krydda
 
