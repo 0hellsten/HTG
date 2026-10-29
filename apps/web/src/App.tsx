@@ -220,6 +220,7 @@ export const App: React.FC = () => {
             <BongScreen
               initialGameType={bongInitialGameType}
               initialSelectedHorses={bongInitialHorses}
+              onSelectHorse={(id) => setSelectedHorseId(id)}
             />
           ) : activeTab === 'hastar' ? (
             <HastarScreen onSelectHorse={(id) => setSelectedHorseId(id)} />

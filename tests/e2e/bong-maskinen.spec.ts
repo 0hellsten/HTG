@@ -48,7 +48,32 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
     await filterBtn.click();
     await expect(page.locator('text=ABCD-villkor per enkelrad')).toBeVisible();
 
-    // 7. Kontrollera att export-knapparna finns
+    // 7. Kontrollera informations-I och öppna hästinfo och analys
+    const infoBtn = page.locator('button[title*="Information och analys"]').first();
+    await expect(infoBtn).toBeVisible();
+    await infoBtn.click();
+
+    // Verifiera att analysrutan öppnats med rätt innehåll
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText('Kupongstatus')).toBeVisible();
+    await expect(dialog.getByText('Stallbackens analys och spelvärde')).toBeVisible();
+    await expect(dialog.getByText('Vinnarodds', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('Streckprocent', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('Spelvärde', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('Spår och startsätt')).toBeVisible();
+
+    // Ändra rank till C direkt i analysrutan
+    const rankCBtn = dialog.locator('button:has-text("Rank C")').first();
+    await expect(rankCBtn).toBeVisible();
+    await rankCBtn.click();
+
+    // Stäng rutan
+    const closeBtn = dialog.locator('button[aria-label="Stäng informationsruta"]');
+    await closeBtn.click();
+    await expect(dialog).not.toBeVisible();
+
+    // 8. Kontrollera att export-knapparna finns
     await expect(page.getByRole('button', { name: 'Kopiera', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Fil', exact: true })).toBeVisible();
   });

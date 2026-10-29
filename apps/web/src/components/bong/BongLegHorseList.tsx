@@ -1,6 +1,6 @@
 import React from 'react';
 import { Sparkles, Clock, MapPin, Flag } from 'lucide-react';
-import { BongRaceLeg, HorseRank } from '@stallbacken/shared';
+import { BongRaceLeg, HorseRank, BongHorseInput } from '@stallbacken/shared';
 
 interface BongLegHorseListProps {
   leg: BongRaceLeg;
@@ -9,6 +9,7 @@ interface BongLegHorseListProps {
   onToggleHorse: (horseId: string) => void;
   onSetRank: (horseId: string, rank: HorseRank) => void;
   onClearLeg: () => void;
+  onOpenHorseInfo?: (horse: BongHorseInput) => void;
 }
 
 const RANK_OPTIONS: HorseRank[] = ['A', 'B', 'C', 'D'];
@@ -20,6 +21,7 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
   onToggleHorse,
   onSetRank,
   onClearLeg,
+  onOpenHorseInfo,
 }) => {
   const startMethodText = leg.startMethod === 'auto' ? 'autostart' : 'voltstart';
   const distanceText = leg.distance ? `${leg.distance.toLocaleString('sv-SE')} m` : undefined;
@@ -165,15 +167,42 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
                       </button>
                     );
                   })}
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenHorseInfo?.(horse);
+                    }}
+                    title={`Information och analys för ${horse.name || `häst ${horse.startNumber}`}`}
+                    aria-label={`Information och analys för ${horse.name || `häst ${horse.startNumber}`}`}
+                    className="w-7 h-7 rounded text-xs font-serif font-black italic transition-colors cursor-pointer flex items-center justify-center bg-sky-50 text-sky-700 hover:bg-sky-100 hover:text-sky-900 border border-sky-200/80"
+                  >
+                    i
+                  </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => onToggleHorse(horse.id)}
-                  className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer"
-                >
-                  Välj
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenHorseInfo?.(horse);
+                    }}
+                    title={`Information och analys för ${horse.name || `häst ${horse.startNumber}`}`}
+                    aria-label={`Information och analys för ${horse.name || `häst ${horse.startNumber}`}`}
+                    className="w-7 h-7 rounded text-xs font-serif font-black italic transition-colors cursor-pointer flex items-center justify-center bg-slate-50 text-slate-600 hover:bg-sky-50 hover:text-sky-700 border border-slate-200 hover:border-sky-300"
+                  >
+                    i
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onToggleHorse(horse.id)}
+                    className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer"
+                  >
+                    Välj
+                  </button>
+                </div>
               )}
             </div>
           );

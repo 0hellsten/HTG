@@ -30,6 +30,17 @@ test.describe('Verifierande skärmdumpar', () => {
       path: path.join(ARTIFACTS_DIR, 'bong-maskinen-laptop.png'),
     });
 
+    // 2b. Hästinfo & Analys i Bong-maskinen på laptop
+    const infoBtnLaptop = page.locator('button[title*="Information och analys"]').first();
+    await infoBtnLaptop.click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.waitForTimeout(300);
+    await page.screenshot({
+      path: path.join(ARTIFACTS_DIR, 'bong-hastinfo-laptop.png'),
+    });
+    await page.locator('button[aria-label="Stäng informationsruta"]').click();
+    await page.waitForTimeout(200);
+
     // 3. Hästar med ranking på laptop
     const hastarTab = page.locator('aside button:has-text("Hästar")').first();
     await expect(hastarTab).toBeVisible();
@@ -79,6 +90,17 @@ test.describe('Verifierande skärmdumpar', () => {
     await page.screenshot({
       path: path.join(ARTIFACTS_DIR, 'bong-maskinen-mobil.png'),
     });
+
+    // 2b. Hästinfo & Analys i Bong-maskinen på mobil
+    const infoBtnMobil = page.locator('button[title*="Information och analys"]').first();
+    await infoBtnMobil.click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.waitForTimeout(300);
+    await page.screenshot({
+      path: path.join(ARTIFACTS_DIR, 'bong-hastinfo-mobil.png'),
+    });
+    await page.locator('button[aria-label="Stäng informationsruta"]').click();
+    await page.waitForTimeout(200);
 
     // 3. Hästar på mobil
     const hastarTab = page
