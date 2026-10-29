@@ -59,7 +59,7 @@ export default defineConfig({
   ],
   server: {
     host: true,
-    port: 5173,
+    port: 5180,
     proxy: {
       '/halsa': 'http://localhost:3001',
       '/api': 'http://localhost:3001',
@@ -67,7 +67,7 @@ export default defineConfig({
   },
   preview: {
     host: true,
-    port: 5173,
+    port: 5180,
     proxy: {
       '/halsa': 'http://localhost:3001',
       '/api': 'http://localhost:3001',
