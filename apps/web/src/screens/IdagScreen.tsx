@@ -2,6 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Calendar, ChevronRight } from 'lucide-react';
 import { RaceDay, Race, SourceStatus, ApiResponse } from '@stallbacken/shared';
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
+import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
+import { IdagSkelett } from '../components/SkelettKort';
+import { HastsKoIkon } from '../components/HastsKoIkon';
+import {
+  getFavoriteTrackIds,
+  toggleFavoriteTrack,
+  sortRaceDaysWithFavorites,
+} from '../lib/favoriter';
 import { formatSwedishDate, isEvening } from '../lib/date';
 import { formatDistance, formatStartMethod } from '../lib/format';
 
@@ -11,6 +19,7 @@ interface IdagScreenProps {
 
 export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace }) => {
   const [raceDays, setRaceDays] = useState<RaceDay[]>([]);
+  const [favoriteTrackIds, setFavoriteTrackIds] = useState<string[]>([]);
   const [status, setStatus] = useState<SourceStatus>('ok');
   const [statusMessage, setStatusMessage] = useState<string>('Allt är färskt och uppdaterat.');
   const [loading, setLoading] = useState<boolean>(true);
@@ -26,7 +35,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace }) => {
         setStatusMessage(json.message);
       } else {
         setStatus('failed');
-        setStatusMessage('Kunde inte läsa in dagens omgångar.');
+        setStatusMessage('Uppgifterna uppdateras inte just nu.');
       }
     } catch {
       setStatus('failed');
@@ -37,9 +46,16 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace }) => {
   };
 
   useEffect(() => {
+    setFavoriteTrackIds(getFavoriteTrackIds());
     fetchIdag();
   }, []);
 
+  const handleToggleFavorite = (trackId: string) => {
+    toggleFavoriteTrack(trackId);
+    setFavoriteTrackIds(getFavoriteTrackIds());
+  };
+
+  const sortedRaceDays = sortRaceDaysWithFavorites(raceDays, favoriteTrackIds);
   const heading = isEvening() ? 'Kvällens omgång' : 'Dagens omgång';
   const todayFormatted = formatSwedishDate();
 
@@ -48,7 +64,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace }) => {
       {/* Rubrikrad med datum och färskhetsprick */}
       <div className="flex items-start justify-between border-b border-slate-200 pb-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
             {heading}
           </h1>
           <p className="text-base text-slate-600 mt-0.5 capitalize">
@@ -64,32 +80,42 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace }) => {
         </div>
       </div>
 
-      {loading && (
-        <div className="p-12 text-center bg-white rounded-xl border border-slate-200 text-slate-500">
-          Hämtar dagens banor och tävlingar...
-        </div>
-      )}
+      {/* Skelettkort under laddning (aldrig en spinnande cirkel) */}
+      {loading && <IdagSkelett />}
 
-      {!loading && raceDays.length === 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 p-8 text-center space-y-3">
-          <Calendar className="w-10 h-10 text-slate-400 mx-auto" />
-          <h2 className="text-xl font-bold text-slate-900">Inga lopp idag</h2>
-          <p className="text-slate-600 text-base max-w-md mx-auto">
-            Det körs inga tävlingar just idag. Nästa omgång visas här så snart anmälningslistorna är klara.
+      {/* Tomt läge om inga tävlingar körs idag */}
+      {!loading && sortedRaceDays.length === 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 p-8 sm:p-12 text-center space-y-3">
+          <Calendar className="w-12 h-12 text-slate-400 mx-auto" />
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
+            Inga lopp idag
+          </h2>
+          <p className="text-slate-600 text-base sm:text-lg max-w-md mx-auto leading-relaxed">
+            Inga lopp idag. Nästa omgång visas här så snart anmälningslistorna är klara.
           </p>
         </div>
       )}
 
-      {/* Kort per bana */}
-      {!loading && raceDays.length > 0 && (
+      {/* Kort per bana — var och en skyddad av sin egen felgräns */}
+      {!loading && sortedRaceDays.length > 0 && (
         <div className="space-y-6">
-          {raceDays.map((day) => (
-            <BanaKort
-              key={day.id}
-              day={day}
-              onOpenRace={onOpenRace}
-            />
-          ))}
+          {sortedRaceDays.map((day) => {
+            const isFavorite = favoriteTrackIds.includes(day.trackId);
+            return (
+              <BlockErrorBoundary
+                key={day.id}
+                fallbackTitle={`Uppgifterna för ${day.trackName} saknas just nu`}
+                onRetry={fetchIdag}
+              >
+                <BanaKort
+                  day={day}
+                  isFavorite={isFavorite}
+                  onToggleFavorite={() => handleToggleFavorite(day.trackId)}
+                  onOpenRace={onOpenRace}
+                />
+              </BlockErrorBoundary>
+            );
+          })}
         </div>
       )}
     </div>
@@ -98,31 +124,67 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace }) => {
 
 interface BanaKortProps {
   day: RaceDay;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
   onOpenRace: (raceId: string, siblingRaces: Race[]) => void;
 }
 
-const BanaKort: React.FC<BanaKortProps> = ({ day, onOpenRace }) => {
+const BanaKort: React.FC<BanaKortProps> = ({
+  day,
+  isFavorite,
+  onToggleFavorite,
+  onOpenRace,
+}) => {
   const races = day.races || [];
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
-      {/* Banans toppinfo */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+      {/* Banans toppinfo med namn, spelform, hästsko och tider */}
+      <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-950">
               {day.trackName}
             </h2>
+            {isFavorite && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-semibold">
+                <HastsKoIkon className="w-3.5 h-3.5" filled />
+                <span>Favoritbana</span>
+              </span>
+            )}
             {day.biggestGame && (
               <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-bold text-xs uppercase tracking-wider">
                 {day.biggestGame}
               </span>
             )}
           </div>
-          <p className="text-sm text-slate-600 mt-0.5">
+          <p className="text-sm sm:text-base text-slate-600 mt-1">
             Första start kl. {day.firstStart || '–'} · {day.racesCount} lopp
           </p>
         </div>
+
+        {/* Hästsko-knapp för att spara eller ta bort från favoritbanor */}
+        <button
+          type="button"
+          onClick={onToggleFavorite}
+          className={`p-2.5 rounded-lg border transition-colors cursor-pointer shrink-0 flex items-center justify-center min-w-[44px] min-h-[44px] ${
+            isFavorite
+              ? 'bg-amber-50 border-amber-300 text-amber-600 hover:bg-amber-100'
+              : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+          }`}
+          aria-label={
+            isFavorite
+              ? `Ta bort ${day.trackName} från dina favoriter`
+              : `Lägg till ${day.trackName} som favoritbana`
+          }
+          title={
+            isFavorite
+              ? 'Ta bort från dina favoriter'
+              : 'Lägg till som favoritbana'
+          }
+        >
+          <HastsKoIkon className="w-5 h-5" filled={isFavorite} />
+        </button>
       </div>
 
       {/* Lista över lopp på banan */}
@@ -132,10 +194,10 @@ const BanaKort: React.FC<BanaKortProps> = ({ day, onOpenRace }) => {
             <button
               key={race.id}
               onClick={() => onOpenRace(race.id, races)}
-              className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100/90 text-left transition-colors cursor-pointer group"
+              className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100/90 text-left transition-colors cursor-pointer group min-h-[44px]"
             >
               <div>
-                <div className="font-bold text-slate-900 group-hover:text-amber-800 transition-colors">
+                <div className="font-bold text-base text-slate-900 group-hover:text-amber-800 transition-colors">
                   Lopp {race.number}
                   {race.scheduledStart && (
                     <span className="font-normal text-slate-500 text-sm ml-2">
@@ -143,7 +205,7 @@ const BanaKort: React.FC<BanaKortProps> = ({ day, onOpenRace }) => {
                     </span>
                   )}
                 </div>
-                <div className="text-xs text-slate-600 mt-0.5">
+                <div className="text-xs sm:text-sm text-slate-600 mt-0.5">
                   {formatDistance(race.distanceM)} · {formatStartMethod(race.startMethod)}
                   {race.name ? ` · ${race.name}` : ''}
                 </div>
@@ -153,7 +215,7 @@ const BanaKort: React.FC<BanaKortProps> = ({ day, onOpenRace }) => {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-slate-500 italic">
+        <p className="text-sm sm:text-base text-slate-500 italic">
           Lopplistan laddas upp inom kort.
         </p>
       )}

@@ -45,7 +45,7 @@ export const FarskhetsPrick: React.FC<FarskhetsPrickProps> = ({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="inline-flex items-center gap-2 py-1 px-2 -mx-2 rounded hover:bg-slate-100 transition-colors cursor-pointer"
+        className="inline-flex items-center gap-2 py-2 px-2.5 -mx-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer min-h-[44px]"
         aria-label="Visa information om uppgifternas färskhet"
       >
         <span
@@ -73,7 +73,7 @@ export const FarskhetsPrick: React.FC<FarskhetsPrickProps> = ({
                 onRetry();
                 setOpen(false);
               }}
-              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-medium rounded transition-colors"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-semibold rounded-lg transition-colors min-h-[44px] cursor-pointer"
             >
               Försök igen
             </button>

@@ -3,7 +3,7 @@ import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 
-const artifactDir = process.env.ARTIFACT_DIR || 'C:/Users/hells/.gemini/antigravity/brain/f9b48fb7-66c9-4422-953e-9bdb51a497b8';
+const artifactDir = process.env.ARTIFACT_DIR || 'C:/Users/hells/.gemini/antigravity/brain/122e86ac-93d3-429a-99b2-3f6659558080';
 if (!fs.existsSync(artifactDir)) {
   fs.mkdirSync(artifactDir, { recursive: true });
 }
@@ -63,9 +63,20 @@ async function run() {
     await mobilePage.goto('http://localhost:5173', { waitUntil: 'networkidle' });
     await sleep(1500);
 
-    const mobileIdagPath = path.join(artifactDir, 'fas-3-mobil-idag-390x844.png');
+    const mobileIdagPath = path.join(artifactDir, 'fas-4-mobil-idag-390x844.png');
     await mobilePage.screenshot({ path: mobileIdagPath });
     console.log(`Mobil Idag sparad till: ${mobileIdagPath}`);
+
+    // Klicka på favorit-hästskon för första banan
+    console.log('Mobil: Trycker på favoritbaneknappen (hästsko)...');
+    const favButton = mobilePage.locator('button[title*="favoritbana"], button[title*="favoriter"]').first();
+    if (await favButton.isVisible()) {
+      await favButton.click();
+      await sleep(600);
+      const favShotPath = path.join(artifactDir, 'fas-4-mobil-favorit-390x844.png');
+      await mobilePage.screenshot({ path: favShotPath });
+      console.log(`Mobil Favorit sparad till: ${favShotPath}`);
+    }
 
     // Klicka på Lopp 4 för att öppna loppkortet
     console.log('Mobil: Navigerar in i Lopp 4...');
@@ -73,7 +84,7 @@ async function run() {
     await raceButton.click();
     await sleep(1500);
 
-    const mobileLoppPath = path.join(artifactDir, 'fas-3-mobil-lopp-390x844.png');
+    const mobileLoppPath = path.join(artifactDir, 'fas-4-mobil-lopp-390x844.png');
     await mobilePage.screenshot({ path: mobileLoppPath });
     console.log(`Mobil Loppkort sparad till: ${mobileLoppPath}`);
 
@@ -82,14 +93,14 @@ async function run() {
     if (await dotBtn.isVisible()) {
       await dotBtn.click();
       await sleep(500);
-      const dotShotPath = path.join(artifactDir, 'fas-3-mobil-prick-klick.png');
+      const dotShotPath = path.join(artifactDir, 'fas-4-mobil-prick-klick.png');
       await mobilePage.screenshot({ path: dotShotPath });
       console.log(`Mobil Prick-klick sparad till: ${dotShotPath}`);
     }
     await mobileContext.close();
 
     // ==========================================
-    // 2. Laptop: 1440x900 — Startsida & Loppkort
+    // 2. Laptop: 1440x900 — Startsida & Loppkort med tvåkolumns-layout
     // ==========================================
     console.log('Tar skärmbild för laptop (1440x900) - Dagens omgång...');
     const laptopContext = await browser.newContext({
@@ -99,7 +110,7 @@ async function run() {
     await laptopPage.goto('http://localhost:5173', { waitUntil: 'networkidle' });
     await sleep(1500);
 
-    const laptopIdagPath = path.join(artifactDir, 'fas-3-laptop-idag-1440x900.png');
+    const laptopIdagPath = path.join(artifactDir, 'fas-4-laptop-idag-1440x900.png');
     await laptopPage.screenshot({ path: laptopIdagPath });
     console.log(`Laptop Idag sparad till: ${laptopIdagPath}`);
 
@@ -109,9 +120,9 @@ async function run() {
     await laptopRaceBtn.click();
     await sleep(1500);
 
-    const laptopLoppPath = path.join(artifactDir, 'fas-3-laptop-lopp-1440x900.png');
+    const laptopLoppPath = path.join(artifactDir, 'fas-4-laptop-lopp-1440x900.png');
     await laptopPage.screenshot({ path: laptopLoppPath });
-    console.log(`Laptop Loppkort sparad till: ${laptopLoppPath}`);
+    console.log(`Laptop Loppkort med tvåkolumns-vy sparad till: ${laptopLoppPath}`);
 
     await laptopContext.close();
     await browser.close();

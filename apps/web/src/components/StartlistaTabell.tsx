@@ -11,7 +11,7 @@ export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({ starts }) =>
   if (!starts || starts.length === 0) {
     return (
       <div className="p-6 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 text-center text-base">
-        Startlistan är inte tillgänglig just nu.
+        Den här uppgiften saknas just nu.
       </div>
     );
   }
