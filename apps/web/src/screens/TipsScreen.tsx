@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Award, ExternalLink, RefreshCw } from 'lucide-react';
+import { Award, RefreshCw } from 'lucide-react';
 import { ApiResponse, TipsOverviewData, SourceStatus } from '@stallbacken/shared';
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
 import { IdagSkelett } from '../components/SkelettKort';
+import { LoppRankingKort } from '../components/tips/LoppRankingKort';
+import { AnalysArtikelKort } from '../components/tips/AnalysArtikelKort';
+import { getReadTipIds, saveReadTipId } from '../lib/read-tips';
 
 interface TipsScreenProps {
   onOpenRace?: (raceId: string) => void;
@@ -15,6 +18,12 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
   const [status, setStatus] = useState<SourceStatus>('ok');
   const [statusMessage, setStatusMessage] = useState<string>('Alla tips är färska.');
   const [filter, setFilter] = useState<'alla' | 'ranking' | 'artiklar'>('alla');
+  const [readTipIds, setReadTipIds] = useState<Set<string>>(() => getReadTipIds());
+
+  const handleMarkRead = (id: string) => {
+    saveReadTipId(id);
+    setReadTipIds((prev) => new Set(prev).add(id));
+  };
 
   const fetchTips = async () => {
     setLoading(true);
@@ -167,43 +176,13 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {raceTips.map((tip) => (
-                <div
+                <LoppRankingKort
                   key={tip.id}
-                  className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3 hover:border-slate-300 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-2.5">
-                    <div>
-                      {tip.trackName && (
-                        <span className="text-xs font-bold text-amber-700 uppercase tracking-wider block">
-                          {tip.trackName}
-                        </span>
-                      )}
-                      <h3 className="text-lg font-bold text-slate-950">{tip.title}</h3>
-                    </div>
-                    {typeof tip.rank === 'number' && (
-                      <span className="px-2.5 py-1 bg-amber-100 text-amber-950 rounded-md text-sm font-extrabold shrink-0">
-                        Rank {tip.rank}
-                      </span>
-                    )}
-                  </div>
-
-                  {tip.summary && (
-                    <p className="text-slate-700 text-base leading-relaxed">{tip.summary}</p>
-                  )}
-
-                  <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 pt-1">
-                    <span className="font-semibold text-slate-700">{tip.provider}</span>
-                    {tip.raceId && onOpenRace && (
-                      <button
-                        type="button"
-                        onClick={() => onOpenRace(tip.raceId!)}
-                        className="text-amber-700 hover:text-amber-900 font-bold min-h-[44px] py-2 px-1 cursor-pointer"
-                      >
-                        Öppna lopp &rarr;
-                      </button>
-                    )}
-                  </div>
-                </div>
+                  tip={tip}
+                  isRead={readTipIds.has(tip.id)}
+                  onOpenRace={onOpenRace}
+                  onMarkRead={handleMarkRead}
+                />
               ))}
             </div>
           </section>
@@ -223,38 +202,12 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
 
             <div className="space-y-3">
               {articles.map((art) => (
-                <article
+                <AnalysArtikelKort
                   key={art.id}
-                  className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-2.5 hover:border-slate-300 transition-colors"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-1.5">
-                    <h3 className="text-lg sm:text-xl font-bold text-slate-950 leading-snug">
-                      {art.title}
-                    </h3>
-                    <span className="text-xs sm:text-sm font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md shrink-0 self-start">
-                      {art.provider}
-                    </span>
-                  </div>
-
-                  {art.summary && (
-                    <p className="text-slate-700 text-base leading-relaxed">{art.summary}</p>
-                  )}
-
-                  <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 pt-2 border-t border-slate-100">
-                    <span>Publicerat {art.publishedAt.slice(0, 16).replace('T', ' ')}</span>
-                    {art.url && (
-                      <a
-                        href={art.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-950 font-medium min-h-[44px] py-2 px-1 cursor-pointer"
-                      >
-                        <span>Läs hela</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                  </div>
-                </article>
+                  article={art}
+                  isRead={readTipIds.has(art.id)}
+                  onMarkRead={handleMarkRead}
+                />
               ))}
             </div>
           </section>
