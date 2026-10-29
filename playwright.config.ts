@@ -9,7 +9,7 @@ export default defineConfig({
   fullyParallel: false,
   reporter: 'list',
   use: {
-    baseURL: 'http://localhost:5174',
+    baseURL: 'http://localhost:4173',
     trace: 'on-first-retry',
   },
   webServer: [
@@ -17,18 +17,18 @@ export default defineConfig({
       command: 'node apps/server/dist/index.js',
       url: 'http://localhost:3001/halsa',
       timeout: 20000,
-      reuseExistingServer: true,
+      reuseExistingServer: false,
       env: {
         PORT: '3001',
         USE_FIXTURES: 'true',
       },
     },
     {
-      command: 'npx vite preview --port 5174 --strictPort',
+      command: 'npx vite preview --port 4173 --strictPort',
       cwd: './apps/web',
-      url: 'http://localhost:5174',
+      url: 'http://localhost:4173',
       timeout: 20000,
-      reuseExistingServer: true,
+      reuseExistingServer: false,
     },
   ],
   projects: [

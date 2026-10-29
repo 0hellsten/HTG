@@ -80,13 +80,20 @@ export const MerScreen: React.FC<MerScreenProps> = ({ onSelectOption }) => {
       </div>
 
       {/* Info om appen */}
-      <div className="mt-8 pt-6 border-t border-slate-200 text-center text-slate-500 text-sm space-y-1">
-        <div className="flex items-center justify-center gap-1.5 font-semibold text-slate-700">
+      <div className="mt-12 pt-6 border-t border-slate-200 text-center text-slate-500 text-sm space-y-1.5">
+        <div className="flex items-center justify-center gap-1.5 font-bold text-slate-800 text-base">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>HTG — Hellstens Trav och Galopp</span>
+          <span>Tangitza</span>
         </div>
-        <p>Privat och icke-kommersiell travapplikation för lugn läsning.</p>
-        <p>Version 1.0 (Fas 8)</p>
+        <p className="text-slate-500 text-sm">
+          Privat och icke-kommersiell travapplikation för lugn läsning.
+        </p>
+        <p className="text-xs text-slate-400">Version 1.0</p>
+        <div className="pt-4">
+          <span className="text-[11px] font-mono tracking-widest text-slate-400 select-none block">
+            HTG™ Hellstens Trav &amp; Galopp
+          </span>
+        </div>
       </div>
     </div>
   );

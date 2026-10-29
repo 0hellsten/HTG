@@ -1,6 +1,6 @@
-# Hjälp och bruksanvisning för Stallbacken (HTG)
+# Hjälp och bruksanvisning för Tangitza
 
-Välkommen till **Stallbacken**! Den här appen är byggd för att ge dig en lugn, tydlig och samlad bild av dagens och kvällens travlopp, utan reklam, stress, blinkande banners eller krav på inloggning.
+Välkommen till **Tangitza**! Den här appen är byggd för att ge dig en lugn, tydlig och samlad bild av dagens och kvällens travlopp, utan reklam, stress, blinkande banners eller krav på inloggning.
 
 ---
 
@@ -11,8 +11,8 @@ Du kan använda appen direkt i webbläsaren, men det bästa är att lägga den s
 1. Öppna webbläsaren **Chrome** på telefonen och gå in på appens adress.
 2. Tryck på de **tre prickarna** längst uppe till höger i Chrome.
 3. Välj alternativet **"Installera app"** eller **"Lägg till på startskärmen"**.
-4. Nu dyker en ikon upp med namnet **HTG** bland dina vanliga appar.
-5. När du trycker på ikonen öppnas Stallbacken precis som en vanlig app — helt utan webbadresser eller menyer i vägen.
+4. Nu dyker en ikon upp med namnet **Tangitza** bland dina vanliga appar.
+5. När du trycker på ikonen öppnas Tangitza precis som en vanlig app — helt utan webbadresser eller menyer i vägen.
 
 ---
 
@@ -108,4 +108,12 @@ Om du är ute på stallbacken, sitter på tåget eller tappar mottagningen:
 
 ## 7. En viktig grundregel
 
-Stallbacken är byggd för att **informera och underlätta**, inte för att uppmana till spel. Appen ger inga insatsråd, inga löften om vinster och använder aldrig ord som "säker" eller "garanterad". Du avgör alltid själv vad du vill tro på.
+Tangitza är byggd för att **informera och underlätta**, inte för att uppmana till spel. Appen ger inga insatsråd, inga löften om vinster och använder aldrig ord som "säker" eller "garanterad". Du avgör alltid själv vad du vill tro på.
+
+---
+
+<div align="center">
+<span style="font-family: monospace; font-size: 11px; letter-spacing: 0.15em; color: #94a3b8;">
+HTG™ Hellstens Trav &amp; Galopp
+</span>
+</div>

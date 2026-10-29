@@ -155,7 +155,7 @@ export const HjalpScreen: React.FC<HjalpScreenProps> = ({ onBack }) => {
               Välj <strong>"Installera app"</strong> eller{' '}
               <strong>"Lägg till på startskärmen"</strong>.
             </li>
-            <li>En HTG-ikon läggs på din hemskärm. Tryck på den i fortsättningen!</li>
+            <li>En Tangitza-ikon läggs på din hemskärm. Tryck på den i fortsättningen!</li>
           </ol>
         </div>
       ),
@@ -250,9 +250,14 @@ export const HjalpScreen: React.FC<HjalpScreenProps> = ({ onBack }) => {
       {/* Fotnot */}
       <div className="pt-6 border-t border-slate-200 text-center text-slate-500 text-sm space-y-1">
         <p className="font-semibold text-slate-800">
-          Stallbacken (HTG) — Byggd för lugn och läsbar travinformation.
+          Tangitza — Byggd för lugn och läsbar travinformation.
         </p>
         <p>Inga annonser, inga användarkonton och inga insatskrav.</p>
+        <div className="pt-3">
+          <span className="text-[11px] font-mono tracking-widest text-slate-400 select-none block">
+            HTG™ Hellstens Trav &amp; Galopp
+          </span>
+        </div>
       </div>
     </div>
   );

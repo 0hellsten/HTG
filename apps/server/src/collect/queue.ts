@@ -119,7 +119,7 @@ export async function fetchWithPolicy(url: string, options: FetchOptions = {}): 
 
   const parsedUrl = new URL(url);
   const domain = parsedUrl.hostname;
-  const userAgent = `HTG/1.0 (Hellstens Trav och Galopp; privat, icke-kommersiell; kontakt: ${contactEmail})`;
+  const userAgent = `Tangitza/1.0 (Hellstens Trav och Galopp; privat, icke-kommersiell; kontakt: ${contactEmail})`;
 
   const executeAttempt = async (_attempt: number): Promise<Response> => {
     return rateLimiter.schedule(domain, async () => {

@@ -97,14 +97,12 @@ export const App: React.FC = () => {
       {/* Laptop: Vänstermeny */}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-slate-900 text-slate-100 p-6 border-r border-slate-800 shrink-0">
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center font-bold text-slate-950 text-base shadow-inner tracking-wider">
-            HTG
+          <div className="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center font-black text-slate-950 text-xl shadow-inner font-serif tracking-normal">
+            T
           </div>
           <div>
-            <span className="text-xl font-bold tracking-tight text-white block">HTG</span>
-            <span className="text-xs text-slate-400 block font-normal">
-              Hellstens Trav och Galopp
-            </span>
+            <span className="text-xl font-extrabold tracking-tight text-white block">Tangitza</span>
+            <span className="text-xs text-slate-400 block font-normal">En lugn travapp</span>
           </div>
         </div>
 
@@ -138,6 +136,12 @@ export const App: React.FC = () => {
             <span>Installera app</span>
           </button>
         )}
+
+        <div className="pt-6 mt-auto border-t border-slate-800/80 text-center">
+          <span className="text-[10px] font-mono tracking-widest text-slate-500/70 select-none block">
+            HTG™ Hellstens Trav &amp; Galopp
+          </span>
+        </div>
       </aside>
 
       {/* Huvudinnehåll */}
@@ -148,15 +152,15 @@ export const App: React.FC = () => {
         {/* Mobil: Topprad */}
         <header className="lg:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-0 z-10 shadow-sm">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-md bg-amber-500 flex items-center justify-center font-bold text-slate-950 text-xs tracking-wider">
-              HTG
+            <div className="w-8 h-8 rounded-md bg-amber-500 flex items-center justify-center font-black text-slate-950 text-sm font-serif shadow-inner">
+              T
             </div>
             <div>
-              <span className="text-base font-bold tracking-tight text-white block leading-tight">
-                HTG
+              <span className="text-base font-extrabold tracking-tight text-white block leading-tight">
+                Tangitza
               </span>
               <span className="text-[10px] text-slate-400 block font-normal leading-none">
-                Hellstens Trav och Galopp
+                En lugn travapp
               </span>
             </div>
           </div>

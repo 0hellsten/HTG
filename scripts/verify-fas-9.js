@@ -35,8 +35,8 @@ async function run() {
     env: { ...process.env, PORT: '3001', USE_FIXTURES: 'true' },
   });
 
-  console.log('2. Startar Vite preview server för webb på port 5174...');
-  const webProcess = spawn('npx', ['vite', 'preview', '--port', '5174', '--strictPort'], {
+  console.log('2. Startar Vite preview server för webb på port 4173...');
+  const webProcess = spawn('npx', ['vite', 'preview', '--port', '4173', '--strictPort'], {
     cwd: path.resolve('apps/web'),
     shell: true,
     stdio: 'inherit',
@@ -46,8 +46,8 @@ async function run() {
     await waitForServer('http://localhost:3001/halsa');
     console.log('Backend svarar på /halsa!');
 
-    await waitForServer('http://localhost:5174');
-    console.log('Frontend svarar på http://localhost:5174!');
+    await waitForServer('http://localhost:4173');
+    console.log('Frontend svarar på http://localhost:4173!');
 
     console.log('3. Startar Chromium via Playwright...');
     const browser = await chromium.launch();
@@ -64,7 +64,7 @@ async function run() {
         'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
     });
     const mobilePage = await mobileContext.newPage();
-    await mobilePage.goto('http://localhost:5174', { waitUntil: 'networkidle' });
+    await mobilePage.goto('http://localhost:4173', { waitUntil: 'networkidle' });
     await sleep(1000);
 
     // Klicka på Mitt stall i bottenmenyn
@@ -125,7 +125,7 @@ async function run() {
     // DEL 4: MOBIL (390x844) — OFFLINE-REMSA
     // ========================================================
     console.log('\n--- 4. Mobil (390x844): Simulerad offline med remsa ---');
-    await mobilePage.goto('http://localhost:5174/?simulateOffline=true', { waitUntil: 'networkidle' });
+    await mobilePage.goto('http://localhost:4173/?simulateOffline=true', { waitUntil: 'networkidle' });
     await sleep(1000);
 
     const mobileOfflinePath = path.join(artifactDir, 'fas-9-mobil-offline.png');
@@ -140,7 +140,7 @@ async function run() {
       viewport: { width: 1440, height: 900 },
     });
     const desktopPage = await desktopContext.newPage();
-    await desktopPage.goto('http://localhost:5174', { waitUntil: 'networkidle' });
+    await desktopPage.goto('http://localhost:4173', { waitUntil: 'networkidle' });
     await sleep(1000);
 
     // Klicka på Mitt stall i vänstermenyn
