@@ -13,7 +13,11 @@ import { BongLegTabs } from '../components/bong/BongLegTabs';
 import { BongLegHorseList } from '../components/bong/BongLegHorseList';
 import { BongFilters } from '../components/bong/BongFilters';
 import { BongSettings } from '../components/bong/BongSettings';
-import { buildDefaultRaceDay } from '../components/bong/defaultRaceDay';
+import {
+  buildDefaultRaceDay,
+  buildRaceDayFromCompetition,
+} from '../components/bong/defaultRaceDay';
+import { BongCompetition, getUpcomingBongCompetitions } from '../components/bong/competitions';
 
 interface BongScreenProps {
   initialGameType?: BongGameType;
@@ -24,10 +28,27 @@ export const BongScreen: React.FC<BongScreenProps> = ({
   initialGameType,
   initialSelectedHorses,
 }) => {
-  const [gameType, setGameType] = useState<BongGameType>(initialGameType || 'V75');
+  const competitions = useMemo(() => getUpcomingBongCompetitions(), []);
+
+  const initialComp = useMemo(() => {
+    if (initialGameType) {
+      const match = competitions.find((c) => c.gameType === initialGameType);
+      if (match) return match;
+    }
+    return competitions[0];
+  }, [competitions, initialGameType]);
+
+  const [selectedDateIso, setSelectedDateIso] = useState<string>(
+    () => initialComp?.dateIso || new Date().toISOString().slice(0, 10)
+  );
+  const [gameType, setGameType] = useState<BongGameType>(
+    initialComp?.gameType || initialGameType || 'V75'
+  );
   const [activeLegIndex, setActiveLegIndex] = useState<number>(0);
   const [raceDay, setRaceDay] = useState<BongRaceDayData>(() =>
-    buildDefaultRaceDay(initialGameType || 'V75')
+    initialComp
+      ? buildRaceDayFromCompetition(initialComp)
+      : buildDefaultRaceDay(initialGameType || 'V75')
   );
 
   const [selectedHorses, setSelectedHorses] = useState<Record<number, string[]>>(
@@ -78,13 +99,15 @@ export const BongScreen: React.FC<BongScreenProps> = ({
   const [copied, setCopied] = useState<boolean>(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
-  const handleGameTypeChange = (newType: BongGameType) => {
-    setGameType(newType);
+  const handleSelectCompetition = (comp: BongCompetition) => {
+    setSelectedDateIso(comp.dateIso);
+    setGameType(comp.gameType);
     setActiveLegIndex(0);
-    setRaceDay(buildDefaultRaceDay(newType));
+    setRaceDay(buildRaceDayFromCompetition(comp));
+
     const newSel: Record<number, string[]> = {};
     const newRanks: Record<string, HorseRank> = {};
-    const count = newType === 'V75' ? 7 : 8;
+    const count = comp.gameType === 'V75' ? 7 : 8;
     for (let l = 0; l < count; l++) {
       newSel[l] = [`h_${l}_1`, `h_${l}_2`];
       newRanks[`h_${l}_1`] = 'A';
@@ -195,9 +218,10 @@ export const BongScreen: React.FC<BongScreenProps> = ({
   return (
     <div className="space-y-6 pb-20">
       <BongOmgangHeader
-        gameType={gameType}
         raceDay={raceDay}
-        onSelectGameType={handleGameTypeChange}
+        competitions={competitions}
+        selectedDateIso={selectedDateIso}
+        onSelectCompetition={handleSelectCompetition}
       />
 
       <BongSummaryCard

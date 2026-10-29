@@ -151,6 +151,9 @@ export function getHorseRankings(
     orderBy = 'h.win_percentage DESC, h.wins DESC, h.earnings_total DESC';
   } else if (category === 'segrar') {
     orderBy = 'h.wins DESC, h.win_percentage DESC, h.earnings_total DESC';
+  } else if (category === 'kallblod') {
+    whereClause = "WHERE h.breed = 'Kallblod'";
+    orderBy = 'h.earnings_total DESC, h.wins DESC';
   }
 
   const query = `

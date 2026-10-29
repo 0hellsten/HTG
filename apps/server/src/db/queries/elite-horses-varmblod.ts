@@ -1,0 +1,174 @@
+// Autentisk svensk och internationell travsportselit (Varmblod del 1)
+// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
+
+export interface SeedHorse {
+  id: string;
+  name: string;
+  birth_year: number;
+  sex: 'Hingst' | 'Sto' | 'Valack';
+  breed: 'Varmblod' | 'Kallblod';
+  trainer_name: string;
+  home_track: string;
+  sire_name: string;
+  dam_name: string;
+  damsire_name: string;
+  earnings_total: number;
+  starts: number;
+  wins: number;
+  seconds: number;
+  thirds: number;
+  win_percentage: number;
+  place_percentage: number;
+  record_auto: string;
+  record_volt: string;
+}
+
+export const ELITE_VARMBLOD_PART1: SeedHorse[] = [
+  {
+    id: 'h_san_moteur',
+    name: 'San Moteur',
+    birth_year: 2017,
+    sex: 'Hingst',
+    breed: 'Varmblod',
+    trainer_name: 'Björn Goop',
+    home_track: 'Färjestad',
+    sire_name: 'Panne de Moteur',
+    dam_name: 'Aung San Suu Kyi',
+    damsire_name: 'Super Arnie',
+    earnings_total: 14260000,
+    starts: 32,
+    wins: 21,
+    seconds: 5,
+    thirds: 2,
+    win_percentage: 66,
+    place_percentage: 88,
+    record_auto: '1.09,1a',
+    record_volt: '1.13,2',
+  },
+  {
+    id: 'h_francesco_zet',
+    name: 'Francesco Zet',
+    birth_year: 2018,
+    sex: 'Hingst',
+    breed: 'Varmblod',
+    trainer_name: 'Daniel Redén',
+    home_track: 'Solvalla',
+    sire_name: 'Father Patrick',
+    dam_name: 'Shaqline',
+    damsire_name: 'Credit Winner',
+    earnings_total: 19875000,
+    starts: 28,
+    wins: 23,
+    seconds: 2,
+    thirds: 1,
+    win_percentage: 82,
+    place_percentage: 93,
+    record_auto: '1.09,4a',
+    record_volt: '1.13,8',
+  },
+  {
+    id: 'h_calgary_games',
+    name: 'Calgary Games',
+    birth_year: 2017,
+    sex: 'Hingst',
+    breed: 'Varmblod',
+    trainer_name: 'Timo Nurmos',
+    home_track: 'Solvalla',
+    sire_name: 'Readly Express',
+    dam_name: 'Olympia Tilly',
+    damsire_name: 'Lindys Crown',
+    earnings_total: 6685000,
+    starts: 11,
+    wins: 10,
+    seconds: 0,
+    thirds: 0,
+    win_percentage: 91,
+    place_percentage: 91,
+    record_auto: '1.11,7a',
+    record_volt: '1.13,1',
+  },
+  {
+    id: 'h_hail_mary',
+    name: 'Hail Mary',
+    birth_year: 2016,
+    sex: 'Hingst',
+    breed: 'Varmblod',
+    trainer_name: 'Daniel Redén',
+    home_track: 'Solvalla',
+    sire_name: 'Googoo Gaagaa',
+    dam_name: 'Dreams U.S.',
+    damsire_name: 'Victory Dream',
+    earnings_total: 16350000,
+    starts: 44,
+    wins: 26,
+    seconds: 8,
+    thirds: 2,
+    win_percentage: 59,
+    place_percentage: 82,
+    record_auto: '1.08,6a',
+    record_volt: '1.13,5',
+  },
+  {
+    id: 'h_don_fanucci_zet',
+    name: 'Don Fanucci Zet',
+    birth_year: 2016,
+    sex: 'Hingst',
+    breed: 'Varmblod',
+    trainer_name: 'Daniel Redén',
+    home_track: 'Solvalla',
+    sire_name: 'Hard Livin',
+    dam_name: 'Kissed By The West',
+    damsire_name: 'Western Terror',
+    earnings_total: 15200000,
+    starts: 48,
+    wins: 24,
+    seconds: 9,
+    thirds: 5,
+    win_percentage: 50,
+    place_percentage: 79,
+    record_auto: '1.08,9a',
+    record_volt: '1.14,1',
+  },
+  {
+    id: 'h_joviality',
+    name: 'Joviality',
+    birth_year: 2019,
+    sex: 'Sto',
+    breed: 'Varmblod',
+    trainer_name: 'Sabine Kagebrant',
+    home_track: 'Solvalla',
+    sire_name: 'Chapter Seven',
+    dam_name: 'Pasithea Face',
+    damsire_name: 'Muscle Hill',
+    earnings_total: 26120000,
+    starts: 41,
+    wins: 27,
+    seconds: 6,
+    thirds: 3,
+    win_percentage: 66,
+    place_percentage: 88,
+    record_auto: '1.08,4a',
+    record_volt: '1.12,1',
+  },
+  {
+    id: 'h_onas_prince',
+    name: 'Önas Prince',
+    birth_year: 2017,
+    sex: 'Hingst',
+    breed: 'Varmblod',
+    trainer_name: 'Per Nordström',
+    home_track: 'Jägersro',
+    sire_name: 'Chocolatier',
+    dam_name: 'Sobra',
+    damsire_name: 'Pine Chip',
+    earnings_total: 13450000,
+    starts: 46,
+    wins: 28,
+    seconds: 6,
+    thirds: 4,
+    win_percentage: 61,
+    place_percentage: 83,
+    record_auto: '1.08,8a',
+    record_volt: '1.13,3',
+  },
+];

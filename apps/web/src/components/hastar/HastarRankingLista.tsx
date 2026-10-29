@@ -15,6 +15,7 @@ const CATEGORIES: { id: HorseRankingCategory; label: string }[] = [
   { id: 'vinstrikast', label: 'Vinstrikast' },
   { id: 'segerprocent', label: 'Segerprocent' },
   { id: 'segrar', label: 'Flest segrar' },
+  { id: 'kallblod', label: 'Kallblod' },
   { id: 'idag', label: 'Startar idag' },
 ];
 

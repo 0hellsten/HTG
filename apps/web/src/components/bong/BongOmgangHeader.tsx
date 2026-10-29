@@ -1,21 +1,29 @@
+// Omgångshuvud och dragbar tävlingsväljare för Bong-maskinen
+// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
+
 import React from 'react';
 import { Calculator, Calendar, MapPin, Sparkles, TrendingUp } from 'lucide-react';
-import { BongGameType, BongRaceDayData } from '@stallbacken/shared';
+import { BongRaceDayData } from '@stallbacken/shared';
+import { BongCompetition } from './competitions';
+import { BongDateSelector } from './BongDateSelector';
 
 interface BongOmgangHeaderProps {
-  gameType: BongGameType;
   raceDay: BongRaceDayData;
-  onSelectGameType: (type: BongGameType) => void;
+  competitions: BongCompetition[];
+  selectedDateIso: string;
+  onSelectCompetition: (comp: BongCompetition) => void;
 }
 
 export const BongOmgangHeader: React.FC<BongOmgangHeaderProps> = ({
-  gameType,
   raceDay,
-  onSelectGameType,
+  competitions,
+  selectedDateIso,
+  onSelectCompetition,
 }) => {
   return (
-    <div className="space-y-3 border-b border-slate-200 pb-5">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-4 border-b border-slate-200 pb-5">
+      {/* Titelrad */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <div className="flex items-center gap-2.5">
             <span className="p-2 rounded-lg bg-amber-500 text-slate-950">
@@ -29,34 +37,23 @@ export const BongOmgangHeader: React.FC<BongOmgangHeaderProps> = ({
             Professionell systemkalkylator, reduceringsmotor och radkalkyl för travet.
           </p>
         </div>
-
-        <div className="flex items-center gap-1.5 p-1 bg-slate-200 rounded-xl self-start sm:self-center">
-          <button
-            type="button"
-            onClick={() => onSelectGameType('V75')}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
-              gameType === 'V75'
-                ? 'bg-amber-500 text-slate-950 shadow-sm'
-                : 'text-slate-700 hover:text-slate-950'
-            }`}
-          >
-            V75 (7 lopp)
-          </button>
-          <button
-            type="button"
-            onClick={() => onSelectGameType('V86')}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
-              gameType === 'V86'
-                ? 'bg-amber-500 text-slate-950 shadow-sm'
-                : 'text-slate-700 hover:text-slate-950'
-            }`}
-          >
-            V86 (8 lopp)
-          </button>
-        </div>
       </div>
 
-      {/* Tydlig omgångsinformation: bana, datum, starttid, omsättning och jackpot */}
+      {/* Dragbar tävlings- och datumväljare */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between text-xs font-semibold text-slate-600 px-1">
+          <span>Kommande tävlingar (dra för att se längre fram)</span>
+          <span className="text-slate-600 text-[11px] font-medium">14 dagar framåt</span>
+        </div>
+
+        <BongDateSelector
+          competitions={competitions}
+          selectedDateIso={selectedDateIso}
+          onSelectCompetition={onSelectCompetition}
+        />
+      </div>
+
+      {/* Tydlig omgångsinformation för valt datum: bana, starttid, omsättning och jackpot */}
       <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900 text-white rounded-xl px-4 py-3 shadow-xs">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm font-medium">
           <span className="flex items-center gap-1.5 font-bold text-amber-400">

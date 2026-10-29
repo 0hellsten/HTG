@@ -1,4 +1,5 @@
 import { BongGameType, BongRaceDayData, BongHorseInput, BongRaceLeg } from '@stallbacken/shared';
+import { BongCompetition } from './competitions';
 
 // Skapa standard-hästar för en realistisk V75/V86-omgång
 export function createDefaultHorses(legIndex: number): BongHorseInput[] {
@@ -226,6 +227,25 @@ export function buildDefaultRaceDay(gameType: BongGameType): BongRaceDayData {
     startTime,
     races: legsInfo.map((info, legIdx) => ({
       ...info,
+      horses: createDefaultHorses(legIdx),
+    })),
+  };
+}
+
+export function buildRaceDayFromCompetition(competition: BongCompetition): BongRaceDayData {
+  const isV86 = competition.gameType === 'V86';
+  const legsInfo = isV86 ? V86_LEGS_INFO : V75_LEGS_INFO;
+
+  return {
+    gameType: competition.gameType,
+    turnover: competition.turnover,
+    jackpotPool: competition.jackpotPool,
+    trackName: competition.trackName,
+    date: competition.fullDateText,
+    startTime: competition.startTime,
+    races: legsInfo.map((info, legIdx) => ({
+      ...info,
+      trackName: isV86 ? info.trackName : competition.trackName,
       horses: createDefaultHorses(legIdx),
     })),
   };
