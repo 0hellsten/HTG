@@ -12,6 +12,7 @@ import { hastarRoutes } from './routes/hastar.js';
 import { banorRoutes } from './routes/banor.js';
 import { tipsRoutes } from './routes/tips.js';
 import { stallRoutes } from './routes/stall.js';
+import { janneBoyRoutes } from './routes/janne-boy.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,6 +47,7 @@ export async function createServer(customDbPath?: string) {
   await app.register(banorRoutes);
   await app.register(tipsRoutes);
   await app.register(stallRoutes);
+  await app.register(janneBoyRoutes);
 
   // Hälsokontroll enligt Fas 1-specifikationen
   app.get('/halsa', async (_req, reply) => {

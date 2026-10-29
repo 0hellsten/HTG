@@ -13,6 +13,15 @@ export interface BongHorseInput {
   betDistribution: number; // Streckprocent (0.0001 - 1.00)
   winOdds?: number; // Vinnarodds för värdeberäkning
   driverName?: string;
+  trainerName?: string;
+  postPosition?: number;
+  shoeFront?: boolean; // false = barfota fram, true = skor
+  shoeBack?: boolean; // false = barfota bak, true = skor
+  shoeChanged?: boolean; // barfotaändring/skoryck
+  sulkyType?: 'american' | 'regular'; // vagn
+  earningsTotal?: number;
+  record?: string;
+  driverWinPercentage?: number;
 }
 
 export interface BongRaceLeg {

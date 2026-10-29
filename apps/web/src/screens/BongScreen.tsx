@@ -15,20 +15,33 @@ import { BongFilters } from '../components/bong/BongFilters';
 import { BongSettings } from '../components/bong/BongSettings';
 import { buildDefaultRaceDay } from '../components/bong/defaultRaceDay';
 
-export const BongScreen: React.FC = () => {
-  const [gameType, setGameType] = useState<BongGameType>('V75');
-  const [activeLegIndex, setActiveLegIndex] = useState<number>(0);
-  const [raceDay, setRaceDay] = useState<BongRaceDayData>(() => buildDefaultRaceDay('V75'));
+interface BongScreenProps {
+  initialGameType?: BongGameType;
+  initialSelectedHorses?: Record<number, string[]>;
+}
 
-  const [selectedHorses, setSelectedHorses] = useState<Record<number, string[]>>({
-    0: ['h_0_1', 'h_0_2'],
-    1: ['h_1_1', 'h_1_2', 'h_1_3'],
-    2: ['h_2_1'],
-    3: ['h_3_1', 'h_3_2'],
-    4: ['h_4_1', 'h_4_2', 'h_4_3', 'h_4_4'],
-    5: ['h_5_1'],
-    6: ['h_6_1', 'h_6_2', 'h_6_3'],
-  });
+export const BongScreen: React.FC<BongScreenProps> = ({
+  initialGameType,
+  initialSelectedHorses,
+}) => {
+  const [gameType, setGameType] = useState<BongGameType>(initialGameType || 'V75');
+  const [activeLegIndex, setActiveLegIndex] = useState<number>(0);
+  const [raceDay, setRaceDay] = useState<BongRaceDayData>(() =>
+    buildDefaultRaceDay(initialGameType || 'V75')
+  );
+
+  const [selectedHorses, setSelectedHorses] = useState<Record<number, string[]>>(
+    () =>
+      initialSelectedHorses || {
+        0: ['h_0_1', 'h_0_2'],
+        1: ['h_1_1', 'h_1_2', 'h_1_3'],
+        2: ['h_2_1'],
+        3: ['h_3_1', 'h_3_2'],
+        4: ['h_4_1', 'h_4_2', 'h_4_3', 'h_4_4'],
+        5: ['h_5_1'],
+        6: ['h_6_1', 'h_6_2', 'h_6_3'],
+      }
+  );
 
   const [ranks, setRanks] = useState<Record<string, HorseRank>>({
     h_0_1: 'A',

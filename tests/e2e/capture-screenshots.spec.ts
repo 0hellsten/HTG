@@ -10,7 +10,17 @@ test.describe('Verifierande skärmdumpar', () => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    // 1. Bong-maskinen på laptop
+    // 1. Janne Boy på laptop
+    const janneTab = page.locator('aside button:has-text("Janne Boy")').first();
+    await expect(janneTab).toBeVisible();
+    await janneTab.click();
+    await expect(page.locator('h1:has-text("Janne Boy")')).toBeVisible();
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: path.join(ARTIFACTS_DIR, 'janne-boy-laptop.png'),
+    });
+
+    // 2. Bong-maskinen på laptop
     const bongTab = page.locator('aside button:has-text("Bong-maskinen")').first();
     await expect(bongTab).toBeVisible();
     await bongTab.click();
@@ -20,7 +30,7 @@ test.describe('Verifierande skärmdumpar', () => {
       path: path.join(ARTIFACTS_DIR, 'bong-maskinen-laptop.png'),
     });
 
-    // 2. Hästar med ranking på laptop
+    // 3. Hästar med ranking på laptop
     const hastarTab = page.locator('aside button:has-text("Hästar")').first();
     await expect(hastarTab).toBeVisible();
     await hastarTab.click();
@@ -30,7 +40,7 @@ test.describe('Verifierande skärmdumpar', () => {
       path: path.join(ARTIFACTS_DIR, 'hastar-ranking-laptop.png'),
     });
 
-    // 3. Tips med Aftonbladet på laptop
+    // 4. Tips med Aftonbladet på laptop
     const tipsTab = page.locator('aside button:has-text("Tips")').first();
     await expect(tipsTab).toBeVisible();
     await tipsTab.click();
@@ -46,7 +56,19 @@ test.describe('Verifierande skärmdumpar', () => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    // 1. Bong-maskinen på mobil
+    // 1. Janne Boy på mobil
+    const janneTab = page
+      .locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Janne")')
+      .first();
+    await expect(janneTab).toBeVisible();
+    await janneTab.click();
+    await expect(page.locator('h1:has-text("Janne Boy")')).toBeVisible();
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: path.join(ARTIFACTS_DIR, 'janne-boy-mobil.png'),
+    });
+
+    // 2. Bong-maskinen på mobil
     const bongTab = page
       .locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Bongen")')
       .first();
@@ -58,7 +80,7 @@ test.describe('Verifierande skärmdumpar', () => {
       path: path.join(ARTIFACTS_DIR, 'bong-maskinen-mobil.png'),
     });
 
-    // 2. Hästar på mobil
+    // 3. Hästar på mobil
     const hastarTab = page
       .locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Hästar")')
       .first();

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Search, Award, Star, Menu, Download, Calculator } from 'lucide-react';
-import { Race } from '@stallbacken/shared';
+import { Calendar, Search, Award, Star, Menu, Download, Calculator, Wand2 } from 'lucide-react';
+import { Race, BongGameType } from '@stallbacken/shared';
 import { IdagScreen } from './screens/IdagScreen';
 import { LoppScreen } from './screens/LoppScreen';
 import { HastScreen } from './screens/HastScreen';
 import { HastarScreen } from './screens/HastarScreen';
 import { BongScreen } from './screens/BongScreen';
+import { JanneBoyScreen } from './screens/JanneBoyScreen';
 import { TipsScreen } from './screens/TipsScreen';
 import { BanvisarenScreen } from './screens/BanvisarenScreen';
 import { StallScreen } from './screens/StallScreen';
@@ -15,7 +16,7 @@ import { HjalpScreen } from './screens/HjalpScreen';
 import { MerScreen } from './screens/MerScreen';
 import { OfflineRemsa } from './components/OfflineRemsa';
 
-type Tab = 'idag' | 'bong' | 'hastar' | 'tips' | 'stall' | 'mer';
+type Tab = 'idag' | 'janneboy' | 'bong' | 'hastar' | 'tips' | 'stall' | 'mer';
 type MerSubscreen = 'none' | 'status' | 'hjalp' | 'textstorlek';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -31,6 +32,10 @@ export const App: React.FC = () => {
   const [merSubscreen, setMerSubscreen] = useState<MerSubscreen>('none');
   const [siblingRaces, setSiblingRaces] = useState<Race[]>([]);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [bongInitialGameType, setBongInitialGameType] = useState<BongGameType>('V75');
+  const [bongInitialHorses, setBongInitialHorses] = useState<
+    Record<number, string[]> | undefined
+  >();
 
   const [textSize, setTextSize] = useState<TextSize>(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -55,24 +60,19 @@ export const App: React.FC = () => {
   }, [textSize]);
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
+    const handlePrompt = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
     };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
+    window.addEventListener('beforeinstallprompt', handlePrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handlePrompt);
   }, []);
 
   const handleInstallClick = async () => {
     if (!installPrompt) return;
     await installPrompt.prompt();
     const choice = await installPrompt.userChoice;
-    if (choice.outcome === 'accepted') {
-      setInstallPrompt(null);
-    }
+    if (choice.outcome === 'accepted') setInstallPrompt(null);
   };
 
   const handleTabChange = (tab: Tab) => {
@@ -80,13 +80,18 @@ export const App: React.FC = () => {
     setSelectedHorseId(null);
     setSelectedTrackId(null);
     setMerSubscreen('none');
-    if (tab === 'idag') {
-      setSelectedRaceId(null);
-    }
+    if (tab === 'idag') setSelectedRaceId(null);
+  };
+
+  const handleOpenJanneBoyInBong = (type: BongGameType, horses: Record<number, string[]>) => {
+    setBongInitialGameType(type);
+    setBongInitialHorses(horses);
+    setActiveTab('bong');
   };
 
   const navItems = [
     { id: 'idag' as Tab, label: 'Idag', mobileLabel: 'Idag', icon: Calendar },
+    { id: 'janneboy' as Tab, label: 'Janne Boy', mobileLabel: 'Janne', icon: Wand2 },
     { id: 'bong' as Tab, label: 'Bong-maskinen', mobileLabel: 'Bongen', icon: Calculator },
     { id: 'hastar' as Tab, label: 'Hästar', mobileLabel: 'Hästar', icon: Search },
     { id: 'tips' as Tab, label: 'Tips', mobileLabel: 'Tips', icon: Award },
@@ -115,7 +120,7 @@ export const App: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => handleTabChange(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-base font-medium transition-colors ${
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-base font-medium transition-colors cursor-pointer ${
                   isActive
                     ? 'bg-amber-500 text-slate-950 font-semibold shadow-sm'
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white'
@@ -147,7 +152,6 @@ export const App: React.FC = () => {
 
       {/* Huvudinnehåll */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Offline-remsa visas överst vid nätverksbortfall */}
         <OfflineRemsa />
 
         {/* Mobil: Topprad */}
@@ -174,15 +178,14 @@ export const App: React.FC = () => {
           )}
         </header>
 
-        {/* Vy-yta */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-10 max-w-5xl w-full mx-auto pb-24 lg:pb-10">
-          {selectedTrackId ? (
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24 lg:pb-8">
+          {selectedHorseId ? (
+            <HastScreen horseId={selectedHorseId} onBack={() => setSelectedHorseId(null)} />
+          ) : selectedTrackId ? (
             <BanvisarenScreen
               initialTrackId={selectedTrackId}
               onBack={() => setSelectedTrackId(null)}
             />
-          ) : selectedHorseId ? (
-            <HastScreen horseId={selectedHorseId} onBack={() => setSelectedHorseId(null)} />
           ) : merSubscreen === 'status' ? (
             <StatusScreen onBack={() => setMerSubscreen('none')} />
           ) : merSubscreen === 'hjalp' ? (
@@ -190,18 +193,17 @@ export const App: React.FC = () => {
           ) : merSubscreen === 'textstorlek' ? (
             <TextstorlekScreen
               currentSize={textSize}
-              onSelectSize={(newSize) => setTextSize(newSize)}
+              onSelectSize={(size) => setTextSize(size)}
               onBack={() => setMerSubscreen('none')}
             />
           ) : activeTab === 'idag' ? (
             selectedRaceId ? (
               <LoppScreen
                 raceId={selectedRaceId}
-                onBack={() => setSelectedRaceId(null)}
-                onSelectRace={(id) => setSelectedRaceId(id)}
-                onSelectHorse={(id) => setSelectedHorseId(id)}
-                onOpenTrack={(trackId) => setSelectedTrackId(trackId)}
                 siblingRaces={siblingRaces}
+                onBack={() => setSelectedRaceId(null)}
+                onSelectRace={(newRaceId) => setSelectedRaceId(newRaceId)}
+                onSelectHorse={(horseId) => setSelectedHorseId(horseId)}
               />
             ) : (
               <IdagScreen
@@ -212,8 +214,13 @@ export const App: React.FC = () => {
                 onOpenTrack={(trackId) => setSelectedTrackId(trackId)}
               />
             )
+          ) : activeTab === 'janneboy' ? (
+            <JanneBoyScreen onOpenInBong={handleOpenJanneBoyInBong} />
           ) : activeTab === 'bong' ? (
-            <BongScreen />
+            <BongScreen
+              initialGameType={bongInitialGameType}
+              initialSelectedHorses={bongInitialHorses}
+            />
           ) : activeTab === 'hastar' ? (
             <HastarScreen onSelectHorse={(id) => setSelectedHorseId(id)} />
           ) : activeTab === 'tips' ? (
@@ -236,11 +243,8 @@ export const App: React.FC = () => {
           ) : activeTab === 'mer' ? (
             <MerScreen
               onSelectOption={(opt) => {
-                if (opt === 'banvisaren') {
-                  setSelectedTrackId('1');
-                } else {
-                  setMerSubscreen(opt);
-                }
+                if (opt === 'banvisaren') setSelectedTrackId('1');
+                else setMerSubscreen(opt);
               }}
             />
           ) : null}
@@ -265,7 +269,7 @@ export const App: React.FC = () => {
                 <Icon
                   className={`w-5 h-5 mb-0.5 shrink-0 ${isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'}`}
                 />
-                <span className="text-[11px] font-medium leading-none truncate max-w-full">
+                <span className="text-[10px] font-medium leading-none truncate max-w-full">
                   {item.mobileLabel || item.label}
                 </span>
               </button>
