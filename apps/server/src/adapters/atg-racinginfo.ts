@@ -176,6 +176,14 @@ export class AtgRacingInfoAdapter implements SourceAdapter<unknown> {
     fixtureFilename: string,
     expectedId?: string
   ): Promise<unknown> {
+    if (process.env.USE_FIXTURES === 'true' && this.allowFixtureFallback) {
+      const fixturePath = path.resolve(__dirname, `../../test/fixtures/${fixtureFilename}`);
+      if (fs.existsSync(fixturePath)) {
+        logger.info(`Använder lokal fixtur ${fixtureFilename} (USE_FIXTURES=true)`);
+        return JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+      }
+    }
+
     try {
       const response = await fetchWithPolicy(url, this.fetchOptions);
       if (!response.ok) {

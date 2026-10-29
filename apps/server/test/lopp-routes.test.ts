@@ -75,4 +75,44 @@ describe('Lopp API-rutter', () => {
     expect(body.data).toBeNull();
     expect(body.message).toBe('Uppdateras inte just nu');
   });
+
+  it('GET /api/lopp/:raceId/odds returnerar 200 med odds och streckprocent', async () => {
+    // Hämta loppet först så att lopp och starter skapas
+    await app.inject({ method: 'GET', url: '/api/dagar/idag' });
+    await app.inject({ method: 'GET', url: '/api/lopp/2026-10-29_1_4' });
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/lopp/2026-10-29_1_4/odds',
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = JSON.parse(res.body);
+
+    expect(body.status).toBe('ok');
+    expect(body.data).toBeDefined();
+    expect(body.data.raceId).toBe('2026-10-29_1_4');
+    expect(body.data.timeFormatted).toBe('18:42');
+    expect(Array.isArray(body.data.odds)).toBe(true);
+    expect(body.data.odds.length).toBeGreaterThan(0);
+
+    const horse1 = body.data.odds.find((o: { startNumber: number }) => o.startNumber === 1);
+    expect(horse1.winOdds).toBe(3.45);
+    expect(horse1.stakePercent).toBe(24);
+  });
+
+  it('GET /api/lopp/:raceId/odds med simulateDown=true returnerar 200 med status failed', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/lopp/2026-10-29_1_4/odds?simulateDown=true',
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = JSON.parse(res.body);
+
+    expect(body.status).toBe('failed');
+    expect(body.data).toBeNull();
+    expect(body.message).toBe('Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.');
+  });
 });
+

@@ -99,3 +99,28 @@ export function formatSulky(sulkyType?: string | null): string {
   }
   return 'Vanlig vagn';
 }
+
+/**
+ * Formaterar vinnarodds med en decimal och decimalkomma.
+ * Exempel: 4.8 -> "4,8", 12 -> "12,0"
+ * Saknat värde ger tankstreck "–".
+ */
+export function formatOdds(odds?: number | null): string {
+  if (odds === undefined || odds === null || isNaN(odds) || odds <= 0) {
+    return '–';
+  }
+  return odds.toFixed(1).replace('.', ',');
+}
+
+/**
+ * Formaterar streckprocent som heltal med procenttecken och mellanslag.
+ * Exempel: 23 -> "23 %", 0 -> "0 %"
+ * Saknat värde ger tankstreck "–".
+ */
+export function formatPercent(percent?: number | null): string {
+  if (percent === undefined || percent === null || isNaN(percent) || percent < 0) {
+    return '–';
+  }
+  return `${Math.round(percent)} %`;
+}
+

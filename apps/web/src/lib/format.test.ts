@@ -6,6 +6,8 @@ import {
   formatStartMethod,
   formatShoeInfo,
   formatSulky,
+  formatOdds,
+  formatPercent,
 } from './format';
 
 describe('Svensk travformatering', () => {
@@ -74,4 +76,23 @@ describe('Svensk travformatering', () => {
     expect(formatSulky('')).toBe('–');
     expect(formatSulky(null)).toBe('–');
   });
+
+  it('formaterar vinnarodds med en decimal och decimalkomma', () => {
+    expect(formatOdds(4.8)).toBe('4,8');
+    expect(formatOdds(3.45)).toBe('3,5');
+    expect(formatOdds(12)).toBe('12,0');
+    expect(formatOdds(undefined)).toBe('–');
+    expect(formatOdds(null)).toBe('–');
+    expect(formatOdds(0)).toBe('–');
+  });
+
+  it('formaterar streckprocent som heltal med mellanslag och procent', () => {
+    expect(formatPercent(23)).toBe('23 %');
+    expect(formatPercent(23.4)).toBe('23 %');
+    expect(formatPercent(23.8)).toBe('24 %');
+    expect(formatPercent(0)).toBe('0 %');
+    expect(formatPercent(undefined)).toBe('–');
+    expect(formatPercent(null)).toBe('–');
+  });
 });
+

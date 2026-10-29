@@ -1,11 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Scale, Award, TrendingUp } from 'lucide-react';
-import { Race, Start, SourceStatus, ApiResponse } from '@stallbacken/shared';
+import {
+  Race,
+  Start,
+  SourceStatus,
+  ApiResponse,
+  RaceOddsData,
+} from '@stallbacken/shared';
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
 import { LoppSkelett } from '../components/SkelettKort';
-import { StartlistaTabell } from '../components/StartlistaTabell';
-import { formatDistance, formatStartMethod } from '../lib/format';
+import {
+  StartlistaTabell,
+  HorseOddsMap,
+} from '../components/StartlistaTabell';
+import {
+  formatDistance,
+  formatStartMethod,
+  formatOdds,
+  formatPercent,
+} from '../lib/format';
 
 interface LoppScreenProps {
   raceId: string;
@@ -25,6 +39,13 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
   const [status, setStatus] = useState<SourceStatus>('ok');
   const [statusMessage, setStatusMessage] = useState<string>('Allt är färskt och uppdaterat.');
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Egen state och livscykel för odds och streck
+  const [oddsData, setOddsData] = useState<RaceOddsData | null>(null);
+  const [oddsStatus, setOddsStatus] = useState<SourceStatus>('ok');
+  const [oddsMessage, setOddsMessage] = useState<string>(
+    'Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.'
+  );
 
   const fetchRaceData = async () => {
     setLoading(true);
@@ -48,8 +69,43 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
     }
   };
 
+  const fetchOddsData = async () => {
+    try {
+      const isSimulateDown =
+        typeof window !== 'undefined' &&
+        new URLSearchParams(window.location.search).get('simulateOddsDown') === 'true';
+
+      const queryParam = isSimulateDown ? '?simulateDown=true' : '';
+      const res = await fetch(`/api/lopp/${raceId}/odds${queryParam}`);
+      const json: ApiResponse<RaceOddsData | null> = await res.json();
+
+      if (json && json.status === 'ok' && json.data) {
+        setOddsData(json.data);
+        setOddsStatus('ok');
+        setOddsMessage(json.message || 'Allt är färskt och uppdaterat.');
+      } else if (json && json.status === 'stale' && json.data) {
+        setOddsData(json.data);
+        setOddsStatus('stale');
+        setOddsMessage(json.message || 'Uppdaterat för en stund sedan.');
+      } else if (json && json.status === 'degraded' && json.data) {
+        setOddsData(json.data);
+        setOddsStatus('degraded');
+        setOddsMessage(json.message || 'Delvis uppdaterat.');
+      } else {
+        setOddsData(null);
+        setOddsStatus('failed');
+        setOddsMessage('Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.');
+      }
+    } catch {
+      setOddsData(null);
+      setOddsStatus('failed');
+      setOddsMessage('Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.');
+    }
+  };
+
   useEffect(() => {
     fetchRaceData();
+    fetchOddsData();
   }, [raceId]);
 
   const raceNumber = race?.number || '–';
@@ -57,6 +113,34 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
   const methodStr = formatStartMethod(race?.startMethod);
   const startTimeStr = race?.scheduledStart ? race.scheduledStart.slice(11, 16) : '–';
   const purseStr = race?.purse || '–';
+
+  // Konstruera kartan med odds per startnummer för startlistan
+  const oddsMap: HorseOddsMap = {};
+  if (oddsData?.odds && oddsStatus !== 'failed') {
+    for (const o of oddsData.odds) {
+      oddsMap[o.startNumber] = {
+        winOdds: o.winOdds,
+        placeOdds: o.placeOdds,
+        stakePercent: o.stakePercent,
+      };
+    }
+  }
+
+  // Beräkna "Dagens spik" (hästen med högst streckprocent)
+  const sortedByStake = oddsData?.odds && oddsStatus !== 'failed'
+    ? [...oddsData.odds]
+        .filter((o) => typeof o.stakePercent === 'number' && (o.stakePercent || 0) > 0)
+        .sort((a, b) => (b.stakePercent || 0) - (a.stakePercent || 0))
+    : [];
+  const topStaked = sortedByStake.length > 0 ? sortedByStake[0] : null;
+  const favoriteHorse = topStaked
+    ? {
+        ...topStaked,
+        name:
+          starts.find((s) => s.startNumber === topStaked.startNumber)?.horseName ||
+          `Häst ${topStaked.startNumber}`,
+      }
+    : null;
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-16">
@@ -163,16 +247,21 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
                   </span>
                 </div>
 
-                <StartlistaTabell starts={starts} />
+                <StartlistaTabell
+                  starts={starts}
+                  oddsMap={oddsMap}
+                  oddsTimestamp={oddsData?.timeFormatted}
+                  oddsStatus={oddsStatus}
+                />
               </section>
             </BlockErrorBoundary>
           </div>
 
           {/* Kolumn 2 (höger på laptop, under på mobil): Odds, Tips, Jämför */}
           <div className="lg:col-span-4 space-y-6">
-            {/* Block 2: Odds och streck (isolerat block med egen prick) */}
-            <BlockErrorBoundary fallbackTitle="Odds och streck">
-              <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-3">
+            {/* Block 2: Odds och streck (helt isolerat block med egen prick och felgräns) */}
+            <BlockErrorBoundary fallbackTitle="Odds och streck" onRetry={fetchOddsData}>
+              <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-amber-600 shrink-0" />
@@ -181,13 +270,87 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
                     </h2>
                   </div>
                   <FarskhetsPrick
-                    status="failed"
-                    explanation="Oddsen uppdateras inte just nu. Allt annat på sidan är färskt."
+                    status={oddsStatus}
+                    explanation={oddsMessage}
+                    onRetry={fetchOddsData}
                   />
                 </div>
-                <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                  Den här uppgiften saknas just nu.
-                </p>
+
+                {oddsStatus === 'failed' || !oddsData ? (
+                  <div className="space-y-3">
+                    <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                      Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.
+                    </p>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => fetchOddsData()}
+                        className="min-h-[44px] px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-semibold rounded-lg transition-colors cursor-pointer"
+                      >
+                        Försök igen
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 border-b border-slate-100 pb-2">
+                      <span>Spelform: {oddsData.gameType || 'Vinnare'}</span>
+                      <span>Odds från {oddsData.timeFormatted}</span>
+                    </div>
+
+                    {/* Dagens spik / mest streckade häst */}
+                    {favoriteHorse && (
+                      <div className="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
+                        <span className="text-xs font-bold text-amber-900 uppercase tracking-wider block">
+                          Dagens spik (mest streckad)
+                        </span>
+                        <div className="flex justify-between items-baseline gap-2">
+                          <span className="text-base font-bold text-slate-950 truncate">
+                            {favoriteHorse.startNumber}. {favoriteHorse.name}
+                          </span>
+                          <span className="text-sm font-semibold text-amber-950 whitespace-nowrap">
+                            {formatPercent(favoriteHorse.stakePercent)} streck · {formatOdds(favoriteHorse.winOdds)}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Snabböversikt per häst */}
+                    <div className="divide-y divide-slate-100 pt-1 text-sm">
+                      {oddsData.odds.map((item) => {
+                        const start = starts.find((s) => s.startNumber === item.startNumber);
+                        const isScratched = Boolean(start?.scratched);
+                        const horseName = start?.horseName || `Häst ${item.startNumber}`;
+
+                        return (
+                          <div
+                            key={item.startNumber}
+                            className={`py-2 px-1 flex items-center justify-between ${
+                              isScratched ? 'opacity-50 line-through' : ''
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 truncate pr-2">
+                              <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs shrink-0">
+                                {item.startNumber}
+                              </span>
+                              <span className="font-medium text-slate-900 truncate">
+                                {horseName}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span className="text-slate-600 font-medium">
+                                {isScratched ? '–' : formatOdds(item.winOdds)}
+                              </span>
+                              <span className="text-slate-950 font-bold w-12 text-right">
+                                {isScratched ? '–' : formatPercent(item.stakePercent)}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </section>
             </BlockErrorBoundary>
 

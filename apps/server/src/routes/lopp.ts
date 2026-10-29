@@ -2,8 +2,9 @@
 // Privat, icke-kommersiell användning. Ingen vidarespridning av data.
 
 import { FastifyPluginAsync } from 'fastify';
-import { ApiResponse, RaceDay, Race, Start } from '@stallbacken/shared';
+import { ApiResponse, RaceDay, Race, Start, RaceOddsData } from '@stallbacken/shared';
 import { atgRacingInfoAdapter } from '../adapters/atg-racinginfo.js';
+import { atgOddsAdapter } from '../adapters/atg-odds.js';
 import { getDb } from '../db/connection.js';
 import { getRacesByRaceDayId } from '../db/queries/races.js';
 import { logger } from '../lib/logger.js';
@@ -78,6 +79,48 @@ export const loppRoutes: FastifyPluginAsync = async (app) => {
         status: 'failed',
         fetchedAt: new Date().toISOString(),
         message: 'Uppdateras inte just nu',
+      };
+      return reply.status(200).send(response);
+    }
+  });
+
+  /**
+   * Hämtar aktuella odds och streckprocent för ett lopp.
+   * Isolerad från startlistan så att ett fel på oddsen inte sänker loppkortet.
+   * Stödjer simulateDown=true för verifiering av degraderingsläget.
+   */
+  app.get<{
+    Params: { raceId: string };
+    Querystring: { refresh?: string; simulateDown?: string };
+  }>('/api/lopp/:raceId/odds', async (request, reply) => {
+    const { raceId } = request.params;
+    const forceRefresh = request.query.refresh === 'true';
+    const simulateDown = request.query.simulateDown === 'true';
+
+    try {
+      if (simulateDown) {
+        atgOddsAdapter.setSimulatedFailure(true);
+      } else if (atgOddsAdapter.isSimulatedFailure()) {
+        atgOddsAdapter.setSimulatedFailure(false);
+      }
+
+      const result = await atgOddsAdapter.fetchOddsForRace(raceId, forceRefresh);
+
+      const response: ApiResponse<RaceOddsData | null> = {
+        data: result.data,
+        status: result.status,
+        fetchedAt: result.fetchedAt,
+        message: result.message,
+      };
+
+      return reply.status(200).send(response);
+    } catch (err) {
+      logger.error(`Oväntat fel vid hämtning av odds för lopp ${raceId}`, err);
+      const response: ApiResponse<RaceOddsData | null> = {
+        data: null,
+        status: 'failed',
+        fetchedAt: new Date().toISOString(),
+        message: 'Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.',
       };
       return reply.status(200).send(response);
     }

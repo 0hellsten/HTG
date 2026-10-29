@@ -1,13 +1,35 @@
 import React from 'react';
-import { Start } from '@stallbacken/shared';
+import { Start, SourceStatus } from '@stallbacken/shared';
 import { SkoVisare } from './SkoVisare';
-import { formatCurrency, formatKmTime, formatDistance } from '../lib/format';
+import {
+  formatCurrency,
+  formatKmTime,
+  formatDistance,
+  formatOdds,
+  formatPercent,
+} from '../lib/format';
+
+export interface HorseOddsMap {
+  [startNumber: number]: {
+    winOdds?: number;
+    placeOdds?: number;
+    stakePercent?: number;
+  };
+}
 
 interface StartlistaTabellProps {
   starts: Start[];
+  oddsMap?: HorseOddsMap;
+  oddsTimestamp?: string;
+  oddsStatus?: SourceStatus;
 }
 
-export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({ starts }) => {
+export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({
+  starts,
+  oddsMap,
+  oddsTimestamp,
+  oddsStatus,
+}) => {
   if (!starts || starts.length === 0) {
     return (
       <div className="p-6 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 text-center text-base">
@@ -16,12 +38,33 @@ export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({ starts }) =>
     );
   }
 
+  const isOddsFailed = oddsStatus === 'failed';
+
   return (
-    <div>
+    <div className="space-y-3">
+      {/* Tidsstämpel / info för odds i startlistan */}
+      <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 px-1">
+        <span>
+          {isOddsFailed
+            ? 'Oddsen uppdateras inte just nu'
+            : oddsTimestamp
+            ? `Odds från ${oddsTimestamp}`
+            : 'Vinnarodds och streckprocent'}
+        </span>
+        <span className="hidden sm:inline">
+          {starts.filter((s) => !s.scratched).length} startande hästar
+        </span>
+      </div>
+
       {/* Mobil: Tydliga startkort (visas under 1024px) */}
       <div className="lg:hidden space-y-3">
         {starts.map((start) => (
-          <MobilStartKort key={start.id} start={start} />
+          <MobilStartKort
+            key={start.id}
+            start={start}
+            oddsInfo={oddsMap?.[start.startNumber]}
+            isOddsFailed={isOddsFailed}
+          />
         ))}
       </div>
 
@@ -30,17 +73,24 @@ export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({ starts }) =>
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-100 text-slate-700 text-sm font-semibold border-b border-slate-200">
-              <th className="py-3 px-4 w-12 text-center">Nr</th>
-              <th className="py-3 px-4">Häst & härstamning</th>
-              <th className="py-3 px-4">Kusk / Tränare</th>
-              <th className="py-3 px-4">Skor & vagn</th>
-              <th className="py-3 px-4 text-right">Rekord</th>
-              <th className="py-3 px-4 text-right">Intjänat</th>
+              <th className="py-3 px-3 w-12 text-center">Nr</th>
+              <th className="py-3 px-3">Häst & härstamning</th>
+              <th className="py-3 px-3">Kusk / Tränare</th>
+              <th className="py-3 px-3">Skor & vagn</th>
+              <th className="py-3 px-3 text-right">Odds</th>
+              <th className="py-3 px-3 text-right">Streck</th>
+              <th className="py-3 px-3 text-right">Rekord</th>
+              <th className="py-3 px-3 text-right">Intjänat</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 text-base">
             {starts.map((start) => (
-              <LaptopStartRad key={start.id} start={start} />
+              <LaptopStartRad
+                key={start.id}
+                start={start}
+                oddsInfo={oddsMap?.[start.startNumber]}
+                isOddsFailed={isOddsFailed}
+              />
             ))}
           </tbody>
         </table>
@@ -49,7 +99,21 @@ export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({ starts }) =>
   );
 };
 
-const MobilStartKort: React.FC<{ start: Start }> = ({ start }) => {
+interface CardProps {
+  start: Start;
+  oddsInfo?: {
+    winOdds?: number;
+    placeOdds?: number;
+    stakePercent?: number;
+  };
+  isOddsFailed?: boolean;
+}
+
+const MobilStartKort: React.FC<CardProps> = ({
+  start,
+  oddsInfo,
+  isOddsFailed,
+}) => {
   const isScratched = Boolean(start.scratched);
 
   return (
@@ -124,17 +188,24 @@ const MobilStartKort: React.FC<{ start: Start }> = ({ start }) => {
             />
           </div>
 
-          <div className="flex justify-between items-center text-slate-700 pt-1 border-t border-slate-100">
+          {/* Odds och streckrad för mobil */}
+          <div className="flex justify-between items-center text-slate-700 pt-2 border-t border-slate-100">
             <div>
-              <span className="text-xs text-slate-400 block">Rekord</span>
-              <span className="font-medium text-slate-900">
-                {formatKmTime(start.record)}
+              <span className="text-xs text-slate-500 font-medium block">Vinnarodds</span>
+              <span className="text-base font-bold text-slate-900">
+                {isOddsFailed ? '–' : formatOdds(oddsInfo?.winOdds)}
+              </span>
+            </div>
+            <div className="text-center">
+              <span className="text-xs text-slate-500 font-medium block">Streck</span>
+              <span className="text-base font-bold text-slate-900">
+                {isOddsFailed ? '–' : formatPercent(oddsInfo?.stakePercent)}
               </span>
             </div>
             <div className="text-right">
-              <span className="text-xs text-slate-400 block">Intjänat</span>
+              <span className="text-xs text-slate-400 block">Rekord</span>
               <span className="font-medium text-slate-900">
-                {formatCurrency(start.earnings)}
+                {formatKmTime(start.record)}
               </span>
             </div>
           </div>
@@ -144,7 +215,11 @@ const MobilStartKort: React.FC<{ start: Start }> = ({ start }) => {
   );
 };
 
-const LaptopStartRad: React.FC<{ start: Start }> = ({ start }) => {
+const LaptopStartRad: React.FC<CardProps> = ({
+  start,
+  oddsInfo,
+  isOddsFailed,
+}) => {
   const isScratched = Boolean(start.scratched);
 
   return (
@@ -153,7 +228,7 @@ const LaptopStartRad: React.FC<{ start: Start }> = ({ start }) => {
         isScratched ? 'bg-slate-50/60 opacity-60' : ''
       }`}
     >
-      <td className="py-3.5 px-4 text-center font-bold">
+      <td className="py-3.5 px-3 text-center font-bold">
         <span
           className={`inline-flex items-center justify-center w-8 h-8 rounded ${
             isScratched
@@ -165,11 +240,11 @@ const LaptopStartRad: React.FC<{ start: Start }> = ({ start }) => {
         </span>
       </td>
 
-      <td className="py-3.5 px-4">
+      <td className="py-3.5 px-3">
         <div className="flex items-center gap-2">
           <span
             className={`font-semibold ${
-              isScratched ? 'line-through text-slate-500' : 'text-slate-900'
+              isScratched ? 'line-through text-slate-500' : 'text-slate-950'
             }`}
           >
             {start.horseName}
@@ -185,14 +260,14 @@ const LaptopStartRad: React.FC<{ start: Start }> = ({ start }) => {
         </div>
       </td>
 
-      <td className="py-3.5 px-4 text-slate-800">
+      <td className="py-3.5 px-3 text-slate-800">
         <div className="font-medium">{start.driverName || '–'}</div>
         <div className="text-xs text-slate-500">
           Tränare: {start.trainerName || '–'}
         </div>
       </td>
 
-      <td className="py-3.5 px-4">
+      <td className="py-3.5 px-3">
         <SkoVisare
           shoesFront={start.shoesFront}
           shoesBack={start.shoesBack}
@@ -201,11 +276,21 @@ const LaptopStartRad: React.FC<{ start: Start }> = ({ start }) => {
         />
       </td>
 
-      <td className="py-3.5 px-4 text-right font-medium text-slate-900">
+      {/* Vinnarodds kolumn */}
+      <td className="py-3.5 px-3 text-right font-semibold text-slate-900">
+        {isScratched || isOddsFailed ? '–' : formatOdds(oddsInfo?.winOdds)}
+      </td>
+
+      {/* Streckprocent kolumn */}
+      <td className="py-3.5 px-3 text-right font-semibold text-slate-900">
+        {isScratched || isOddsFailed ? '–' : formatPercent(oddsInfo?.stakePercent)}
+      </td>
+
+      <td className="py-3.5 px-3 text-right font-medium text-slate-900">
         {formatKmTime(start.record)}
       </td>
 
-      <td className="py-3.5 px-4 text-right font-medium text-slate-900">
+      <td className="py-3.5 px-3 text-right font-medium text-slate-900">
         {formatCurrency(start.earnings)}
       </td>
     </tr>
