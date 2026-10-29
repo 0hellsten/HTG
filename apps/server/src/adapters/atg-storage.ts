@@ -28,26 +28,46 @@ export function saveCalendarToDb(
     });
 
     // Hitta eventuell huvudspelform
-    let biggestGame: string | undefined;
-    for (const [gameType, gameList] of Object.entries(games)) {
-      if (gameList.some((g) => g.trackId === track.id)) {
-        biggestGame = gameType;
-        break;
+    let biggestGame: string | undefined = track.biggestGameType;
+    if (!biggestGame) {
+      for (const [gameType, gameList] of Object.entries(games)) {
+        if (gameList.some((g) => g.trackId === track.id)) {
+          biggestGame = gameType;
+          break;
+        }
       }
     }
 
     const raceDayId = `${date}_${track.id}`;
-    const firstRace = races.find((r) => r.track?.id === track.id);
+    const trackRaces = track.races || [];
+    const firstRace = trackRaces[0] || races.find((r) => r.track?.id === track.id);
+    const firstStartTime = track.startTime || firstRace?.startTime;
 
     upsertRaceDay(db, {
       id: raceDayId,
       date,
       trackId: track.id,
       biggestGame,
-      firstStart: firstRace?.startTime ? firstRace.startTime.slice(11, 16) : undefined,
+      firstStart: firstStartTime ? firstStartTime.slice(11, 16) : undefined,
       sourceId,
       fetchedAt: nowIso,
     });
+
+    // Spara lopp för denna bana (om källan levererar track.races)
+    for (const r of trackRaces) {
+      upsertRace(db, {
+        id: r.id,
+        raceDayId,
+        number: r.number,
+        name: r.name || `Lopp ${r.number}`,
+        distanceM: r.distance || 2140,
+        startMethod: r.startMethod === 'volt' ? 'volt' : 'auto',
+        scheduledStart: r.startTime || nowIso,
+        status: r.status || 'kommande',
+        sourceId,
+        fetchedAt: nowIso,
+      });
+    }
   }
 
   // Spara loppreferenser
@@ -107,8 +127,8 @@ export function saveRaceDetailToDb(
     number: data.number,
     name: data.name,
     distanceM: data.distance,
-    startMethod: data.startMethod === 'volt' ? 'volt' : 'auto',
-    purse: data.purse,
+    startMethod: data.startMethod === 'volt' || data.startMethod === 'volte' ? 'volt' : 'auto',
+    purse: data.prize || data.purse,
     terms: data.terms,
     scheduledStart: data.startTime,
     status: data.status === 'avgjort' ? 'avgjort' : 'kommande',
@@ -131,9 +151,13 @@ function saveEquipage(
   nowIso: string
 ): void {
   if (s.horse.trainer && s.horse.trainer.id) {
+    const trainerName =
+      s.horse.trainer.name ||
+      [s.horse.trainer.firstName, s.horse.trainer.lastName].filter(Boolean).join(' ') ||
+      'Okänd tränare';
     upsertPerson(db, {
       id: s.horse.trainer.id,
-      name: s.horse.trainer.name || 'Okänd tränare',
+      name: trainerName,
       role: 'tränare',
       sourceId,
       fetchedAt: nowIso,
@@ -141,9 +165,13 @@ function saveEquipage(
   }
 
   if (s.driver && s.driver.id) {
+    const driverName =
+      s.driver.name ||
+      [s.driver.firstName, s.driver.lastName].filter(Boolean).join(' ') ||
+      'Okänd kusk';
     upsertPerson(db, {
       id: s.driver.id,
-      name: s.driver.name || 'Okänd kusk',
+      name: driverName,
       role: 'kusk',
       sourceId,
       fetchedAt: nowIso,

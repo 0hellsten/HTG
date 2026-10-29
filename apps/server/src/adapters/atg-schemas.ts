@@ -3,11 +3,24 @@
 
 import { z } from 'zod';
 
+export const AtgTrackRaceSummarySchema = z.object({
+  id: z.string(),
+  number: z.number(),
+  status: z.string().optional(),
+  startTime: z.string().optional(),
+  name: z.string().optional(),
+  distance: z.number().optional().default(2140),
+  startMethod: z.string().optional().default('auto'),
+});
+
 export const AtgTrackSchema = z.object({
   id: z.union([z.number(), z.string()]).transform(String),
   name: z.string(),
   countryCode: z.string().optional().default('SE'),
   condition: z.string().optional(),
+  startTime: z.string().optional(),
+  biggestGameType: z.string().optional(),
+  races: z.array(AtgTrackRaceSummarySchema).optional().default([]),
 });
 
 export const AtgGameSchema = z.object({
@@ -50,6 +63,18 @@ export const AtgShoeInfoSchema = z.object({
   changed: z.boolean().optional(),
 });
 
+export const AtgPersonRefSchema = z.object({
+  id: z
+    .union([z.number(), z.string()])
+    .optional()
+    .transform((v) => (v ? String(v) : undefined)),
+  name: z.string().optional(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  shortName: z.string().optional(),
+  silks: z.string().optional(),
+});
+
 export const AtgStartSchema = z.object({
   number: z.number(),
   postPosition: z.number().optional(),
@@ -60,33 +85,21 @@ export const AtgStartSchema = z.object({
     age: z.number().optional(),
     sex: z.string().optional(),
     color: z.string().optional(),
-    owner: z.object({ name: z.string().optional() }).optional(),
-    trainer: z
-      .object({
-        id: z
-          .union([z.number(), z.string()])
-          .optional()
-          .transform((v) => (v ? String(v) : undefined)),
-        name: z.string().optional(),
-      })
-      .optional(),
+    owner: z
+      .union([z.string(), z.object({ name: z.string().optional() })])
+      .optional()
+      .transform((v) => (typeof v === 'string' ? { name: v } : v)),
+    trainer: AtgPersonRefSchema.optional(),
     records: z
       .object({
         auto: z.string().optional(),
         volt: z.string().optional(),
       })
       .optional(),
+    record: z.unknown().optional(),
     money: z.number().optional(),
   }),
-  driver: z
-    .object({
-      id: z
-        .union([z.number(), z.string()])
-        .optional()
-        .transform((v) => (v ? String(v) : undefined)),
-      name: z.string().optional(),
-    })
-    .optional(),
+  driver: AtgPersonRefSchema.optional(),
   shoes: z
     .object({
       front: AtgShoeInfoSchema.optional(),
@@ -96,7 +109,7 @@ export const AtgStartSchema = z.object({
   sulky: z
     .object({
       type: z.object({ text: z.string().optional() }).optional(),
-      color: z.string().optional(),
+      color: z.union([z.string(), z.object({ text: z.string().optional() })]).optional().transform((v) => (typeof v === 'object' && v ? v.text : v)),
     })
     .optional(),
   scratched: z.boolean().optional().default(false),
@@ -112,7 +125,11 @@ export const AtgRaceDetailSchema = z.object({
   startTime: z.string(),
   status: z.string().optional().default('upcoming'),
   purse: z.string().optional(),
-  terms: z.string().optional(),
+  prize: z.string().optional(),
+  terms: z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .transform((v) => (Array.isArray(v) ? v.join('. ') : v)),
   track: AtgTrackSchema.optional(),
   starts: z.array(AtgStartSchema).optional().default([]),
 });
