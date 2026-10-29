@@ -39,6 +39,7 @@ test.describe('Krav: Tålighet och degradering med avstängda källor', () => {
     const tipsNav = page.locator('button:has-text("Tips"):visible').first();
     await tipsNav.click();
     await expect(page.locator('h1')).toContainText(/Vad tycker stallbacken\?/i);
+    await expect(page.locator('text=Aftonbladet').first()).toBeVisible();
 
     // 5. Verifiera att Mitt stall fungerar
     const stallNav = page.locator('button:has-text("Mitt stall"):visible').first();

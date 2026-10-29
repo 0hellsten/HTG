@@ -89,3 +89,21 @@ export interface HorseProfileResponse {
 }
 
 export type HorseBatchResponse = Record<string, HorseProfileResponse | null>;
+
+export type HorseRankingCategory = 'vinstrikast' | 'segerprocent' | 'segrar' | 'idag';
+
+export interface HorseRankingItem extends HorseDetail {
+  rankPosition: number;
+  todayStart?: {
+    trackName: string;
+    raceNumber: number;
+    startNumber: number;
+    startTime?: string;
+  };
+}
+
+export interface HorseRankingsResponse {
+  category: HorseRankingCategory;
+  items: HorseRankingItem[];
+  updatedAt: string;
+}

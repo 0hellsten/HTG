@@ -7,6 +7,7 @@ import { getDb } from '../db/connection.js';
 import { getLatestTipArticles, getTipsForRace, getAllRaceTips } from '../db/queries/tips.js';
 import { tipsExpressenAdapter } from '../adapters/tips-expressen.js';
 import { tipsTravrondenAdapter } from '../adapters/tips-travronden.js';
+import { tipsAftonbladetAdapter } from '../adapters/tips-aftonbladet.js';
 import { logger } from '../lib/logger.js';
 
 export const tipsRoutes: FastifyPluginAsync = async (app) => {
@@ -23,25 +24,18 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
     const simulateDown = request.query.simulateDown;
 
     try {
-      if (simulateDown === 'tips-expressen') {
-        tipsExpressenAdapter.setSimulatedFailure(true);
-      } else {
-        tipsExpressenAdapter.setSimulatedFailure(false);
-      }
-
-      if (simulateDown === 'tips-travronden') {
-        tipsTravrondenAdapter.setSimulatedFailure(true);
-      } else {
-        tipsTravrondenAdapter.setSimulatedFailure(false);
-      }
+      tipsExpressenAdapter.setSimulatedFailure(simulateDown === 'tips-expressen');
+      tipsTravrondenAdapter.setSimulatedFailure(simulateDown === 'tips-travronden');
+      tipsAftonbladetAdapter.setSimulatedFailure(simulateDown === 'tips-aftonbladet');
 
       // Hämta färsk data från källorna
-      const [resExpressen, resTravronden] = await Promise.all([
+      const [resExpressen, resTravronden, resAftonbladet] = await Promise.all([
         tipsExpressenAdapter.fetch({ forceRefresh }),
         tipsTravrondenAdapter.fetch({ forceRefresh }),
+        tipsAftonbladetAdapter.fetch({ forceRefresh }),
       ]);
 
-      const articles = getLatestTipArticles(db, 20);
+      const articles = getLatestTipArticles(db, 25);
       const raceTips = getAllRaceTips(db);
 
       const providers = [
@@ -59,6 +53,13 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
           message: resTravronden.message,
           fetchedAt: resTravronden.fetchedAt,
         },
+        {
+          id: tipsAftonbladetAdapter.id,
+          name: tipsAftonbladetAdapter.label,
+          status: resAftonbladet.status,
+          message: resAftonbladet.message,
+          fetchedAt: resAftonbladet.fetchedAt,
+        },
       ];
 
       const overviewData: TipsOverviewData = {
@@ -67,12 +68,10 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
         providers,
       };
 
-      const overallStatus =
-        resExpressen.status === 'ok' && resTravronden.status === 'ok'
-          ? 'ok'
-          : resExpressen.status === 'failed' && resTravronden.status === 'failed'
-            ? 'failed'
-            : 'degraded';
+      const statuses = [resExpressen.status, resTravronden.status, resAftonbladet.status];
+      const allOk = statuses.every((s) => s === 'ok');
+      const allFailed = statuses.every((s) => s === 'failed');
+      const overallStatus = allOk ? 'ok' : allFailed ? 'failed' : 'degraded';
 
       const response: ApiResponse<TipsOverviewData> = {
         data: overviewData,
@@ -98,6 +97,7 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
     } finally {
       tipsExpressenAdapter.setSimulatedFailure(false);
       tipsTravrondenAdapter.setSimulatedFailure(false);
+      tipsAftonbladetAdapter.setSimulatedFailure(false);
     }
   });
 

@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { Calculator } from 'lucide-react';
 import {
   BongEngine,
   BongGameType,
@@ -8,6 +7,7 @@ import {
   HorseRank,
   ReductionConditions,
 } from '@stallbacken/shared';
+import { BongOmgangHeader } from '../components/bong/BongOmgangHeader';
 import { BongSummaryCard } from '../components/bong/BongSummaryCard';
 import { BongLegTabs } from '../components/bong/BongLegTabs';
 import { BongLegHorseList } from '../components/bong/BongLegHorseList';
@@ -174,48 +174,18 @@ export const BongScreen: React.FC = () => {
     }
   };
 
+  const currentLeg = raceDay.races[activeLegIndex] || {
+    legIndex: activeLegIndex,
+    horses: [],
+  };
+
   return (
     <div className="space-y-6 pb-20">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-lg bg-amber-500 text-slate-950">
-              <Calculator className="w-6 h-6 stroke-[2.2]" />
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
-              Bong-maskinen
-            </h1>
-          </div>
-          <p className="text-slate-600 text-sm sm:text-base mt-1">
-            Professionell systemkalkylator, reduceringsmotor och radkalkyl för travet.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-1.5 p-1 bg-slate-200 rounded-xl self-start sm:self-center">
-          <button
-            type="button"
-            onClick={() => handleGameTypeChange('V75')}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-              gameType === 'V75'
-                ? 'bg-amber-500 text-slate-950 shadow-sm'
-                : 'text-slate-700 hover:text-slate-950'
-            }`}
-          >
-            V75 (7 lopp)
-          </button>
-          <button
-            type="button"
-            onClick={() => handleGameTypeChange('V86')}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-              gameType === 'V86'
-                ? 'bg-amber-500 text-slate-950 shadow-sm'
-                : 'text-slate-700 hover:text-slate-950'
-            }`}
-          >
-            V86 (8 lopp)
-          </button>
-        </div>
-      </div>
+      <BongOmgangHeader
+        gameType={gameType}
+        raceDay={raceDay}
+        onSelectGameType={handleGameTypeChange}
+      />
 
       <BongSummaryCard
         calculationResult={calculationResult}
@@ -238,8 +208,7 @@ export const BongScreen: React.FC = () => {
       />
 
       <BongLegHorseList
-        activeLegIndex={activeLegIndex}
-        horses={raceDay.races[activeLegIndex]?.horses || []}
+        leg={currentLeg}
         selectedIds={selectedHorses[activeLegIndex] || []}
         ranks={ranks}
         onToggleHorse={handleToggleHorse}

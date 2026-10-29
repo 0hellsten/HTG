@@ -1,4 +1,4 @@
-import { BongGameType, BongRaceDayData, BongHorseInput } from '@stallbacken/shared';
+import { BongGameType, BongRaceDayData, BongHorseInput, BongRaceLeg } from '@stallbacken/shared';
 
 // Skapa standard-hästar för en realistisk V75/V86-omgång
 export function createDefaultHorses(legIndex: number): BongHorseInput[] {
@@ -67,18 +67,165 @@ export function createDefaultHorses(legIndex: number): BongHorseInput[] {
   });
 }
 
+const V75_LEGS_INFO: Omit<BongRaceLeg, 'horses'>[] = [
+  {
+    legIndex: 0,
+    raceNumber: 5,
+    trackName: 'Solvalla',
+    startTime: '16:20',
+    distance: 2140,
+    startMethod: 'auto',
+    raceName: 'Klass II, Försök 1',
+  },
+  {
+    legIndex: 1,
+    raceNumber: 6,
+    trackName: 'Solvalla',
+    startTime: '16:42',
+    distance: 2640,
+    startMethod: 'volt',
+    raceName: 'Klass I, Försök 2',
+  },
+  {
+    legIndex: 2,
+    raceNumber: 7,
+    trackName: 'Solvalla',
+    startTime: '17:05',
+    distance: 1640,
+    startMethod: 'auto',
+    raceName: 'Gulddivisionen',
+  },
+  {
+    legIndex: 3,
+    raceNumber: 8,
+    trackName: 'Solvalla',
+    startTime: '17:27',
+    distance: 2140,
+    startMethod: 'volt',
+    raceName: 'Diamantstoet, Försök 3',
+  },
+  {
+    legIndex: 4,
+    raceNumber: 9,
+    trackName: 'Solvalla',
+    startTime: '17:50',
+    distance: 2140,
+    startMethod: 'auto',
+    raceName: 'Bronsdivisionen, Försök 1',
+  },
+  {
+    legIndex: 5,
+    raceNumber: 10,
+    trackName: 'Solvalla',
+    startTime: '18:20',
+    distance: 2140,
+    startMethod: 'auto',
+    raceName: 'Silverdivisionen, Försök 2',
+  },
+  {
+    legIndex: 6,
+    raceNumber: 11,
+    trackName: 'Solvalla',
+    startTime: '18:43',
+    distance: 2140,
+    startMethod: 'auto',
+    raceName: 'Walter Lundbergs Memorial',
+  },
+];
+
+const V86_LEGS_INFO: Omit<BongRaceLeg, 'horses'>[] = [
+  {
+    legIndex: 0,
+    raceNumber: 6,
+    trackName: 'Åby',
+    startTime: '20:30',
+    distance: 2140,
+    startMethod: 'auto',
+    raceName: 'Xpress-sprinten',
+  },
+  {
+    legIndex: 1,
+    raceNumber: 7,
+    trackName: 'Solvalla',
+    startTime: '20:41',
+    distance: 1640,
+    startMethod: 'auto',
+    raceName: 'Stolopp',
+  },
+  {
+    legIndex: 2,
+    raceNumber: 7,
+    trackName: 'Åby',
+    startTime: '20:52',
+    distance: 2640,
+    startMethod: 'volt',
+    raceName: 'Stayerlopp',
+  },
+  {
+    legIndex: 3,
+    raceNumber: 8,
+    trackName: 'Solvalla',
+    startTime: '21:03',
+    distance: 2140,
+    startMethod: 'auto',
+    raceName: 'Klass I',
+  },
+  {
+    legIndex: 4,
+    raceNumber: 8,
+    trackName: 'Åby',
+    startTime: '21:14',
+    distance: 2140,
+    startMethod: 'auto',
+    raceName: 'Diamantstoet',
+  },
+  {
+    legIndex: 5,
+    raceNumber: 9,
+    trackName: 'Solvalla',
+    startTime: '21:26',
+    distance: 2140,
+    startMethod: 'volt',
+    raceName: 'Treåringslopp',
+  },
+  {
+    legIndex: 6,
+    raceNumber: 9,
+    trackName: 'Åby',
+    startTime: '21:40',
+    distance: 1640,
+    startMethod: 'auto',
+    raceName: 'Snabblopp',
+  },
+  {
+    legIndex: 7,
+    raceNumber: 10,
+    trackName: 'Solvalla',
+    startTime: '21:51',
+    distance: 2140,
+    startMethod: 'auto',
+    raceName: 'Fyraåringsstjärnan',
+  },
+];
+
 export function buildDefaultRaceDay(gameType: BongGameType): BongRaceDayData {
-  const legsCount = gameType === 'V75' ? 7 : 8;
-  const turnover = gameType === 'V75' ? 52000000 : 28000000;
-  const jackpot = gameType === 'V75' ? 14000000 : 4000000;
+  const isV75 = gameType === 'V75';
+  const turnover = isV75 ? 52000000 : 28000000;
+  const jackpot = isV75 ? 14000000 : 4000000;
+  const trackName = isV75 ? 'Solvalla' : 'Solvalla / Åby (Xpress)';
+  const date = isV75 ? 'Lördag' : 'Onsdag';
+  const startTime = isV75 ? '16:20' : '20:30';
+  const legsInfo = isV75 ? V75_LEGS_INFO : V86_LEGS_INFO;
 
   return {
     gameType,
     turnover,
     jackpotPool: jackpot,
-    races: Array.from({ length: legsCount }, (_, legIdx) => ({
-      legIndex: legIdx,
-      raceNumber: legIdx + 1,
+    trackName,
+    date,
+    startTime,
+    races: legsInfo.map((info, legIdx) => ({
+      ...info,
       horses: createDefaultHorses(legIdx),
     })),
   };

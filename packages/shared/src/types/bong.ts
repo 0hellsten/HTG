@@ -19,6 +19,10 @@ export interface BongRaceLeg {
   legIndex: number; // 0..N-1 eller 1..N
   raceNumber?: number;
   trackName?: string;
+  raceName?: string;
+  startTime?: string;
+  distance?: number;
+  startMethod?: 'volt' | 'auto';
   horses: BongHorseInput[];
 }
 
@@ -26,6 +30,9 @@ export interface BongRaceDayData {
   gameType: BongGameType;
   turnover: number; // Aktuell omsättning i SEK
   jackpotPool?: number; // Extra jackpot adderad till högsta vinstgruppen i SEK
+  trackName?: string;
+  date?: string;
+  startTime?: string;
   races: BongRaceLeg[];
 }
 

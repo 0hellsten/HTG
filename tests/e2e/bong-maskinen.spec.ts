@@ -17,14 +17,21 @@ test.describe('Bong-maskinen — Systemkalkylator och reducering', () => {
     await expect(page.locator('text=Matematiska rader')).toBeVisible();
     await expect(page.locator('text=Reducerade rader')).toBeVisible();
 
-    // 3. Kontrollera att V75 är förvalt och visar 7 avdelningar
+    // 3. Kontrollera tydlig omgångsinformation för V75 (bana, tid, lopp och proposition)
     const v75Btn = page.locator('button:has-text("V75 (7 lopp)")');
     await expect(v75Btn).toBeVisible();
+    await expect(page.getByText('Solvalla').first()).toBeVisible();
+    await expect(page.locator('text=Start kl. 16:20').first()).toBeVisible();
+    await expect(page.locator('text=Klass II, Försök 1')).toBeVisible();
+    await expect(page.locator('text=2 140 m autostart')).toBeVisible();
 
-    // 4. Växla till V86 och kontrollera 8 avdelningar
+    // 4. Växla till V86 och kontrollera 8 avdelningar samt saxade banor
     const v86Btn = page.locator('button:has-text("V86 (8 lopp)")');
     await v86Btn.click();
     await expect(page.locator('text=Avd 8')).toBeVisible();
+    await expect(page.getByText('Solvalla / Åby (Xpress)').first()).toBeVisible();
+    await expect(page.locator('text=Start kl. 20:30').first()).toBeVisible();
+    await expect(page.locator('text=Xpress-sprinten')).toBeVisible();
 
     // 5. Öppna filter och justera ABCD-krav
     const filterBtn = page.locator('button:has-text("Reduceringsmotor")');

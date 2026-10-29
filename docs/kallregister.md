@@ -15,6 +15,7 @@ Alla hämtningar följer reglerna i `.agents/rules/10-datakallor-och-etik.md`.
 | `smhi`             | `opendata-download-metfcst.smhi.se`      | Officiellt öppet API    | Tillåter              | **Aktiv (200 OK)**       | Väder vid travbanan (temp, vind, nederbörd, symbol)                              | Var 60:e min tävlingsdag                       | Mycket låg (officiell svensk myndighetsdata, `snow1g/v1`) |
 | `tips-expressen`   | `feeds.expressen.se`                     | Publik RSS-feed         | Tillåter              | **Aktiv (200 OK)**       | Travtips, V75/V86/V64-snack, skrällbud                                           | 2 ggr/dygn                                     | Låg (standard RSS 2.0)                                    |
 | `tips-travronden`  | `travronden.se`                          | Publik RSS-feed         | Tillåter RSS          | **Aktiv (200 OK)**       | Travnyheter, stallbacksrapporter                                                 | 2 ggr/dygn                                     | Låg (standard RSS 2.0)                                    |
+| `tips-aftonbladet` | `rss.aftonbladet.se`                     | Publik RSS-feed         | Tillåter RSS          | **Aktiv (200 OK)**       | Aftonbladet Trav365 tips, V75/V86 analyser, skrällbud                            | 2 ggr/dygn                                     | Låg (standard RSS 2.0)                                    |
 | `fake-source`      | —                                        | Intern testadapter      | —                     | **Permanent test**       | Simulerad data för tester                                                        | Valfri                                         | Ingen (intern testmodul)                                  |
 
 ---
@@ -72,7 +73,14 @@ Alla hämtningar följer reglerna i `.agents/rules/10-datakallor-och-etik.md`.
 - **Statuskod & svar:** `200 OK`, `application/rss+xml`
 - **Innehåll:** Nyheter från travvärlden, stallbacksrapporter och loppanalyser.
 
-### 7. `fake-source`
+### 7. `tips-aftonbladet`
+
+- **Domän:** `https://rss.aftonbladet.se/rss2/small/pages/sections/sportbladet/trav365/`
+- **Statuskod & svar:** `200 OK`, `text/xml` (RSS 2.0)
+- **Robots.txt:** Tillåter RSS-flödet under `/rss2/`.
+- **Innehåll:** Sportbladet Trav365-tips, V75/V86-analyser, spikförslag och intervjuer.
+
+### 8. `fake-source`
 
 - **Domän:** Intern
 - **Syfte:** Tester och verifiering av degradering, kretsbrytare (circuit breaker) och färskhetsprickar.

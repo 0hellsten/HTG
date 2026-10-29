@@ -1,10 +1,9 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
-import { BongHorseInput, HorseRank } from '@stallbacken/shared';
+import { Sparkles, Clock, MapPin, Flag } from 'lucide-react';
+import { BongRaceLeg, HorseRank } from '@stallbacken/shared';
 
 interface BongLegHorseListProps {
-  activeLegIndex: number;
-  horses: BongHorseInput[];
+  leg: BongRaceLeg;
   selectedIds: string[];
   ranks: Record<string, HorseRank>;
   onToggleHorse: (horseId: string) => void;
@@ -15,37 +14,77 @@ interface BongLegHorseListProps {
 const RANK_OPTIONS: HorseRank[] = ['A', 'B', 'C', 'D'];
 
 export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
-  activeLegIndex,
-  horses,
+  leg,
   selectedIds,
   ranks,
   onToggleHorse,
   onSetRank,
   onClearLeg,
 }) => {
+  const startMethodText = leg.startMethod === 'auto' ? 'autostart' : 'voltstart';
+  const distanceText = leg.distance ? `${leg.distance.toLocaleString('sv-SE')} m` : undefined;
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-        <div>
-          <h2 className="text-lg sm:text-xl font-bold text-slate-950">
-            Avdelning {activeLegIndex + 1} — Välj hästar och sätt rank
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            {selectedIds.length} hästar markerade i denna avdelning
-          </p>
-        </div>
+      {/* Detaljerad loppinformation */}
+      <div className="border-b border-slate-200 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider">
+                Avd {leg.legIndex + 1}
+              </span>
+              <h2 className="text-lg sm:text-xl font-extrabold text-slate-950">
+                {leg.trackName ? `${leg.trackName} · ` : ''}Lopp{' '}
+                {leg.raceNumber || leg.legIndex + 1}
+              </h2>
+              {leg.raceName && (
+                <span className="text-sm font-semibold text-slate-600 italic">
+                  — {leg.raceName}
+                </span>
+              )}
+            </div>
 
-        <button
-          type="button"
-          onClick={onClearLeg}
-          className="text-xs font-semibold text-slate-500 hover:text-red-600 p-1 transition-colors"
-        >
-          Rensa avdelning
-        </button>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs sm:text-sm text-slate-600">
+              {leg.trackName && (
+                <span className="inline-flex items-center gap-1 font-medium text-slate-700">
+                  <MapPin className="w-3.5 h-3.5 text-amber-600" />
+                  <span>{leg.trackName}</span>
+                </span>
+              )}
+              {leg.startTime && (
+                <span className="inline-flex items-center gap-1 font-medium text-slate-700">
+                  <Clock className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Start kl. {leg.startTime}</span>
+                </span>
+              )}
+              {(distanceText || leg.startMethod) && (
+                <span className="inline-flex items-center gap-1 font-medium text-slate-700">
+                  <Flag className="w-3.5 h-3.5 text-slate-500" />
+                  <span>{[distanceText, startMethodText].filter(Boolean).join(' ')}</span>
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0">
+            <span className="text-xs sm:text-sm font-semibold text-slate-500">
+              {selectedIds.length} hästar markerade
+            </span>
+            <button
+              type="button"
+              onClick={onClearLeg}
+              className="text-xs font-semibold text-slate-500 hover:text-red-600 p-1.5 transition-colors cursor-pointer"
+            >
+              Rensa avdelning
+            </button>
+          </div>
+        </div>
       </div>
 
+      {/* Hästlista med ranking */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-        {horses.map((horse) => {
+        {leg.horses.map((horse) => {
           const isSelected = selectedIds.includes(horse.id);
           const rank = ranks[horse.id] || 'A';
           const streckPct = Math.round(horse.betDistribution * 100);
@@ -131,7 +170,7 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
                 <button
                   type="button"
                   onClick={() => onToggleHorse(horse.id)}
-                  className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg"
+                  className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer"
                 >
                   Välj
                 </button>

@@ -8,13 +8,58 @@ import {
   HorseDetail,
   HorseBatchResponse,
   SourceStatus,
+  HorseRankingCategory,
+  HorseRankingsResponse,
 } from '@stallbacken/shared';
 import { atgRacingInfoAdapter } from '../adapters/atg-racinginfo.js';
-import { searchHorses } from '../db/queries/horses.js';
+import { searchHorses, getHorseRankings } from '../db/queries/horses.js';
 import { getDb } from '../db/connection.js';
 import { logger } from '../lib/logger.js';
 
 export const hastarRoutes = async (fastify: FastifyInstance): Promise<void> => {
+  // Hästrankings och topplistor
+  fastify.get<{
+    Querystring: { kategori?: string; limit?: string };
+  }>('/api/hastar/ranking', async (request, reply) => {
+    const rawCat = request.query.kategori || 'vinstrikast';
+    const category: HorseRankingCategory =
+      rawCat === 'segerprocent' || rawCat === 'segrar' || rawCat === 'idag'
+        ? rawCat
+        : 'vinstrikast';
+    const limit = request.query.limit ? parseInt(request.query.limit, 10) : 50;
+
+    try {
+      const db = getDb();
+      const items = getHorseRankings(db, category, limit);
+
+      const response: ApiResponse<HorseRankingsResponse> = {
+        data: {
+          category,
+          items,
+          updatedAt: new Date().toISOString(),
+        },
+        status: 'ok',
+        fetchedAt: new Date().toISOString(),
+        message: `${items.length} hästar rankade`,
+      };
+
+      return reply.status(200).send(response);
+    } catch (err) {
+      logger.error('Fel vid hämtning av hästranking', err);
+      const response: ApiResponse<HorseRankingsResponse> = {
+        data: {
+          category,
+          items: [],
+          updatedAt: new Date().toISOString(),
+        },
+        status: 'degraded',
+        fetchedAt: new Date().toISOString(),
+        message: 'Kunde inte sammanställa rankingen just nu.',
+      };
+      return reply.status(200).send(response);
+    }
+  });
+
   // Sök hästar i databasen
   fastify.get<{
     Querystring: { q?: string; limit?: string };

@@ -1,142 +1,240 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, ChevronRight } from 'lucide-react';
-import { HorseDetail, ApiResponse } from '@stallbacken/shared';
+import {
+  HorseDetail,
+  ApiResponse,
+  HorseRankingCategory,
+  HorseRankingsResponse,
+  HorseRankingItem,
+} from '@stallbacken/shared';
 import { formatCurrency } from '../lib/format';
+import { HastarSokHistorik } from '../components/hastar/HastarSokHistorik';
+import { HastarRankingLista } from '../components/hastar/HastarRankingLista';
 
 interface HastarScreenProps {
   onSelectHorse: (horseId: string) => void;
 }
 
+const STORAGE_KEY = 'tangitza_hastsok_historik';
+
 export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<HorseDetail[]>([]);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
 
+  // Sökhistorik från localStorage
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  // Rankinglista state
+  const [rankingCategory, setRankingCategory] = useState<HorseRankingCategory>('vinstrikast');
+  const [rankingItems, setRankingItems] = useState<HorseRankingItem[]>([]);
+  const [rankingLoading, setRankingLoading] = useState(false);
+
+  // Spara historik i localStorage
+  const saveSearchTerm = (term: string) => {
+    const trimmed = term.trim();
+    if (!trimmed || trimmed.length < 2) return;
+    setRecentSearches((prev) => {
+      const filtered = prev.filter((s) => s.toLowerCase() !== trimmed.toLowerCase());
+      const updated = [trimmed, ...filtered].slice(0, 8);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const handleRemoveSearch = (term: string) => {
+    setRecentSearches((prev) => {
+      const updated = prev.filter((s) => s !== term);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const handleClearAllSearches = () => {
+    setRecentSearches([]);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
+  };
+
+  // Hämta rankinglistan
+  useEffect(() => {
+    let isCancelled = false;
+    const fetchRankings = async () => {
+      setRankingLoading(true);
+      try {
+        const res = await fetch(`/api/hastar/ranking?kategori=${rankingCategory}`);
+        const json: ApiResponse<HorseRankingsResponse> = await res.json();
+        if (!isCancelled && json?.data?.items) {
+          setRankingItems(json.data.items);
+        }
+      } catch {
+        if (!isCancelled) setRankingItems([]);
+      } finally {
+        if (!isCancelled) setRankingLoading(false);
+      }
+    };
+
+    fetchRankings();
+    return () => {
+      isCancelled = true;
+    };
+  }, [rankingCategory]);
+
+  // Sökning med debounce
   useEffect(() => {
     const trimmed = query.trim();
     if (!trimmed) {
-      // Hämta initiala hästar ur databasen (t.ex. med tom sträng eller q=)
-      fetchInitialHorses();
-      setHasSearched(false);
+      setResults([]);
+      setSearchLoading(false);
       return;
     }
 
     const timer = setTimeout(async () => {
-      setLoading(true);
+      setSearchLoading(true);
       try {
         const res = await fetch(`/api/hastar/sok?q=${encodeURIComponent(trimmed)}`);
         const json: ApiResponse<HorseDetail[]> = await res.json();
         setResults(json?.data || []);
-        setHasSearched(true);
       } catch {
         setResults([]);
-        setHasSearched(true);
       } finally {
-        setLoading(false);
+        setSearchLoading(false);
       }
     }, 250);
 
     return () => clearTimeout(timer);
   }, [query]);
 
-  const fetchInitialHorses = async () => {
-    try {
-      const res = await fetch('/api/hastar/sok?q=');
-      const json: ApiResponse<HorseDetail[]> = await res.json();
-      setResults(json?.data || []);
-    } catch {
-      setResults([]);
-    }
+  const handleSelectHorse = (horseId: string, horseName?: string) => {
+    if (horseName) saveSearchTerm(horseName);
+    onSelectHorse(horseId);
   };
 
+  const isSearching = query.trim().length > 0;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl mx-auto pb-16">
       {/* Rubrik */}
       <div className="border-b border-slate-200 pb-4">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           Hästar
         </h1>
-        <p className="text-slate-600 text-base mt-1">
-          Sök upp en häst för att se stamtavla, formkurva och alla tidigare lopp.
+        <p className="text-slate-600 text-sm sm:text-base mt-1">
+          Sök upp valfri häst eller bläddra bland topprankade hästar och dagens startande.
         </p>
       </div>
 
       {/* Sökruta */}
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-slate-400" />
+      <div className="space-y-2">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-slate-400" />
+          </div>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Sök häst på namn, tränare eller bana..."
+            className="w-full pl-11 pr-11 py-3 bg-white border border-slate-300 rounded-xl text-base text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-sm"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+              aria-label="Rensa sökning"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          )}
         </div>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Sök häst..."
-          className="w-full pl-11 pr-11 py-3 bg-white border border-slate-300 rounded-xl text-base text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-sm"
+
+        {/* Tidigare sökningar (historik) */}
+        <HastarSokHistorik
+          searches={recentSearches}
+          onSelectSearch={(term) => setQuery(term)}
+          onRemoveSearch={handleRemoveSearch}
+          onClearAll={handleClearAllSearches}
         />
-        {query && (
-          <button
-            type="button"
-            onClick={() => setQuery('')}
-            className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
-            aria-label="Rensa sökning"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        )}
       </div>
 
-      {/* Resultatlista */}
-      {loading ? (
-        <div className="py-8 text-center text-slate-500 text-base">Söker...</div>
-      ) : results.length > 0 ? (
-        <div className="space-y-3">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block px-1">
-            {hasSearched ? `Hittade ${results.length} hästar` : 'Sparade hästar i stallet'}
-          </span>
-          <div className="divide-y divide-slate-100 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-            {results.map((horse) => (
-              <button
-                key={horse.id}
-                type="button"
-                onClick={() => onSelectHorse(horse.id)}
-                className="w-full text-left p-4 sm:p-5 hover:bg-slate-50 transition-colors flex items-center justify-between gap-4 cursor-pointer focus:outline-none focus:bg-slate-50"
-              >
-                <div className="space-y-1">
-                  <div className="text-lg font-bold text-slate-900">{horse.name}</div>
-                  <div className="text-sm text-slate-600 flex flex-wrap gap-x-2.5">
-                    <span>
-                      {[horse.sex, horse.age ? `${horse.age} år` : ''].filter(Boolean).join(' · ')}
-                    </span>
-                    {horse.trainerName && <span>Tränare: {horse.trainerName}</span>}
-                  </div>
-                  {horse.earningsTotal > 0 && (
-                    <div className="text-xs text-slate-500 font-medium">
-                      Intjänat: {formatCurrency(horse.earningsTotal)}
+      {/* Visning vid sökning eller ranking */}
+      {isSearching ? (
+        searchLoading ? (
+          <div className="py-12 text-center text-slate-500 text-base">Söker hästar...</div>
+        ) : results.length > 0 ? (
+          <div className="space-y-3">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block px-1">
+              Hittade {results.length} hästar för &rdquo;{query.trim()}&rdquo;
+            </span>
+            <div className="divide-y divide-slate-100 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+              {results.map((horse) => (
+                <button
+                  key={horse.id}
+                  type="button"
+                  onClick={() => handleSelectHorse(horse.id, horse.name)}
+                  className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition-colors text-left group cursor-pointer"
+                >
+                  <div className="min-w-0 flex-1 mr-4">
+                    <div className="font-extrabold text-slate-900 group-hover:text-amber-800 transition-colors text-base truncate">
+                      {horse.name}
                     </div>
-                  )}
-                </div>
+                    <div className="text-sm text-slate-500 truncate mt-0.5">
+                      {horse.trainerName
+                        ? `Tränare: ${horse.trainerName}`
+                        : horse.homeTrack || 'Travhäst'}
+                      {horse.age && horse.sex && ` · ${horse.age} år ${horse.sex.toLowerCase()}`}
+                    </div>
+                  </div>
 
-                <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
-                  <ChevronRight className="w-5 h-5" />
-                </div>
-              </button>
-            ))}
+                  <div className="flex items-center gap-4 shrink-0">
+                    <div className="text-right">
+                      <div className="font-bold text-slate-900 text-sm sm:text-base">
+                        {formatCurrency(horse.earningsTotal)}
+                      </div>
+                      <div className="text-xs text-slate-400">
+                        {horse.winPercentage}% segrar ({horse.starts} st)
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      ) : hasSearched ? (
-        <div className="p-8 bg-white border border-slate-200 rounded-xl text-center space-y-2">
-          <p className="text-slate-800 text-base font-medium">
-            Hittade ingen häst med det namnet. Prova med en del av namnet.
-          </p>
-          <p className="text-slate-500 text-sm">
-            Kontrollera stavningen eller sök på bara förnamnet.
-          </p>
-        </div>
+        ) : (
+          <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-500">
+            Hittade ingen häst med &rdquo;{query.trim()}&rdquo;. Kontrollera stavningen eller prova
+            ett kortare ord.
+          </div>
+        )
       ) : (
-        <div className="p-8 bg-white border border-slate-200 rounded-xl text-center text-slate-600 text-base">
-          Skriv namnet på en häst för att söka i databasen.
-        </div>
+        /* Rankinglista när sökrutan är tom */
+        <HastarRankingLista
+          category={rankingCategory}
+          items={rankingItems}
+          loading={rankingLoading}
+          onChangeCategory={setRankingCategory}
+          onSelectHorse={(id) => {
+            const h = rankingItems.find((item) => item.id === id);
+            handleSelectHorse(id, h?.name);
+          }}
+        />
       )}
     </div>
   );

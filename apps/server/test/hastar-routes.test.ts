@@ -155,4 +155,41 @@ describe('Hästar API-rutter', () => {
     );
     expect(body.data['783840']).toBeNull();
   });
+
+  it('GET /api/hastar/ranking returnerar topprankade hästar', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/hastar/ranking?kategori=vinstrikast',
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = JSON.parse(res.body);
+
+    expect(body.status).toBe('ok');
+    expect(body.data.category).toBe('vinstrikast');
+    expect(Array.isArray(body.data.items)).toBe(true);
+    expect(body.data.items.length).toBeGreaterThan(0);
+
+    const firstHorse = body.data.items[0];
+    expect(firstHorse.rankPosition).toBe(1);
+    expect(firstHorse.name).toBeDefined();
+    expect(firstHorse.earningsTotal).toBeGreaterThan(0);
+  });
+
+  it('GET /api/hastar/sok med sökterm hittar kända elithästar', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/hastar/sok?q=San',
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = JSON.parse(res.body);
+
+    expect(body.status).toBe('ok');
+    expect(Array.isArray(body.data)).toBe(true);
+    const sanMoteur = body.data.find((h: { name: string }) => h.name.includes('San Moteur'));
+    expect(sanMoteur).toBeDefined();
+    expect(sanMoteur.trainerName).toBe('Björn Goop');
+    expect(sanMoteur.earningsTotal).toBeGreaterThan(10000000);
+  });
 });

@@ -3,6 +3,7 @@ import Database from 'better-sqlite3';
 import { runMigrations } from '../src/db/migrations.js';
 import { TipsExpressenAdapter } from '../src/adapters/tips-expressen.js';
 import { TipsTravrondenAdapter } from '../src/adapters/tips-travronden.js';
+import { TipsAftonbladetAdapter } from '../src/adapters/tips-aftonbladet.js';
 import { parseRssXml } from '../src/adapters/rss-parser.js';
 
 describe('Tip-adaptrar (Fas 8)', () => {
@@ -68,6 +69,33 @@ describe('Tip-adaptrar (Fas 8)', () => {
 
   it('degraderar lugnt till failed utan krasch om källa är avstängd', async () => {
     const adapter = new TipsExpressenAdapter(db);
+    adapter.setSimulatedFailure(true);
+
+    const result = await adapter.fetch();
+    expect(result.status).toBe('failed');
+    expect(result.message).toBe('Tipsen är från i morse. De brukar komma in på nytt vid lunch.');
+  });
+
+  it('TipsAftonbladetAdapter sparar artiklar med avsändare "Tips från Aftonbladet"', async () => {
+    const adapter = new TipsAftonbladetAdapter(db);
+    adapter.setFeedUrl('http://127.0.0.1:59999/ogiltig'); // tvinga fixtur
+    adapter.setFetchOptions({ maxRetries: 0, backoffDelays: [] });
+    adapter.setAllowFixtureFallback(true);
+
+    const result = await adapter.fetch();
+    expect(result.status).toBe('ok');
+    expect(result.data).toBeDefined();
+    expect(result.data?.length).toBeGreaterThan(0);
+    expect(result.data?.[0].provider).toContain('Tips från Aftonbladet');
+
+    const articles = db
+      .prepare('SELECT * FROM tip_articles WHERE source_id = ?')
+      .all('tips-aftonbladet');
+    expect(articles.length).toBeGreaterThan(0);
+  });
+
+  it('TipsAftonbladetAdapter degraderar lugnt vid fel', async () => {
+    const adapter = new TipsAftonbladetAdapter(db);
     adapter.setSimulatedFailure(true);
 
     const result = await adapter.fetch();

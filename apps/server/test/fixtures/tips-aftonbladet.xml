@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Aftonbladet Trav365</title>
+    <description>Tips och nyheter från Sportbladet Trav365</description>
+    <link>https://www.aftonbladet.se/sportbladet/trav365</link>
+    <item>
+      <title>V75-tips: Här är omgångens bästa spik och hetaste skrällbud</title>
+      <link>https://www.aftonbladet.se/sportbladet/trav365/a/v75-spiken</link>
+      <guid>ab_trav_001</guid>
+      <description>Sportbladets travexperter analyserar lördagens V75-omgång. Bästa spiken startar i V75-3 och skrällen lurar från bakspår.</description>
+      <pubDate>Thu, 29 Oct 2026 12:00:00 GMT</pubDate>
+      <author>Micke Nybrink</author>
+    </item>
+    <item>
+      <title>Tränarkommentarer inför Solvallas Jubileumslopp</title>
+      <link>https://www.aftonbladet.se/sportbladet/trav365/a/solvalla-jubileum</link>
+      <guid>ab_trav_002</guid>
+      <description>Tränaren rapporterar fin form på Global Badman som laddas mot ledningen i lopp 4.</description>
+      <pubDate>Thu, 29 Oct 2026 11:30:00 GMT</pubDate>
+      <author>Erik Pettersson</author>
+    </item>
+  </channel>
+</rss>

@@ -17,7 +17,7 @@ export default defineConfig({
       command: 'node apps/server/dist/index.js',
       url: 'http://localhost:3001/halsa',
       timeout: 20000,
-      reuseExistingServer: false,
+      reuseExistingServer: true,
       env: {
         PORT: '3001',
         USE_FIXTURES: 'true',
@@ -28,7 +28,7 @@ export default defineConfig({
       cwd: './apps/web',
       url: 'http://localhost:4173',
       timeout: 20000,
-      reuseExistingServer: false,
+      reuseExistingServer: true,
     },
   ],
   projects: [

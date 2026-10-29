@@ -5,6 +5,8 @@ import Database from 'better-sqlite3';
 import { HorseDetail } from '@stallbacken/shared';
 
 export * from './horse-results.js';
+export * from './horse-rankings.js';
+import { getHorseRankings, ensureEliteHorsesSeeded } from './horse-rankings.js';
 
 export interface DbPersonInput {
   id: string;
@@ -220,8 +222,11 @@ export function getHorseById(db: Database.Database, id: string): HorseDetail | n
 }
 
 export function searchHorses(db: Database.Database, query: string, limit = 20): HorseDetail[] {
+  ensureEliteHorsesSeeded(db);
   const trimmed = query.trim();
-  if (!trimmed) return [];
+  if (!trimmed) {
+    return getHorseRankings(db, 'vinstrikast', limit);
+  }
 
   const rows = db
     .prepare(
@@ -231,12 +236,12 @@ export function searchHorses(db: Database.Database, query: string, limit = 20): 
       p.name AS trainer_name
     FROM horses h
     LEFT JOIN people p ON p.id = h.trainer_id
-    WHERE h.name LIKE ?
+    WHERE h.name LIKE ? OR p.name LIKE ? OR h.home_track LIKE ?
     ORDER BY h.earnings_total DESC, h.name ASC
     LIMIT ?
   `
     )
-    .all(`%${trimmed}%`, limit) as DbHorseRow[];
+    .all(`%${trimmed}%`, `%${trimmed}%`, `%${trimmed}%`, limit) as DbHorseRow[];
 
   const currentYear = new Date().getFullYear();
 
