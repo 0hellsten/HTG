@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Search, Award, Star, Menu, Download } from 'lucide-react';
+import { Calendar, Search, Award, Star, Menu, Download, Calculator } from 'lucide-react';
 import { Race } from '@stallbacken/shared';
 import { IdagScreen } from './screens/IdagScreen';
 import { LoppScreen } from './screens/LoppScreen';
 import { HastScreen } from './screens/HastScreen';
 import { HastarScreen } from './screens/HastarScreen';
+import { BongScreen } from './screens/BongScreen';
 import { TipsScreen } from './screens/TipsScreen';
 import { BanvisarenScreen } from './screens/BanvisarenScreen';
 import { StallScreen } from './screens/StallScreen';
@@ -14,7 +15,7 @@ import { HjalpScreen } from './screens/HjalpScreen';
 import { MerScreen } from './screens/MerScreen';
 import { OfflineRemsa } from './components/OfflineRemsa';
 
-type Tab = 'idag' | 'hastar' | 'tips' | 'stall' | 'mer';
+type Tab = 'idag' | 'bong' | 'hastar' | 'tips' | 'stall' | 'mer';
 type MerSubscreen = 'none' | 'status' | 'hjalp' | 'textstorlek';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -85,11 +86,12 @@ export const App: React.FC = () => {
   };
 
   const navItems = [
-    { id: 'idag' as Tab, label: 'Idag', icon: Calendar },
-    { id: 'hastar' as Tab, label: 'Hästar', icon: Search },
-    { id: 'tips' as Tab, label: 'Tips', icon: Award },
-    { id: 'stall' as Tab, label: 'Mitt stall', icon: Star },
-    { id: 'mer' as Tab, label: 'Mer', icon: Menu },
+    { id: 'idag' as Tab, label: 'Idag', mobileLabel: 'Idag', icon: Calendar },
+    { id: 'bong' as Tab, label: 'Bong-maskinen', mobileLabel: 'Bongen', icon: Calculator },
+    { id: 'hastar' as Tab, label: 'Hästar', mobileLabel: 'Hästar', icon: Search },
+    { id: 'tips' as Tab, label: 'Tips', mobileLabel: 'Tips', icon: Award },
+    { id: 'stall' as Tab, label: 'Mitt stall', mobileLabel: 'Mitt stall', icon: Star },
+    { id: 'mer' as Tab, label: 'Mer', mobileLabel: 'Mer', icon: Menu },
   ];
 
   return (
@@ -214,6 +216,8 @@ export const App: React.FC = () => {
                 onOpenTrack={(trackId) => setSelectedTrackId(trackId)}
               />
             )
+          ) : activeTab === 'bong' ? (
+            <BongScreen />
           ) : activeTab === 'hastar' ? (
             <HastarScreen onSelectHorse={(id) => setSelectedHorseId(id)} />
           ) : activeTab === 'tips' ? (
@@ -258,12 +262,16 @@ export const App: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => handleTabChange(item.id)}
-                className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 rounded-md transition-colors ${
+                className={`flex flex-col items-center justify-center flex-1 py-1 px-0.5 rounded-md transition-colors min-h-[44px] cursor-pointer ${
                   isActive ? 'text-amber-600 font-semibold' : 'text-slate-500'
                 }`}
               >
-                <Icon className={`w-5 h-5 mb-0.5 ${isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'}`} />
-                <span className="text-xs">{item.label}</span>
+                <Icon
+                  className={`w-5 h-5 mb-0.5 shrink-0 ${isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'}`}
+                />
+                <span className="text-[11px] font-medium leading-none truncate max-w-full">
+                  {item.mobileLabel || item.label}
+                </span>
               </button>
             );
           })}

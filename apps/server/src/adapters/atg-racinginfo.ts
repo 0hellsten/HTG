@@ -208,7 +208,15 @@ export class AtgRacingInfoAdapter implements SourceAdapter<unknown> {
       const fixturePath = path.resolve(__dirname, `../../test/fixtures/${fixtureFilename}`);
       if (fs.existsSync(fixturePath)) {
         logger.info(`Använder lokal fixtur ${fixtureFilename} (USE_FIXTURES=true)`);
-        return JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+        const fixtureData = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+        if (expectedId && fixtureData && typeof fixtureData === 'object' && 'id' in fixtureData) {
+          (fixtureData as Record<string, unknown>).id = expectedId;
+          const parts = expectedId.split('_');
+          if (parts[2]) {
+            (fixtureData as Record<string, unknown>).number = parseInt(parts[2], 10);
+          }
+        }
+        return fixtureData;
       }
     }
 

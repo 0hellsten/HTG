@@ -9,7 +9,7 @@ test.describe('Krav: Mobilanpassning och pekytor (390x844)', () => {
 
   test('fungerar med tumme och visar alla vyer i mobilformat utan textklipp', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // 1. Bottenmenyn är synlig på mobil
     const bottomNav = page.locator('nav[aria-label="Mobil bottenmeny"]');
