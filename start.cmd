@@ -1,7 +1,7 @@
 @echo off
-title Stallbacken
+title HTG - Hellstens Trav och Galopp
 echo ===================================================
-echo   Startar Stallbacken...
+echo   Startar HTG (Hellstens Trav och Galopp)...
 echo ===================================================
 echo.
 cd /d "%~dp0"

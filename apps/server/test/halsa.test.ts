@@ -24,6 +24,6 @@ describe('Server grundstruktur (Fas 1)', () => {
     expect(response.statusCode).toBe(200);
     const body = JSON.parse(response.payload);
     expect(body.ok).toBe(true);
-    expect(body.service).toBe('Stallbacken Backend');
+    expect(body.service).toBe('HTG Backend');
   });
 });

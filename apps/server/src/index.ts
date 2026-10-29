@@ -48,7 +48,7 @@ export async function createServer(customDbPath?: string) {
   app.get('/api/status', async (_req, reply) => {
     return reply.status(200).send({
       ok: true,
-      service: 'Stallbacken Backend',
+      service: 'HTG Backend',
       version: '1.0.0',
       time: new Date().toISOString(),
     });
@@ -61,7 +61,7 @@ async function main() {
   try {
     const server = await createServer();
     await server.listen({ port, host: '0.0.0.0' });
-    logger.info(`Stallbacken backend körs på port ${port}`);
+    logger.info(`HTG backend körs på port ${port}`);
   } catch (err) {
     logger.error('Kunde inte starta servern', err);
     process.exit(1);

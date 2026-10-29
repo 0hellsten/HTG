@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'pwa-192.png', 'pwa-512.png'],
       manifest: {
-        name: 'Stallbacken',
-        short_name: 'Stallbacken',
-        description: 'En lugn travapp med dagens omgång, startlistor och tips.',
+        name: 'HTG — Hellstens Trav och Galopp',
+        short_name: 'HTG',
+        description: 'Hellstens Trav och Galopp — En lugn travapp med dagens omgång, startlistor och tips.',
         theme_color: '#1e293b',
         background_color: '#f8fafc',
         display: 'standalone',

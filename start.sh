@@ -4,7 +4,7 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 cd "$DIR"
 
-echo "Startar Stallbacken..."
+echo "Startar HTG (Hellstens Trav och Galopp)..."
 
 if [ ! -d "node_modules" ]; then
   echo "Förbereder första körningen..."
