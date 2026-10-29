@@ -5,7 +5,10 @@ import Database from 'better-sqlite3';
 import { ELITE_VARMBLOD_PART1, SeedHorse } from './elite-horses-varmblod.js';
 import { ELITE_VARMBLOD_PART2 } from './elite-horses-varmblod-del2.js';
 import { ELITE_VARMBLOD_PART3 } from './elite-horses-varmblod-del3.js';
+import { ELITE_AKTIVA_GULD } from './elite-horses-aktiva-guld.js';
+import { ELITE_STON } from './elite-horses-ston.js';
 import { ELITE_KALLBLOD_OCH_IKONER } from './elite-horses-kallblod.js';
+import { ELITE_AKTIVA_KALLBLOD } from './elite-horses-aktiva-kallblod.js';
 
 let seeded = false;
 
@@ -17,7 +20,10 @@ export function ensureEliteHorsesSeeded(db: Database.Database): void {
     ...ELITE_VARMBLOD_PART1,
     ...ELITE_VARMBLOD_PART2,
     ...ELITE_VARMBLOD_PART3,
+    ...ELITE_AKTIVA_GULD,
+    ...ELITE_STON,
     ...ELITE_KALLBLOD_OCH_IKONER,
+    ...ELITE_AKTIVA_KALLBLOD,
   ];
 
   const stmt = db.prepare(`

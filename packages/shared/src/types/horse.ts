@@ -90,7 +90,8 @@ export interface HorseProfileResponse {
 
 export type HorseBatchResponse = Record<string, HorseProfileResponse | null>;
 
-export type HorseRankingCategory = 'vinstrikast' | 'segerprocent' | 'segrar' | 'kallblod' | 'idag';
+export type HorseRankingCategory =
+  'elit' | 'vinstrikast' | 'segerprocent' | 'segrar' | 'kallblod' | 'idag';
 
 export interface HorseRankingItem extends HorseDetail {
   rankPosition: number;

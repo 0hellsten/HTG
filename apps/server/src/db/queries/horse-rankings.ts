@@ -125,16 +125,17 @@ export function getHorseRankings(
       SELECT 
         h.*,
         p.name AS trainer_name,
-        COALESCE(r.track_name, t.name, 'Solvalla') AS today_track,
+        COALESCE(t.name, 'Solvalla') AS today_track,
         r.number AS today_race_num,
-        s.number AS today_start_num,
-        r.start_time AS today_start_time
+        s.start_number AS today_start_num,
+        r.scheduled_start AS today_start_time
       FROM starts s
       JOIN horses h ON h.id = s.horse_id
       LEFT JOIN races r ON r.id = s.race_id
-      LEFT JOIN tracks t ON t.id = r.track_id
+      LEFT JOIN race_days rd ON rd.id = r.race_day_id
+      LEFT JOIN tracks t ON t.id = rd.track_id
       LEFT JOIN people p ON p.id = h.trainer_id
-      ORDER BY r.start_time ASC, r.number ASC, s.number ASC
+      ORDER BY r.scheduled_start ASC, r.number ASC, s.start_number ASC
       LIMIT ?
     `
       )
@@ -146,7 +147,10 @@ export function getHorseRankings(
   let orderBy = 'h.earnings_total DESC, h.wins DESC';
   let whereClause = '';
 
-  if (category === 'segerprocent') {
+  if (category === 'elit') {
+    whereClause = 'WHERE h.earnings_total >= 1500000';
+    orderBy = 'h.earnings_total DESC, h.wins DESC';
+  } else if (category === 'segerprocent') {
     whereClause = 'WHERE h.starts >= 3';
     orderBy = 'h.win_percentage DESC, h.wins DESC, h.earnings_total DESC';
   } else if (category === 'segrar') {

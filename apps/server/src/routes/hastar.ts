@@ -21,9 +21,13 @@ export const hastarRoutes = async (fastify: FastifyInstance): Promise<void> => {
   fastify.get<{
     Querystring: { kategori?: string; limit?: string };
   }>('/api/hastar/ranking', async (request, reply) => {
-    const rawCat = request.query.kategori || 'vinstrikast';
+    const rawCat = request.query.kategori || 'elit';
     const category: HorseRankingCategory =
-      rawCat === 'segerprocent' || rawCat === 'segrar' || rawCat === 'kallblod' || rawCat === 'idag'
+      rawCat === 'elit' ||
+      rawCat === 'segerprocent' ||
+      rawCat === 'segrar' ||
+      rawCat === 'kallblod' ||
+      rawCat === 'idag'
         ? rawCat
         : 'vinstrikast';
     const limit = request.query.limit ? parseInt(request.query.limit, 10) : 50;

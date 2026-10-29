@@ -36,7 +36,7 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
   });
 
   // Rankinglista state
-  const [rankingCategory, setRankingCategory] = useState<HorseRankingCategory>('vinstrikast');
+  const [rankingCategory, setRankingCategory] = useState<HorseRankingCategory>('elit');
   const [rankingItems, setRankingItems] = useState<HorseRankingItem[]>([]);
   const [rankingLoading, setRankingLoading] = useState(false);
 
