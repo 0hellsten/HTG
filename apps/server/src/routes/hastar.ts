@@ -2,7 +2,13 @@
 // Privat, icke-kommersiell användning. Ingen vidarespridning av data.
 
 import { FastifyInstance } from 'fastify';
-import { ApiResponse, HorseProfileResponse, HorseDetail } from '@stallbacken/shared';
+import {
+  ApiResponse,
+  HorseProfileResponse,
+  HorseDetail,
+  HorseBatchResponse,
+  SourceStatus,
+} from '@stallbacken/shared';
 import { atgRacingInfoAdapter } from '../adapters/atg-racinginfo.js';
 import { searchHorses } from '../db/queries/horses.js';
 import { getDb } from '../db/connection.js';
@@ -78,6 +84,84 @@ export const hastarRoutes = async (fastify: FastifyInstance): Promise<void> => {
         status: 'failed',
         fetchedAt: new Date().toISOString(),
         message: 'Den här hästens tidigare lopp går inte att hämta för tillfället. Resten stämmer.',
+      };
+      return reply.status(200).send(response);
+    }
+  });
+
+  // Batch-hämtning för jämförvyn ("Ställ dem mot varandra")
+  fastify.post<{
+    Body: { horseIds?: string[]; simulateDown?: boolean };
+    Querystring: { refresh?: string; simulateDown?: string };
+  }>('/api/hastar/jamfor', async (request, reply) => {
+    const rawIds = request.body?.horseIds || [];
+    const horseIds = Array.isArray(rawIds) ? rawIds.slice(0, 6) : [];
+    const forceRefresh = request.query.refresh === 'true';
+    const simulateDown =
+      request.query.simulateDown === 'true' || Boolean(request.body?.simulateDown);
+
+    try {
+      if (simulateDown) {
+        const failedMap: HorseBatchResponse = {};
+        for (const id of horseIds) {
+          failedMap[id] = null;
+        }
+        const response: ApiResponse<HorseBatchResponse> = {
+          data: failedMap,
+          status: 'failed',
+          fetchedAt: new Date().toISOString(),
+          message:
+            'Tidigare lopp och historik går inte att hämta för tillfället. Resten stämmer.',
+        };
+        return reply.status(200).send(response);
+      }
+
+      const horsesMap: HorseBatchResponse = {};
+      let failureCount = 0;
+      let degradedCount = 0;
+
+      for (const id of horseIds) {
+        try {
+          const result = await atgRacingInfoAdapter.fetchHorseProfile(id, forceRefresh);
+          horsesMap[id] = result.data;
+          if (result.status === 'failed') {
+            failureCount++;
+          } else if (result.status === 'degraded') {
+            degradedCount++;
+          }
+        } catch (singleErr) {
+          logger.warn(`Kunde inte hämta profil för häst ${id}`, { error: String(singleErr) });
+          horsesMap[id] = null;
+          failureCount++;
+        }
+      }
+
+      let overallStatus: SourceStatus = 'ok';
+      let message = 'Allt är färskt och uppdaterat.';
+
+      if (horseIds.length > 0 && failureCount === horseIds.length) {
+        overallStatus = 'failed';
+        message = 'Tidigare lopp och historik går inte att hämta för tillfället. Resten stämmer.';
+      } else if (failureCount > 0 || degradedCount > 0) {
+        overallStatus = 'degraded';
+        message = 'Viss hästhistorik saknas eller är delvis uppdaterad.';
+      }
+
+      const response: ApiResponse<HorseBatchResponse> = {
+        data: horsesMap,
+        status: overallStatus,
+        fetchedAt: new Date().toISOString(),
+        message,
+      };
+
+      return reply.status(200).send(response);
+    } catch (err) {
+      logger.error('Oväntat fel vid batch-hämtning av hästar för jämförelse', err);
+      const response: ApiResponse<HorseBatchResponse> = {
+        data: {},
+        status: 'failed',
+        fetchedAt: new Date().toISOString(),
+        message: 'Tidigare lopp och historik går inte att hämta för tillfället. Resten stämmer.',
       };
       return reply.status(200).send(response);
     }

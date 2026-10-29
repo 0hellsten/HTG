@@ -87,3 +87,6 @@ export interface HorseProfileResponse {
   fetchedAt: string;
   message: string;
 }
+
+export type HorseBatchResponse = Record<string, HorseProfileResponse | null>;
+

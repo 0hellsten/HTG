@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Scale, Award, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Scale, Award } from 'lucide-react';
 import {
   Race,
   Start,
@@ -10,16 +10,10 @@ import {
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
 import { LoppSkelett } from '../components/SkelettKort';
-import {
-  StartlistaTabell,
-  HorseOddsMap,
-} from '../components/StartlistaTabell';
-import {
-  formatDistance,
-  formatStartMethod,
-  formatOdds,
-  formatPercent,
-} from '../lib/format';
+import { StartlistaTabell, HorseOddsMap } from '../components/StartlistaTabell';
+import { OddsOchStreckBlock } from '../components/OddsOchStreckBlock';
+import { JamforScreen } from './JamforScreen';
+import { formatDistance, formatStartMethod } from '../lib/format';
 
 interface LoppScreenProps {
   raceId: string;
@@ -48,6 +42,10 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
   const [oddsMessage, setOddsMessage] = useState<string>(
     'Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.'
   );
+
+  // Jämför-läge och valda hästar
+  const [isComparing, setIsComparing] = useState<boolean>(false);
+  const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
 
   const fetchRaceData = async () => {
     setLoading(true);
@@ -81,18 +79,10 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
       const res = await fetch(`/api/lopp/${raceId}/odds${queryParam}`);
       const json: ApiResponse<RaceOddsData | null> = await res.json();
 
-      if (json && json.status === 'ok' && json.data) {
+      if (json && json.data) {
         setOddsData(json.data);
-        setOddsStatus('ok');
+        setOddsStatus(json.status);
         setOddsMessage(json.message || 'Allt är färskt och uppdaterat.');
-      } else if (json && json.status === 'stale' && json.data) {
-        setOddsData(json.data);
-        setOddsStatus('stale');
-        setOddsMessage(json.message || 'Uppdaterat för en stund sedan.');
-      } else if (json && json.status === 'degraded' && json.data) {
-        setOddsData(json.data);
-        setOddsStatus('degraded');
-        setOddsMessage(json.message || 'Delvis uppdaterat.');
       } else {
         setOddsData(null);
         setOddsStatus('failed');
@@ -108,7 +98,29 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
   useEffect(() => {
     fetchRaceData();
     fetchOddsData();
+    setSelectedForCompare([]);
   }, [raceId]);
+
+  const handleToggleCompare = (horseId: string) => {
+    if (selectedForCompare.includes(horseId)) {
+      setSelectedForCompare(selectedForCompare.filter((id) => id !== horseId));
+    } else {
+      if (selectedForCompare.length >= 6) return;
+      setSelectedForCompare([...selectedForCompare, horseId]);
+    }
+  };
+
+  // Om vi är i jämförvyn, rendera JamforScreen
+  if (isComparing) {
+    return (
+      <JamforScreen
+        raceId={raceId}
+        initialHorseIds={selectedForCompare}
+        onBack={() => setIsComparing(false)}
+        onSelectHorse={onSelectHorse}
+      />
+    );
+  }
 
   const raceNumber = race?.number || '–';
   const distanceStr = formatDistance(race?.distanceM);
@@ -116,7 +128,6 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
   const startTimeStr = race?.scheduledStart ? race.scheduledStart.slice(11, 16) : '–';
   const purseStr = race?.purse || '–';
 
-  // Konstruera kartan med odds per startnummer för startlistan
   const oddsMap: HorseOddsMap = {};
   if (oddsData?.odds && oddsStatus !== 'failed') {
     for (const o of oddsData.odds) {
@@ -129,11 +140,12 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
   }
 
   // Beräkna "Dagens spik" (hästen med högst streckprocent)
-  const sortedByStake = oddsData?.odds && oddsStatus !== 'failed'
-    ? [...oddsData.odds]
-        .filter((o) => typeof o.stakePercent === 'number' && (o.stakePercent || 0) > 0)
-        .sort((a, b) => (b.stakePercent || 0) - (a.stakePercent || 0))
-    : [];
+  const sortedByStake =
+    oddsData?.odds && oddsStatus !== 'failed'
+      ? [...oddsData.odds]
+          .filter((o) => typeof o.stakePercent === 'number' && (o.stakePercent || 0) > 0)
+          .sort((a, b) => (b.stakePercent || 0) - (a.stakePercent || 0))
+      : [];
   const topStaked = sortedByStake.length > 0 ? sortedByStake[0] : null;
   const favoriteHorse = topStaked
     ? {
@@ -181,9 +193,8 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
 
       {!loading && (
         <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-8 items-start">
-          {/* Kolumn 1 (vänster, bredare på laptop): Lopphuvud + Startlista */}
+          {/* Vänster: Lopphuvud + Startlista */}
           <div className="lg:col-span-8 space-y-6">
-            {/* Rubrikrad för loppet */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div>
@@ -227,7 +238,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
               )}
             </div>
 
-            {/* Block 1: Startlista skyddat av felgräns */}
+            {/* Block 1: Startlista */}
             <BlockErrorBoundary
               fallbackTitle="Startlistan saknas just nu"
               onRetry={fetchRaceData}
@@ -254,110 +265,27 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
                   oddsMap={oddsMap}
                   oddsTimestamp={oddsData?.timeFormatted}
                   oddsStatus={oddsStatus}
+                  selectedForCompare={selectedForCompare}
+                  onToggleCompare={handleToggleCompare}
                   onSelectHorse={onSelectHorse}
                 />
               </section>
             </BlockErrorBoundary>
           </div>
 
-          {/* Kolumn 2 (höger på laptop, under på mobil): Odds, Tips, Jämför */}
+          {/* Höger: Odds, Tips, Jämför */}
           <div className="lg:col-span-4 space-y-6">
-            {/* Block 2: Odds och streck (helt isolerat block med egen prick och felgräns) */}
-            <BlockErrorBoundary fallbackTitle="Odds och streck" onRetry={fetchOddsData}>
-              <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-amber-600 shrink-0" />
-                    <h2 className="text-lg font-bold text-slate-900">
-                      Odds och streck
-                    </h2>
-                  </div>
-                  <FarskhetsPrick
-                    status={oddsStatus}
-                    explanation={oddsMessage}
-                    onRetry={fetchOddsData}
-                  />
-                </div>
+            {/* Block 2: Odds och streck */}
+            <OddsOchStreckBlock
+              oddsData={oddsData}
+              oddsStatus={oddsStatus}
+              oddsMessage={oddsMessage}
+              starts={starts}
+              favoriteHorse={favoriteHorse}
+              onRetry={fetchOddsData}
+            />
 
-                {oddsStatus === 'failed' || !oddsData ? (
-                  <div className="space-y-3">
-                    <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                      Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.
-                    </p>
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => fetchOddsData()}
-                        className="min-h-[44px] px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-semibold rounded-lg transition-colors cursor-pointer"
-                      >
-                        Försök igen
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 border-b border-slate-100 pb-2">
-                      <span>Spelform: {oddsData.gameType || 'Vinnare'}</span>
-                      <span>Odds från {oddsData.timeFormatted}</span>
-                    </div>
-
-                    {/* Dagens spik / mest streckade häst */}
-                    {favoriteHorse && (
-                      <div className="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
-                        <span className="text-xs font-bold text-amber-900 uppercase tracking-wider block">
-                          Dagens spik (mest streckad)
-                        </span>
-                        <div className="flex justify-between items-baseline gap-2">
-                          <span className="text-base font-bold text-slate-950 truncate">
-                            {favoriteHorse.startNumber}. {favoriteHorse.name}
-                          </span>
-                          <span className="text-sm font-semibold text-amber-950 whitespace-nowrap">
-                            {formatPercent(favoriteHorse.stakePercent)} streck · {formatOdds(favoriteHorse.winOdds)}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Snabböversikt per häst */}
-                    <div className="divide-y divide-slate-100 pt-1 text-sm">
-                      {oddsData.odds.map((item) => {
-                        const start = starts.find((s) => s.startNumber === item.startNumber);
-                        const isScratched = Boolean(start?.scratched);
-                        const horseName = start?.horseName || `Häst ${item.startNumber}`;
-
-                        return (
-                          <div
-                            key={item.startNumber}
-                            className={`py-2 px-1 flex items-center justify-between ${
-                              isScratched ? 'opacity-50 line-through' : ''
-                            }`}
-                          >
-                            <div className="flex items-center gap-2 truncate pr-2">
-                              <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs shrink-0">
-                                {item.startNumber}
-                              </span>
-                              <span className="font-medium text-slate-900 truncate">
-                                {horseName}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-3 shrink-0">
-                              <span className="text-slate-600 font-medium">
-                                {isScratched ? '–' : formatOdds(item.winOdds)}
-                              </span>
-                              <span className="text-slate-950 font-bold w-12 text-right">
-                                {isScratched ? '–' : formatPercent(item.stakePercent)}
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </section>
-            </BlockErrorBoundary>
-
-            {/* Block 3: Vad tycker stallbacken? (tipsblock med egen prick) */}
+            {/* Block 3: Vad tycker stallbacken? */}
             <BlockErrorBoundary fallbackTitle="Vad tycker stallbacken?">
               <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-3">
                 <div className="flex items-center justify-between">
@@ -382,14 +310,35 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
             <div>
               <button
                 type="button"
+                onClick={() => setIsComparing(true)}
                 className="w-full min-h-[48px] flex items-center justify-center gap-2.5 py-3.5 px-6 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-base transition-colors shadow-sm cursor-pointer"
               >
-                <Scale className="w-5 h-5 shrink-0" />
-                <span>Ställ dem mot varandra</span>
+                <Scale className="w-5 h-5 text-amber-400 shrink-0" />
+                <span>
+                  Ställ dem mot varandra
+                  {selectedForCompare.length > 0 ? ` (${selectedForCompare.length} valda)` : ''}
+                </span>
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Flytande snabbknapp på mobil om hästar valts för jämförelse */}
+      {selectedForCompare.length >= 2 && !loading && (
+        <aside
+          aria-label="Jämförelseval"
+          className="lg:hidden fixed bottom-16 left-4 right-4 z-20"
+        >
+          <button
+            type="button"
+            onClick={() => setIsComparing(true)}
+            className="w-full min-h-[48px] py-3 px-4 bg-slate-950 text-white rounded-xl font-bold text-base flex items-center justify-center gap-2.5 shadow-2xl border border-amber-500/40 cursor-pointer"
+          >
+            <Scale className="w-5 h-5 text-amber-400 shrink-0" />
+            <span>Ställ dem mot varandra ({selectedForCompare.length} valda)</span>
+          </button>
+        </aside>
       )}
     </div>
   );

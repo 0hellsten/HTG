@@ -115,4 +115,41 @@ describe('Hästar API-rutter', () => {
     expect(body.data).toEqual([]);
     expect(body.message).toBe('Hittade ingen häst med det namnet. Prova med en del av namnet.');
   });
+
+  it('POST /api/hastar/jamfor returnerar profiler för valda hästar i batch', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/hastar/jamfor',
+      payload: {
+        horseIds: ['783840'],
+      },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = JSON.parse(res.body);
+
+    expect(body.status).toBe('ok');
+    expect(body.data).toBeDefined();
+    expect(body.data['783840']).toBeDefined();
+    expect(body.data['783840'].horse.name).toBe('Global F.N.P.');
+  });
+
+  it('POST /api/hastar/jamfor med simulateDown=true returnerar status failed och svenskt meddelande', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/hastar/jamfor',
+      payload: {
+        horseIds: ['783840'],
+        simulateDown: true,
+      },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = JSON.parse(res.body);
+
+    expect(body.status).toBe('failed');
+    expect(body.message).toBe('Tidigare lopp och historik går inte att hämta för tillfället. Resten stämmer.');
+    expect(body.data['783840']).toBeNull();
+  });
 });
+
