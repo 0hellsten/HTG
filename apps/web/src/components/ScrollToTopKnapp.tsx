@@ -44,7 +44,7 @@ export const ScrollToTopKnapp: React.FC<ScrollToTopKnappProps> = ({ threshold = 
       data-testid="scroll-to-top-knapp"
       aria-label="Scrolla upp till toppen"
       title="Till toppen"
-      className="fixed bottom-20 right-4 lg:bottom-8 lg:right-8 z-40 flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] px-3.5 py-2.5 rounded-full bg-slate-900/95 hover:bg-slate-950 text-amber-400 hover:text-amber-300 border border-slate-700/80 shadow-xl backdrop-blur-xs transition-all active:scale-95 cursor-pointer text-sm font-semibold"
+      className="fixed bottom-36 right-4 lg:bottom-24 lg:right-8 z-40 flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] px-3.5 py-2.5 rounded-full bg-slate-900/95 hover:bg-slate-950 text-amber-400 hover:text-amber-300 border border-slate-700/80 shadow-xl backdrop-blur-xs transition-all active:scale-95 cursor-pointer text-sm font-semibold"
     >
       <ArrowUp className="w-5 h-5 shrink-0 stroke-[2.5]" aria-hidden="true" />
       <span className="hidden sm:inline">Till toppen</span>

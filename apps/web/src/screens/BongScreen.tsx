@@ -7,6 +7,7 @@ import { BongLegHorseList } from '../components/bong/BongLegHorseList';
 import { BongFilters } from '../components/bong/BongFilters';
 import { BongSettings } from '../components/bong/BongSettings';
 import { BongHorseInfoModal } from '../components/bong/BongHorseInfoModal';
+import { BongKupongModal } from '../components/bong/BongKupongModal';
 import { useBongState } from '../components/bong/useBongState';
 
 interface BongScreenProps {
@@ -65,6 +66,7 @@ export const BongScreen: React.FC<BongScreenProps> = ({
   } = useBongState(initialGameType, initialSelectedHorses);
 
   const [selectedModalHorse, setSelectedModalHorse] = useState<BongHorseInput | null>(null);
+  const [isKupongModalOpen, setIsKupongModalOpen] = useState(false);
 
   const currentLeg = raceDay.races[activeLegIndex] || {
     legIndex: activeLegIndex,
@@ -158,6 +160,31 @@ export const BongScreen: React.FC<BongScreenProps> = ({
         onToggleHorse={handleToggleHorse}
         onSetRank={handleSetRank}
         onOpenFullHorse={onSelectHorse}
+      />
+
+      {/* Flytande Bong-knapp för att se ifylld kupong */}
+      <button
+        type="button"
+        onClick={() => setIsKupongModalOpen((prev) => !prev)}
+        data-testid="bong-kupong-flytande-knapp"
+        aria-label={isKupongModalOpen ? 'Stäng kupong' : 'Visa ifylld bong'}
+        title={isKupongModalOpen ? 'Stäng kupong' : 'Visa ifylld bong'}
+        className="fixed bottom-20 right-4 lg:bottom-8 lg:right-8 z-30 w-14 h-14 rounded-full p-1 bg-white hover:bg-slate-50 shadow-2xl border-2 border-amber-400 active:scale-95 transition-all cursor-pointer flex items-center justify-center group"
+      >
+        <img
+          src="./bong.png"
+          alt="Bong"
+          className="w-full h-full object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+        />
+      </button>
+
+      <BongKupongModal
+        isOpen={isKupongModalOpen}
+        onClose={() => setIsKupongModalOpen(false)}
+        gameType={gameType}
+        raceDay={raceDay}
+        selectedHorses={selectedHorses}
+        costSek={calculationResult.totalCost}
       />
     </div>
   );
