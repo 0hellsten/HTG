@@ -111,17 +111,6 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
     setSystemResult(engine.generate(raceDay, config));
   };
 
-  const handleSelectGameType = (newType: BongGameType) => {
-    const match = competitions.find((c) => c.gameType === newType) || competitions[0];
-    if (match) {
-      handleSelectCompetition(match);
-    } else {
-      setGameType(newType);
-      setLockedHorses({});
-      loadLiveOmgang(newType, strategy, budget, {});
-    }
-  };
-
   const handleSelectStrategy = (newStrat: JanneBoyStrategy) => {
     setStrategy(newStrat);
     const config: JanneBoyConfig = { gameType, strategy: newStrat, budget, lockedHorses };
@@ -263,9 +252,10 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
       {/* Kontroller för spel, profil & budget */}
       <JanneBoyControls
         gameType={gameType}
+        racesCount={raceDay.races.length}
+        trackName={raceDay.trackName}
         strategy={strategy}
         budget={budget}
-        onSelectGameType={handleSelectGameType}
         onSelectStrategy={handleSelectStrategy}
         onChangeBudget={handleChangeBudget}
         onGenerate={handleGenerate}

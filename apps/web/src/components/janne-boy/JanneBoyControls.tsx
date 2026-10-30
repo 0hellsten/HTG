@@ -4,9 +4,10 @@ import { BongGameType, JanneBoyStrategy, JANNE_BOY_STRATEGIES } from '@stallback
 
 interface JanneBoyControlsProps {
   gameType: BongGameType;
+  racesCount?: number;
+  trackName?: string;
   strategy: JanneBoyStrategy;
   budget: number;
-  onSelectGameType: (type: BongGameType) => void;
   onSelectStrategy: (strat: JanneBoyStrategy) => void;
   onChangeBudget: (b: number) => void;
   onGenerate: () => void;
@@ -16,44 +17,32 @@ const BUDGET_PRESETS = [50, 100, 200, 300, 500];
 
 export const JanneBoyControls: React.FC<JanneBoyControlsProps> = ({
   gameType,
+  racesCount = 7,
+  trackName,
   strategy,
   budget,
-  onSelectGameType,
   onSelectStrategy,
   onChangeBudget,
   onGenerate,
 }) => {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-6">
-      {/* 1. Spelform och budget */}
+      {/* 1. Spelformsinformation och budget */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">
-            Välj spelform
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1.5">
+            Spelform för vald tävling
           </label>
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
-            <button
-              type="button"
-              onClick={() => onSelectGameType('V75')}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
-                gameType === 'V75'
-                  ? 'bg-amber-500 text-slate-950 shadow-sm'
-                  : 'text-slate-700 hover:text-slate-950'
-              }`}
-            >
-              V75 (7 lopp)
-            </button>
-            <button
-              type="button"
-              onClick={() => onSelectGameType('V86')}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all cursor-pointer ${
-                gameType === 'V86'
-                  ? 'bg-amber-500 text-slate-950 shadow-sm'
-                  : 'text-slate-700 hover:text-slate-950'
-              }`}
-            >
-              V86 (8 lopp)
-            </button>
+          <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 text-white shadow-xs">
+            <span className="font-black text-amber-400 text-base">{gameType}</span>
+            <span className="text-slate-400 text-xs">·</span>
+            <span className="text-slate-200 text-sm font-semibold">{racesCount} avdelningar</span>
+            {trackName && (
+              <>
+                <span className="text-slate-400 text-xs">·</span>
+                <span className="text-slate-300 text-sm">{trackName}</span>
+              </>
+            )}
           </div>
         </div>
 

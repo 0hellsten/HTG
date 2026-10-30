@@ -105,13 +105,12 @@ export const App: React.FC = () => {
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col lg:flex-row font-sans">
       {/* Laptop: Vänstermeny */}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-slate-900 text-slate-100 p-6 border-r border-slate-800 shrink-0">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center font-black text-slate-950 text-xl shadow-inner font-serif tracking-normal">
-            T
-          </div>
-          <div>
-            <span className="text-xl font-extrabold tracking-tight text-white block">Tangitza</span>
-          </div>
+        <div className="mb-8 flex items-center justify-start">
+          <img
+            src="/logo.png"
+            alt="Stallbacken"
+            className="h-14 w-auto max-w-full object-contain rounded-lg drop-shadow-sm"
+          />
         </div>
 
         <nav className="space-y-1.5 flex-1" aria-label="Huvudmeny">
@@ -158,15 +157,12 @@ export const App: React.FC = () => {
 
         {/* Mobil: Topprad */}
         <header className="lg:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-0 z-10 shadow-sm">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-md bg-amber-500 flex items-center justify-center font-black text-slate-950 text-sm font-serif shadow-inner">
-              T
-            </div>
-            <div>
-              <span className="text-base font-extrabold tracking-tight text-white block leading-tight">
-                Tangitza
-              </span>
-            </div>
+          <div className="flex items-center">
+            <img
+              src="/logo.png"
+              alt="Stallbacken"
+              className="h-10 w-auto max-w-[180px] object-contain rounded drop-shadow-xs"
+            />
           </div>
 
           {installPrompt && (
