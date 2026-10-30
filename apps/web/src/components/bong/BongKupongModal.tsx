@@ -35,24 +35,25 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
   const model = buildBongCouponViewModel(raceDay, selectedHorses, gameType, costSek);
 
   // Exakta procentkoordinater baserat på uppmätta kuponger
+  // Justerat uppåt ett snäpp eller två för perfekt passning
   const config = isV86
     ? {
         aspectRatio: '1434 / 1830',
-        bana: { left: '16.0%', top: '14.5%' },
-        datum: { left: '18.5%', top: '18.0%' },
-        start: { left: '16.0%', top: '21.8%' },
-        kostnad: { left: '83.5%', top: '14.5%' },
+        bana: { left: '16.0%', top: '12.7%' },
+        datum: { left: '18.5%', top: '16.2%' },
+        start: { left: '16.0%', top: '20.0%' },
+        kostnad: { left: '83.5%', top: '12.7%' },
         horsesLeft: '20.0%',
-        rowTops: ['45.0%', '52.3%', '59.6%', '66.9%', '74.6%', '82.3%', '89.8%', '97.2%'],
+        rowTops: ['43.0%', '50.3%', '57.6%', '64.9%', '72.6%', '80.3%', '87.8%', '95.2%'],
       }
     : {
         aspectRatio: '1399 / 1812',
-        bana: { left: '14.5%', top: '14.0%' },
-        datum: { left: '17.0%', top: '17.5%' },
-        start: { left: '14.5%', top: '21.2%' },
-        kostnad: { left: '84.0%', top: '14.0%' },
+        bana: { left: '14.5%', top: '12.2%' },
+        datum: { left: '17.0%', top: '15.7%' },
+        start: { left: '14.5%', top: '19.4%' },
+        kostnad: { left: '84.0%', top: '12.2%' },
         horsesLeft: '19.0%',
-        rowTops: ['44.5%', '51.8%', '59.2%', '66.5%', '74.3%', '82.0%', '89.5%'],
+        rowTops: ['42.5%', '49.8%', '57.2%', '64.5%', '72.3%', '80.0%', '87.5%'],
       };
 
   return (
