@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Wand2, Sparkles, RefreshCw, Radio } from 'lucide-react';
+import { Sparkles, RefreshCw, Radio } from 'lucide-react';
 import {
   BongGameType,
   BongRaceDayData,
@@ -9,6 +9,7 @@ import {
   JanneBoySystemResult,
 } from '@stallbacken/shared';
 import { JanneBoyControls } from '../components/janne-boy/JanneBoyControls';
+import { JanneBoyIcon } from '../components/janne-boy/JanneBoyIcon';
 import { JanneBoySystemView } from '../components/janne-boy/JanneBoySystemView';
 import { JanneBoyOmgangBanner } from '../components/janne-boy/JanneBoyOmgangBanner';
 import { BongCompetition, getUpcomingBongCompetitions } from '../components/bong/competitions';
@@ -156,8 +157,8 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-amber-500 text-slate-950 shadow-xs">
-              <Wand2 className="w-6 h-6 stroke-[2.2]" />
+            <span className="p-1 rounded-xl bg-amber-500 text-slate-950 shadow-xs flex items-center justify-center">
+              <JanneBoyIcon className="w-8 h-8" />
             </span>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight flex items-center gap-2">
               <span>Janne Boy</span>

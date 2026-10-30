@@ -1,5 +1,6 @@
 import React from 'react';
-import { Sparkles, Check, Wand2, RefreshCw } from 'lucide-react';
+import { Sparkles, Check, RefreshCw } from 'lucide-react';
+import { JanneBoyIcon } from './JanneBoyIcon';
 import { BongGameType, JanneBoyStrategy, JANNE_BOY_STRATEGIES } from '@stallbacken/shared';
 
 interface JanneBoyControlsProps {
@@ -135,7 +136,7 @@ export const JanneBoyControls: React.FC<JanneBoyControlsProps> = ({
             </>
           ) : (
             <>
-              <Wand2 className="w-5 h-5" />
+              <JanneBoyIcon className="w-5 h-5" />
               <span>Skapa systemförslag ({budget} kr)</span>
               <Sparkles className="w-4 h-4 text-slate-950" />
             </>

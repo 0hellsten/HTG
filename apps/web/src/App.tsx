@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Search, Award, Star, Menu, Download, Calculator, Wand2 } from 'lucide-react';
+import { Calendar, Search, Award, Star, Menu, Download, Calculator } from 'lucide-react';
+import { JanneBoyIcon } from './components/janne-boy/JanneBoyIcon';
 import { Race, BongGameType } from '@stallbacken/shared';
 import { IdagScreen } from './screens/IdagScreen';
 import { LoppScreen } from './screens/LoppScreen';
@@ -95,7 +96,7 @@ export const App: React.FC = () => {
 
   const navItems = [
     { id: 'idag' as Tab, label: 'Idag', mobileLabel: 'Idag', icon: Calendar },
-    { id: 'janneboy' as Tab, label: 'Janne Boy', mobileLabel: 'Janne', icon: Wand2 },
+    { id: 'janneboy' as Tab, label: 'Janne Boy', mobileLabel: 'Janne', icon: JanneBoyIcon },
     { id: 'bong' as Tab, label: 'Bong-maskinen', mobileLabel: 'Bongen', icon: Calculator },
     { id: 'hastar' as Tab, label: 'Hästar', mobileLabel: 'Hästar', icon: Search },
     { id: 'tips' as Tab, label: 'Tips', mobileLabel: 'Tips', icon: Award },

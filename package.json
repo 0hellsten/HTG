@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "concurrently -n \"server,web\" -c \"blue,green\" \"pnpm --filter @stallbacken/server dev\" \"pnpm --filter @stallbacken/web dev\"",
     "build": "pnpm --filter @stallbacken/shared build && pnpm --filter @stallbacken/server build && pnpm --filter @stallbacken/web build",
+    "start": "node apps/server/dist/index.js",
     "test": "pnpm -r test",
     "test:e2e": "playwright test",
     "backup": "node scripts/backup-db.js",
