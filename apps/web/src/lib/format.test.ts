@@ -43,7 +43,6 @@ describe('Svensk travformatering', () => {
   });
 
   it('formaterar skoinformation korrekt', () => {
-    // false = barfota (C), true = skor (F)
     expect(formatShoeInfo(false, false)).toEqual({
       code: 'C/C',
       label: 'Barfota runt om',

@@ -52,7 +52,7 @@ export const JanneBoySystemView: React.FC<JanneBoySystemViewProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* 1. Huvudkort med Jannes sammanfattning och analys */}
+      {}
       <div className="bg-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-md space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div>
@@ -77,7 +77,7 @@ export const JanneBoySystemView: React.FC<JanneBoySystemViewProps> = ({
           </div>
         </div>
 
-        {/* Nyckeltal */}
+        {}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 text-xs">
           <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700/60">
             <span className="text-slate-400 block font-medium">Spikar</span>
@@ -100,7 +100,7 @@ export const JanneBoySystemView: React.FC<JanneBoySystemViewProps> = ({
           </div>
         </div>
 
-        {/* Handlingsknappar */}
+        {}
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800">
           <button
             type="button"
@@ -148,7 +148,7 @@ export const JanneBoySystemView: React.FC<JanneBoySystemViewProps> = ({
         )}
       </div>
 
-      {/* 2. Avdelningslista */}
+      {}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-700">

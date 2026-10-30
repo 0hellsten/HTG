@@ -11,11 +11,6 @@ interface State {
   hasError: boolean;
 }
 
-/**
- * Felgräns (Error Boundary) per block.
- * Om ett enskilt block kraschar fångas felet här, så att resten av skärmen fortsätter fungera.
- * Visar en lugn rad med grå prick och 'Försök igen'-knapp — aldrig en felkod eller engelsk text.
- */
 export class BlockErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
@@ -26,7 +21,6 @@ export class BlockErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Logga i utvecklingsläge — visa aldrig feldetaljer för användaren
     if (process.env.NODE_ENV !== 'production') {
       console.error('BlockErrorBoundary fångade ett fel:', error, errorInfo);
     }

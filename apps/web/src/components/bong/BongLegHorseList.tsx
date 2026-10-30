@@ -28,7 +28,7 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-4">
-      {/* Detaljerad loppinformation */}
+      {}
       <div className="border-b border-slate-200 pb-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
@@ -84,7 +84,7 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
         </div>
       </div>
 
-      {/* Hästlista med ranking */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
         {leg.horses.map((horse) => {
           const isSelected = selectedIds.includes(horse.id);

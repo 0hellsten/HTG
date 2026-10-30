@@ -18,7 +18,7 @@ export const JanneBoyLegCard: React.FC<JanneBoyLegCardProps> = ({
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3.5">
-      {/* Avdelningsrubrik & loppdetaljer */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -74,13 +74,13 @@ export const JanneBoyLegCard: React.FC<JanneBoyLegCardProps> = ({
         </div>
       </div>
 
-      {/* Jannes motivering */}
+      {}
       <div className="bg-amber-50/70 rounded-xl p-3 border border-amber-200/70 text-xs sm:text-sm text-amber-950 flex items-start gap-2">
         <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
         <p className="leading-relaxed font-medium">{leg.reason}</p>
       </div>
 
-      {/* Valda hästar med djup travkunskap */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         {leg.selectedHorses.map((horse) => {
           const streckPct = Math.round(horse.betDistribution * 100);
@@ -124,7 +124,7 @@ export const JanneBoyLegCard: React.FC<JanneBoyLegCardProps> = ({
                   </div>
                 </div>
 
-                {/* Lås som spik-knapp */}
+                {}
                 <button
                   type="button"
                   onClick={() => onToggleLock(leg.legIndex, horse.id)}
@@ -139,7 +139,7 @@ export const JanneBoyLegCard: React.FC<JanneBoyLegCardProps> = ({
                 </button>
               </div>
 
-              {/* Djup travinfo: Balans, vagn och analys */}
+              {}
               <div className="mt-2 pt-2 border-t border-slate-200/60 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] text-slate-600">
                 <div className="flex flex-wrap items-center gap-1.5">
                   {horse.shoeInfo && (

@@ -1,6 +1,3 @@
-// Komponent för att visa och välja tipskällor (markerbara kort med minimerat normalläge)
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { SourceStatus } from '@stallbacken/shared';
@@ -42,9 +39,7 @@ export const TipskallorValjare: React.FC<TipskallorValjareProps> = ({
         aria-controls="tipskallor-innehall"
       >
         <div className="flex items-center gap-2.5 flex-wrap">
-          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
-            Tipskällor
-          </h2>
+          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Tipskällor</h2>
           <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
             {activeCount} av {providers.length} aktiva
           </span>
@@ -116,11 +111,7 @@ export const TipskallorValjare: React.FC<TipskallorValjareProps> = ({
                     </div>
                   </div>
 
-                  <div
-                    className="shrink-0"
-                    onClick={(e) => e.stopPropagation()}
-                    title={p.message}
-                  >
+                  <div className="shrink-0" onClick={(e) => e.stopPropagation()} title={p.message}>
                     <FarskhetsPrick status={p.status} explanation={p.message} onRetry={onRetry} />
                   </div>
                 </div>

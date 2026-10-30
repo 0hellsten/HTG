@@ -16,7 +16,6 @@ export const FarskhetsPrick: React.FC<FarskhetsPrickProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
 
-  // Statusfärger och standardtexter enligt regelboken
   let dotColor = 'bg-emerald-500';
   let labelText = '';
 

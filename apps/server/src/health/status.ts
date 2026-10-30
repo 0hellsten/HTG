@@ -1,8 +1,5 @@
 import { SourceStatus } from '@stallbacken/shared';
 
-/**
- * Returnerar en vänlig svensk tidsangivelse för ålder.
- */
 export function formatAgeSwedish(ageSeconds: number): string {
   if (ageSeconds < 60) {
     return 'mindre än en minut';
@@ -21,10 +18,6 @@ export function formatAgeSwedish(ageSeconds: number): string {
   return `${hours} timmar`;
 }
 
-/**
- * Beräknar övergripande källstatus och lämpligt svenskt meddelande baserat på
- * hämtningsålder, källans tröskelvärden och kretsbrytarens läge.
- */
 export function resolveSourceStatus(params: {
   reportedStatus?: SourceStatus;
   ageSeconds: number;
@@ -42,7 +35,6 @@ export function resolveSourceStatus(params: {
     customMessage,
   } = params;
 
-  // 1. Om kretsbrytaren är aktiv är statusen failed
   if (isPaused) {
     return {
       status: 'failed',
@@ -50,7 +42,6 @@ export function resolveSourceStatus(params: {
     };
   }
 
-  // 2. Om källan explicit rapporterat failed
   if (reportedStatus === 'failed') {
     return {
       status: 'failed',
@@ -58,7 +49,6 @@ export function resolveSourceStatus(params: {
     };
   }
 
-  // 3. Om data är äldre än staleAfterSeconds betraktas den som failed
   if (ageSeconds > staleAfterSeconds) {
     return {
       status: 'failed',
@@ -66,7 +56,6 @@ export function resolveSourceStatus(params: {
     };
   }
 
-  // 4. Om källan rapporterat degraded (t.ex. reservkälla eller partiellt format)
   if (reportedStatus === 'degraded') {
     return {
       status: 'degraded',
@@ -74,7 +63,6 @@ export function resolveSourceStatus(params: {
     };
   }
 
-  // 5. Om data är äldre än ttlSeconds men yngre än staleAfterSeconds
   if (ageSeconds > ttlSeconds) {
     return {
       status: 'stale',
@@ -82,7 +70,6 @@ export function resolveSourceStatus(params: {
     };
   }
 
-  // 6. Allt är färskt och i sin ordning
   return {
     status: 'ok',
     message: '',

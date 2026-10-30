@@ -1,6 +1,3 @@
-// Databasfrågor för hästar och personer
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import Database from 'better-sqlite3';
 import { HorseDetail } from '@stallbacken/shared';
 

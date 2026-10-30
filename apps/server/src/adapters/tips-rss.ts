@@ -29,9 +29,7 @@ export function parseIsoDate(rawDate?: string): string {
     if (!isNaN(d.getTime())) {
       return d.toISOString();
     }
-  } catch {
-    // ignorera
-  }
+  } catch {}
   return new Date().toISOString();
 }
 
@@ -70,15 +68,15 @@ export async function fetchRssTips(
   }
 
   const latestHealth = healthManager.getLatestRecord(config.id);
-  if (!forceRefresh && existing.length > 0 && latestHealth?.succeededAt) {
-    const healthTime = new Date(latestHealth.succeededAt).getTime();
+  if (!forceRefresh && existing.length > 0 && latestHealth?.succeeded_at) {
+    const healthTime = new Date(latestHealth.succeeded_at).getTime();
     const ageSec = Math.max(0, Math.floor((Date.now() - healthTime) / 1000));
     if (ageSec < ttlSeconds) {
       return {
         sourceId: config.id,
         status: 'ok',
         data: existing,
-        fetchedAt: latestHealth.succeededAt,
+        fetchedAt: latestHealth.succeeded_at,
         ageSeconds: ageSec,
         message: `Färska tips från ${config.label}.`,
       };
@@ -88,7 +86,7 @@ export async function fetchRssTips(
         sourceId: config.id,
         status: 'stale',
         data: existing,
-        fetchedAt: latestHealth.succeededAt,
+        fetchedAt: latestHealth.succeeded_at,
         ageSeconds: ageSec,
         message: `Uppdaterat för ${Math.round(ageSec / 60)} minuter sedan`,
       };
@@ -155,7 +153,16 @@ export async function fetchRssTips(
         url: it.link,
       });
 
-      matchAndSaveRaceTips(db, it.title, it.description, tipId, providerName, publishedIso, config.id, nowIso);
+      matchAndSaveRaceTips(
+        db,
+        it.title,
+        it.description,
+        tipId,
+        providerName,
+        publishedIso,
+        config.id,
+        nowIso
+      );
     }
 
     healthManager.recordAttempt({
@@ -213,9 +220,7 @@ export async function fetchRssTips(
             ageSeconds: 0,
             message: `Färska tips från ${config.label}.`,
           };
-        } catch {
-          // fall igenom
-        }
+        } catch {}
       }
     }
 
@@ -295,7 +300,5 @@ function matchAndSaveRaceTips(
         }
       }
     }
-  } catch {
-    // Ignorera loppmatchningsfel
-  }
+  } catch {}
 }

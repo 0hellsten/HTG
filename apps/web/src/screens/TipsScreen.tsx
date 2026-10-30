@@ -72,7 +72,6 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
   const raceTips = data?.raceTips || [];
   const providers = data?.providers || [];
 
-  // Filtrera lopprankingar baserat på aktiva tipskällor
   const visibleRaceTips = raceTips.filter((tip) => {
     if (tip.sourceId) {
       return !disabledProviders.has(tip.sourceId);
@@ -80,7 +79,6 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
     return true;
   });
 
-  // Filtrera redaktionella artiklar baserat på aktiva tipskällor
   const visibleArticles = articles.filter((art) => {
     if (art.sourceId) {
       return !disabledProviders.has(art.sourceId);
@@ -92,7 +90,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-16">
-      {/* Rubrikrad med färskhetsprick */}
+      {}
       <div className="flex items-start justify-between border-b border-slate-200 pb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -108,7 +106,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
         </div>
       </div>
 
-      {/* Status och val per tipskälla — minimerad från start */}
+      {}
       <TipskallorValjare
         providers={providers}
         disabledProviders={disabledProviders}
@@ -116,7 +114,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
         onRetry={fetchTips}
       />
 
-      {/* Filterknappar */}
+      {}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
         <button
           type="button"
@@ -179,7 +177,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
         </div>
       )}
 
-      {/* 1. Lopprankingar */}
+      {}
       {!loading && (filter === 'alla' || filter === 'ranking') && visibleRaceTips.length > 0 && (
         <BlockErrorBoundary fallbackTitle="Lopprankingarna saknas just nu">
           <section className="space-y-4" aria-labelledby="ranking-rubrik">
@@ -207,7 +205,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
         </BlockErrorBoundary>
       )}
 
-      {/* 2. Redaktionella tips & artiklar */}
+      {}
       {!loading && (filter === 'alla' || filter === 'artiklar') && visibleArticles.length > 0 && (
         <BlockErrorBoundary fallbackTitle="Tipsartiklarna saknas just nu">
           <section className="space-y-4" aria-labelledby="artiklar-rubrik">
@@ -234,7 +232,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
         </BlockErrorBoundary>
       )}
 
-      {/* Upplysningsruta längst ner */}
+      {}
       <div className="bg-slate-100 rounded-xl p-5 text-slate-700 text-sm sm:text-base leading-relaxed border border-slate-200">
         <p className="font-semibold text-slate-900 mb-1">Om tipsen på stallbacken</p>
         <p>

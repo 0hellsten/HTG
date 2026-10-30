@@ -1,6 +1,3 @@
-// Databasfrågor för banväder från SMHI
-// Stallbacken — HTG
-
 import Database from 'better-sqlite3';
 import { TrackWeather } from '@stallbacken/shared';
 
@@ -15,9 +12,6 @@ export interface DbWeatherInput {
   sourceId: string;
 }
 
-/**
- * Sparar eller uppdaterar en väderobservation för en bana.
- */
 export function saveWeatherObservation(db: Database.Database, w: DbWeatherInput): void {
   const stmt = db.prepare(`
     INSERT INTO weather (track_id, observed_at, temp_c, wind_ms, precip_mm, description, source_id, updated_at)
@@ -34,9 +28,6 @@ export function saveWeatherObservation(db: Database.Database, w: DbWeatherInput)
   stmt.run(w.trackId, w.observedAt, w.tempC, w.windMs, w.precipMm, w.description, w.sourceId);
 }
 
-/**
- * Hämtar senaste sparade väderobservation för en bana.
- */
 export function getLatestWeatherForTrack(
   db: Database.Database,
   trackId: string

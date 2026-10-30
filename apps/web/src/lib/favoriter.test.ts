@@ -22,7 +22,6 @@ import {
   getTotalFavoritesCount,
 } from './favoriter';
 
-// Mock av localStorage för Node-miljö
 class LocalStorageMock {
   private store: Record<string, string> = {};
 

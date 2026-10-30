@@ -12,7 +12,11 @@ import { JanneBoyControls } from '../components/janne-boy/JanneBoyControls';
 import { JanneBoyIcon } from '../components/janne-boy/JanneBoyIcon';
 import { JanneBoySystemView } from '../components/janne-boy/JanneBoySystemView';
 import { JanneBoyOmgangBanner } from '../components/janne-boy/JanneBoyOmgangBanner';
-import { BongCompetition, formatCompetitionFromApi, buildFallbackBongRaceDay } from '../components/bong/competitions';
+import {
+  BongCompetition,
+  formatCompetitionFromApi,
+  buildFallbackBongRaceDay,
+} from '../components/bong/competitions';
 import { BongDateSelector } from '../components/bong/BongDateSelector';
 import { BongKupongModal } from '../components/bong/BongKupongModal';
 import { apiFetch } from '../lib/api';
@@ -60,7 +64,6 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
           setSystemResult(engine.generate(res.data, config));
         }
       } catch {
-        // Behåll befintligt underlag vid nätverksbortfall
       } finally {
         setLoadingLive(false);
       }
@@ -72,16 +75,18 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
     let isSubscribed = true;
 
     async function loadUpcoming() {
-      const res = await apiFetch<Array<{
-        id: string;
-        gameType: BongGameType;
-        gameName: string;
-        date: string;
-        trackName: string;
-        startTime: string;
-        turnover: number;
-        jackpotPool: number;
-      }>>('/api/omganger/kommande');
+      const res = await apiFetch<
+        Array<{
+          id: string;
+          gameType: BongGameType;
+          gameName: string;
+          date: string;
+          trackName: string;
+          startTime: string;
+          turnover: number;
+          jackpotPool: number;
+        }>
+      >('/api/omganger/kommande');
 
       if (!isSubscribed) return;
 
@@ -173,9 +178,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
 
         <div className="flex items-center gap-2.5 bg-white border border-slate-200 px-3 py-2 rounded-xl text-xs shrink-0 shadow-2xs">
           <span
-            className={`w-2.5 h-2.5 rounded-full ${
-              isLive ? 'bg-emerald-500' : 'bg-amber-500'
-            }`}
+            className={`w-2.5 h-2.5 rounded-full ${isLive ? 'bg-emerald-500' : 'bg-amber-500'}`}
           />
           <div className="leading-tight">
             <span className="font-bold text-slate-800 block flex items-center gap-1">

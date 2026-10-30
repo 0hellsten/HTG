@@ -1,6 +1,3 @@
-// Logger för Stallbacken backend enligt AGENTS.md
-// Inga känsliga personuppgifter får loggas här.
-
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface LogContext {

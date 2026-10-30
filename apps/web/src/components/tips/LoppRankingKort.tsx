@@ -1,6 +1,3 @@
-// Loppranking-kort med markering för läst/öppnat läge
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import React from 'react';
 import { TipItem } from '@stallbacken/shared';
 

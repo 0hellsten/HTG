@@ -19,7 +19,7 @@ export const BongHorseAnalysisSection: React.FC<BongHorseAnalysisSectionProps> =
 }) => {
   return (
     <div className="space-y-4">
-      {/* Odds, Streck och Spelvärde */}
+      {}
       <div className="space-y-2">
         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
           <Award className="w-3.5 h-3.5 text-amber-600" />
@@ -56,7 +56,7 @@ export const BongHorseAnalysisSection: React.FC<BongHorseAnalysisSectionProps> =
         </div>
       </div>
 
-      {/* Taktiska förutsättningar */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
         <div className="bg-white border border-slate-200 rounded-xl p-3">
           <div className="font-bold text-slate-950">Spår och startsätt</div>

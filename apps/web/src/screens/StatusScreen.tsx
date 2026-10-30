@@ -19,13 +19,13 @@ export const StatusScreen: React.FC<StatusScreenProps> = ({ onBack }) => {
 
   const fetchKallor = async () => {
     try {
-      const json: ApiResponse<SourceHealthRecord[]> = await apiFetch<SourceHealthRecord[]>('/api/kallor');
+      const json: ApiResponse<SourceHealthRecord[]> =
+        await apiFetch<SourceHealthRecord[]>('/api/kallor');
       if (json && json.data) {
         setSources(json.data);
         setLastRefreshedAt(json.fetchedAt);
       }
     } catch {
-      // Tyst fallback
     } finally {
       setLoading(false);
     }
@@ -38,13 +38,15 @@ export const StatusScreen: React.FC<StatusScreenProps> = ({ onBack }) => {
   const handleUpdateAll = async () => {
     setRefreshing(true);
     try {
-      const json: ApiResponse<SourceHealthRecord[]> = await apiFetch<SourceHealthRecord[]>('/api/kallor/uppdatera-allt', { method: 'POST' });
+      const json: ApiResponse<SourceHealthRecord[]> = await apiFetch<SourceHealthRecord[]>(
+        '/api/kallor/uppdatera-allt',
+        { method: 'POST' }
+      );
       if (json && json.data) {
         setSources(json.data);
         setLastRefreshedAt(json.fetchedAt);
       }
     } catch {
-      // Ignorera
     } finally {
       setRefreshing(false);
     }
@@ -63,7 +65,7 @@ export const StatusScreen: React.FC<StatusScreenProps> = ({ onBack }) => {
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto pb-16">
-      {/* Tillbakaknapp och rubrik */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-4">
         <div className="flex items-center gap-3">
           <button
@@ -154,7 +156,7 @@ export const StatusScreen: React.FC<StatusScreenProps> = ({ onBack }) => {
           </div>
         )}
 
-        {/* Knapp: Uppdatera allt */}
+        {}
         <div className="pt-4">
           <button
             type="button"

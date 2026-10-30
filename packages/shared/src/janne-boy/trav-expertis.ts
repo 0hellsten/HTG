@@ -1,17 +1,14 @@
-// Djup genuin travkunskap, spårstatistik och sannolikhetslära för Janne Boy
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { BongHorseInput, BongRaceLeg } from '../types/bong.js';
 
 export interface HorseProbabilityAnalysis {
-  impliedWinProb: number; // 0.001 - 1.00
-  valueRatio: number; // P_win / P_streck
-  postAdvantage: number; // 0.5 - 1.35
-  equipmentBonus: number; // 0.0 - 0.40
+  impliedWinProb: number;
+  valueRatio: number;
+  postAdvantage: number;
+  equipmentBonus: number;
   shoeInfo: string;
   sulkyInfo?: string;
-  spikScore: number; // 0 - 100
-  skrallScore: number; // 0 - 100
+  spikScore: number;
+  skrallScore: number;
   isSolidSpik: boolean;
   isHighValueSkrall: boolean;
   travSummary: string;
@@ -23,20 +20,18 @@ export function calculatePostAdvantage(
 ): number {
   const spår = postPosition || 1;
   if (startMethod === 'volt') {
-    // Voltstart: springspår (6, 7) och innerspår (1, 3) har enorm fördel
     if (spår === 6 || spår === 7) return 1.3;
     if (spår === 1 || spår === 3) return 1.2;
     if (spår === 2) return 0.9;
-    if (spår === 4 || spår === 5) return 0.7; // Snäva spår med galopprisk
+    if (spår === 4 || spår === 5) return 0.7;
     return 0.85;
   }
 
-  // Autostart: Spår 4 och 5 är statistiskt bäst i Sverige
   if (spår === 4 || spår === 5) return 1.25;
   if (spår === 1 || spår === 2 || spår === 3) return 1.15;
   if (spår === 6 || spår === 7) return 0.95;
-  if (spår === 9 || spår === 10) return 0.95; // Smygläge i rygg på ledaren
-  if (spår === 8 || spår === 11 || spår === 12) return 0.65; // Vingel- och dödslägen
+  if (spår === 9 || spår === 10) return 0.95;
+  if (spår === 8 || spår === 11 || spår === 12) return 0.65;
   return 0.8;
 }
 
@@ -78,7 +73,6 @@ export function analyzeHorseProbabilities(
   const betDist = Math.max(0.0005, horse.betDistribution || 0.01);
   const winOdds = Math.max(1.05, horse.winOdds || 15);
 
-  // Sannolikhetslära: Implicita vinstchansen härledd från vinnarodds med 85% återbetalning
   const rawWinProb = 0.85 / winOdds;
   const impliedWinProb = Math.min(0.92, Math.max(0.005, rawWinProb));
   const valueRatio = Number((impliedWinProb / betDist).toFixed(2));
@@ -86,8 +80,6 @@ export function analyzeHorseProbabilities(
   const postAdv = calculatePostAdvantage(horse.postPosition || horse.startNumber, leg.startMethod);
   const equip = analyzeEquipment(horse, leg.startMethod);
 
-  // Spik med största omsorg:
-  // Kräver hög vinstchans (minst 38 %), inte svåraste spåren, samt distans till loppets tvåa
   const secondProb = secondHorse?.winOdds ? 0.85 / secondHorse.winOdds : 0.2;
   const leadMargin = impliedWinProb - secondProb;
   const spårNr = horse.postPosition || horse.startNumber;
@@ -112,8 +104,6 @@ export function analyzeHorseProbabilities(
     leadMargin >= 0.12 &&
     (!isBadPost || impliedWinProb > 0.65);
 
-  // Högoddsare / Skräll med största omsorg:
-  // Får inte vara chanslös (minst 2% vinstchans), max 15% streckad, men högt spelvärde (VR >= 1.25)
   const isSmygPost = spårNr <= 3 || spårNr === 9 || spårNr === 10;
   let skrallScore = 0;
   if (betDist <= 0.16 && impliedWinProb >= 0.02) {

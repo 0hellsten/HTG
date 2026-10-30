@@ -39,7 +39,8 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
       if (isSimulateDown) queryParams.set('simulateDown', 'true');
 
       const url = `/api/hastar/${horseId}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-      const json: ApiResponse<HorseProfileResponse | null> = await apiFetch<HorseProfileResponse | null>(url);
+      const json: ApiResponse<HorseProfileResponse | null> =
+        await apiFetch<HorseProfileResponse | null>(url);
 
       if (json && json.data) {
         setProfile(json.data);
@@ -49,10 +50,14 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
         const cleanName = horseId.replace(/^h_/, '').replace(/_/g, ' ');
         if (cleanName.length >= 2) {
           try {
-            const searchJson = await apiFetch<any[]>(`/api/hastar/sok?q=${encodeURIComponent(cleanName)}`);
+            const searchJson = await apiFetch<Array<{ id: string; name: string }>>(
+              `/api/hastar/sok?q=${encodeURIComponent(cleanName)}`
+            );
             const matched = searchJson?.data?.[0];
             if (matched) {
-              const matchedJson = await apiFetch<HorseProfileResponse | null>(`/api/hastar/${matched.id}`);
+              const matchedJson = await apiFetch<HorseProfileResponse | null>(
+                `/api/hastar/${matched.id}`
+              );
               if (matchedJson?.data) {
                 setProfile(matchedJson.data);
                 setStatus(matchedJson.status);
@@ -108,7 +113,7 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
 
   return (
     <div className="space-y-6">
-      {/* Tillbakaknapp och rubrik */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200">
         <button
           type="button"
@@ -136,7 +141,7 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
 
       {horse ? (
         <div className="space-y-6">
-          {/* Header information om hästen */}
+          {}
           <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-md">
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{horse.name}</h1>
             <p className="text-slate-300 text-sm sm:text-base mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
@@ -148,7 +153,7 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
             </p>
           </div>
 
-          {/* Block 1: Om hästen */}
+          {}
           <HastOmBlock
             horse={horse}
             status={status}
@@ -156,7 +161,7 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
             onRetry={() => fetchHorse(true)}
           />
 
-          {/* Block 2: Form i backspegeln */}
+          {}
           <FormBackspegelnBlock
             starts={profile.pastStarts}
             status={status}
@@ -164,7 +169,7 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
             onRetry={() => fetchHorse(true)}
           />
 
-          {/* Block 3: Ryggar och lägen */}
+          {}
           <RyggarLagenBlock
             stats={profile.positionStats}
             status={status}
@@ -172,7 +177,7 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
             onRetry={() => fetchHorse(true)}
           />
 
-          {/* Block 4: Hur går det i träningen? */}
+          {}
           <TraningFormBlock
             trainingForm={profile.trainingForm}
             pastStarts={profile.pastStarts}
@@ -182,7 +187,7 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
             onRetry={() => fetchHorse(true)}
           />
 
-          {/* Block 5: Alla starter (hopfällbart) */}
+          {}
           {profile.allStarts.length > profile.pastStarts.length && (
             <div className="space-y-3">
               <button

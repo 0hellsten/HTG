@@ -1,6 +1,3 @@
-// API-rutter för tips och "Vad tycker stallbacken?"
-// Stallbacken — HTG
-
 import { FastifyPluginAsync } from 'fastify';
 import { ApiResponse, TipsOverviewData, RaceTipsData } from '@stallbacken/shared';
 import { getDb } from '../db/connection.js';
@@ -14,10 +11,6 @@ import { logger } from '../lib/logger.js';
 export const tipsRoutes: FastifyPluginAsync = async (app) => {
   const db = getDb();
 
-  /**
-   * Hämtar samlad tipssida ("Vad tycker stallbacken?") med artiklar och lopprankingar.
-   * Stödjer simulateDown=tips-expressen, tips-travronden, tips-aftonbladet eller tips-sulkysport för att testa degradering.
-   */
   app.get<{
     Querystring: { refresh?: string; simulateDown?: string };
   }>('/api/tips', async (request, reply) => {
@@ -30,7 +23,6 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
       tipsAftonbladetAdapter.setSimulatedFailure(simulateDown === 'tips-aftonbladet');
       tipsSulkysportAdapter.setSimulatedFailure(simulateDown === 'tips-sulkysport');
 
-      // Hämta färsk data från källorna
       const [resExpressen, resTravronden, resAftonbladet, resSulkysport] = await Promise.all([
         tipsExpressenAdapter.fetch({ forceRefresh }),
         tipsTravrondenAdapter.fetch({ forceRefresh }),
@@ -117,9 +109,6 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
-  /**
-   * Hämtar tips för ett specifikt lopp (till block 3 på loppkortet).
-   */
   app.get<{
     Params: { raceId: string };
     Querystring: { refresh?: string };
@@ -128,7 +117,6 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
     const forceRefresh = request.query.refresh === 'true';
 
     try {
-      // Säkerställ att tipsen är hämtade
       const [resExpressen, resTravronden, resAftonbladet, resSulkysport] = await Promise.all([
         tipsExpressenAdapter.fetch({ forceRefresh }),
         tipsTravrondenAdapter.fetch({ forceRefresh }),
@@ -169,7 +157,6 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
         },
       ];
 
-      // Skapa egen hopslagning om flera källor har tipsat
       let aggregatedSummary: string | undefined;
       if (tips.length >= 2) {
         aggregatedSummary = 'Appens egen hopslagning av tipsen ovan.';

@@ -1,6 +1,3 @@
-// Aktiva gulddivisionshästar som springer i tävlingar på V75
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { SeedHorse } from './elite-horses-varmblod.js';
 
 export const ELITE_AKTIVA_GULD: SeedHorse[] = [

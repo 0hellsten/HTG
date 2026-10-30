@@ -1,6 +1,3 @@
-// Typer för Mitt stall och anmälda favoriter
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 export interface TodaysEntry {
   horseId: string;
   horseName: string;

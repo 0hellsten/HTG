@@ -10,15 +10,11 @@ export interface ParsedRssItem {
   guid?: string;
 }
 
-/**
- * Rensar CDATA, HTML-taggar, entiteter och eventuella annonstexter från text.
- */
 function cleanText(raw: string): string {
   let cleaned = raw.trim();
   if (cleaned.startsWith('<![CDATA[') && cleaned.endsWith(']]>')) {
     cleaned = cleaned.slice(9, -3).trim();
   }
-  // Avkoda vanliga HTML-entiteter
   cleaned = cleaned
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
@@ -27,13 +23,11 @@ function cleanText(raw: string): string {
     .replace(/&lt;/gi, '<')
     .replace(/&gt;/gi, '>');
 
-  // Ta bort HTML-taggar t.ex. <img ...> eller <p>
   cleaned = cleaned
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 
-  // Klipp bort kommersiella andels-/annonstexter
   const annonsIdx = cleaned.search(/\bANNONS:/i);
   if (annonsIdx > 0) {
     cleaned = cleaned.slice(0, annonsIdx).trim();
@@ -41,9 +35,6 @@ function cleanText(raw: string): string {
   return cleaned;
 }
 
-/**
- * Parsar en RSS 2.0 XML-sträng till en lista med artiklar.
- */
 export function parseRssXml(xml: string): ParsedRssItem[] {
   const items: ParsedRssItem[] = [];
   const itemMatches = xml.match(/<item[\s\S]*?<\/item>/gi) || [];

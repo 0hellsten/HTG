@@ -34,9 +34,6 @@ export class HealthManager {
     this.db = database || getDb();
   }
 
-  /**
-   * Hämtar den allra senaste hälsoposten för en specifik källa.
-   */
   getLatestRecord(sourceId: string): SourceHealthDbRow | null {
     const row = this.db
       .prepare(
@@ -50,9 +47,6 @@ export class HealthManager {
     return row || null;
   }
 
-  /**
-   * Kontrollerar om källans kretsbrytare är aktiv (pausad i 30 minuter).
-   */
   isCircuitBreakerActive(sourceId: string): boolean {
     const latest = this.getLatestRecord(sourceId);
     if (!latest || !latest.paused_until) {
@@ -62,9 +56,6 @@ export class HealthManager {
     return pausedUntilTime > Date.now();
   }
 
-  /**
-   * Återställer kretsbrytaren och felräknaren för en källa.
-   */
   resetCircuitBreaker(sourceId: string): void {
     const latest = this.getLatestRecord(sourceId);
     const now = new Date().toISOString();
@@ -80,9 +71,6 @@ export class HealthManager {
       .run(sourceId, 'ok', now, succeededAt, 0, '', 'Kretsbrytare manuellt återställd', 0, null);
   }
 
-  /**
-   * Registrerar ett hämtförsök och uppdaterar kretsbrytarens tillstånd.
-   */
   recordAttempt(input: RecordAttemptInput): SourceHealthRecord {
     const now = new Date().toISOString();
     const attemptedAt = input.attemptedAt || now;
@@ -94,7 +82,6 @@ export class HealthManager {
 
     if (input.status === 'failed') {
       consecutiveFailures += 1;
-      // Circuit breaker: 5 raka fel -> paus i 30 minuter
       if (consecutiveFailures >= 5) {
         const pauseEnd = new Date(Date.now() + 30 * 60 * 1000);
         pausedUntil = pauseEnd.toISOString();
@@ -103,7 +90,6 @@ export class HealthManager {
         );
       }
     } else {
-      // Vid ok eller degraded räknas anropet som ett fungerande anrop
       consecutiveFailures = 0;
       succeededAt = input.succeededAt || now;
       pausedUntil = null;
@@ -149,15 +135,11 @@ export class HealthManager {
     };
   }
 
-  /**
-   * Beräknar aktuell hälsa för en adapter utifrån dess senaste rad och konfiguration.
-   */
   getSourceHealth(adapter: SourceAdapter<unknown>): SourceHealthRecord {
     const latest = this.getLatestRecord(adapter.id);
     const now = new Date().toISOString();
 
     if (!latest) {
-      // Ingen hämtning gjord än
       return {
         sourceId: adapter.id,
         label: adapter.label,
@@ -197,9 +179,6 @@ export class HealthManager {
     };
   }
 
-  /**
-   * Hämtar hälsostatus för en lista med adaptrar.
-   */
   getAllSourcesHealth(adapters: SourceAdapter<unknown>[]): SourceHealthRecord[] {
     return adapters.map((adapter) => this.getSourceHealth(adapter));
   }

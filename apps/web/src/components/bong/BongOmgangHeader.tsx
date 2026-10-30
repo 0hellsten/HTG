@@ -1,6 +1,3 @@
-// Omgångshuvud och dragbar tävlingsväljare för Bong-maskinen
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import React from 'react';
 import { Calculator, Calendar, MapPin, Sparkles, TrendingUp } from 'lucide-react';
 import { BongRaceDayData } from '@stallbacken/shared';
@@ -22,7 +19,7 @@ export const BongOmgangHeader: React.FC<BongOmgangHeaderProps> = ({
 }) => {
   return (
     <div className="space-y-4 border-b border-slate-200 pb-5">
-      {/* Titelrad */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <div className="flex items-center gap-2.5">
@@ -39,7 +36,7 @@ export const BongOmgangHeader: React.FC<BongOmgangHeaderProps> = ({
         </div>
       </div>
 
-      {/* Dragbar tävlings- och datumväljare */}
+      {}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs font-semibold text-slate-600 px-1">
           <span>Kommande tävlingar (dra för att se längre fram)</span>
@@ -53,7 +50,7 @@ export const BongOmgangHeader: React.FC<BongOmgangHeaderProps> = ({
         />
       </div>
 
-      {/* Tydlig omgångsinformation för valt datum: bana, starttid, omsättning och jackpot */}
+      {}
       <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900 text-white rounded-xl px-4 py-3 shadow-xs">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm font-medium">
           <span className="flex items-center gap-1.5 font-bold text-amber-400">

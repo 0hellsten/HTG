@@ -80,7 +80,9 @@ export const BongHorseInfoModal: React.FC<BongHorseInfoModalProps> = ({
         }
 
         if (horse.name) {
-          const searchJson = await apiFetch<Array<{ id: string; name: string }>>(`/api/hastar/sok?q=${encodeURIComponent(horse.name)}`);
+          const searchJson = await apiFetch<Array<{ id: string; name: string }>>(
+            `/api/hastar/sok?q=${encodeURIComponent(horse.name)}`
+          );
           const matched = searchJson?.data?.[0];
           if (!isCancelled && matched) {
             const fullJson = await apiFetch<HorseProfileResponse>(`/api/hastar/${matched.id}`);
@@ -102,7 +104,6 @@ export const BongHorseInfoModal: React.FC<BongHorseInfoModalProps> = ({
 
   if (!isOpen || !horse) return null;
 
-  // Analysberäkning
   const otherHorses = leg.horses.filter((h) => h.id !== horse.id);
   const secondHorse = otherHorses.reduce<BongHorseInput | undefined>((best, curr) => {
     if (!best) return curr;
@@ -131,7 +132,7 @@ export const BongHorseInfoModal: React.FC<BongHorseInfoModalProps> = ({
         className="bg-white rounded-t-2xl sm:rounded-2xl border border-slate-200 w-full max-w-xl max-h-[92vh] overflow-y-auto shadow-2xl p-4 sm:p-6 space-y-5"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {}
         <div className="flex items-start justify-between gap-3 border-b border-slate-200 pb-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 font-black text-lg flex items-center justify-center shrink-0 shadow-xs">
@@ -176,7 +177,7 @@ export const BongHorseInfoModal: React.FC<BongHorseInfoModalProps> = ({
           </button>
         </div>
 
-        {/* Val & ranking på bongen */}
+        {}
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-3">
           <div className="flex items-center justify-between gap-2">
             <div>
@@ -233,7 +234,7 @@ export const BongHorseInfoModal: React.FC<BongHorseInfoModalProps> = ({
           )}
         </div>
 
-        {/* Travanalys och förutsättningar */}
+        {}
         <BongHorseAnalysisSection
           analysis={analysis}
           winOdds={winOdds}
@@ -242,13 +243,13 @@ export const BongHorseInfoModal: React.FC<BongHorseInfoModalProps> = ({
           startMethodText={startMethodText}
         />
 
-        {/* Form i backspegeln (hästens tidigare lopp) */}
+        {}
         <BongHorsePastStarts
           pastStarts={profile?.pastStarts || []}
           earningsTotal={profile?.horse?.earningsTotal}
         />
 
-        {/* Länk till fullständigt hästkort om tillgängligt */}
+        {}
         {onOpenFullHorse && (
           <div className="pt-1">
             <button

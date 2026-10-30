@@ -33,7 +33,7 @@ export const HastOmBlock: React.FC<HastOmBlockProps> = ({
           />
         </div>
 
-        {/* Grunduppgifter i grid */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-base">
           <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-100">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-1">
@@ -86,9 +86,9 @@ export const HastOmBlock: React.FC<HastOmBlockProps> = ({
           </div>
         </div>
 
-        {/* Karriärsiffror & Stamtavla */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-slate-100">
-          {/* Karriärsiffror */}
+          {}
           <div className="space-y-2.5">
             <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
               Karriär i siffror
@@ -113,7 +113,7 @@ export const HastOmBlock: React.FC<HastOmBlockProps> = ({
             )}
           </div>
 
-          {/* Stamtavla */}
+          {}
           <div className="space-y-2">
             <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Stamtavla</h3>
             <div className="space-y-1.5 text-base">

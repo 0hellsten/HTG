@@ -1,18 +1,10 @@
-// Hjälpfunktioner för jämförvyn ("Ställ dem mot varandra")
-// Privat, icke-kommersiell användning. Allt på svenska.
+import { HorseProfileResponse, TrackPositionStat } from '@stallbacken/shared';
 
-import { HorseProfileResponse, HorsePastStart, TrackPositionStat } from '@stallbacken/shared';
-
-/**
- * Parsar en kilometertid (t.ex. "1.12,3a", "1.14,2", "1.16,0g") till sekunder.
- * Returnerar null om formatet är ogiltigt eller saknas.
- */
 export function parseKmTimeToSeconds(kmTime?: string | null): number | null {
   if (!kmTime) return null;
   const clean = kmTime.trim().toLowerCase().replace(/[a-z]/g, '');
   if (!clean || clean === '–') return null;
 
-  // Stödjer format "1.12,3" eller "12,3"
   const parts = clean.split('.');
   if (parts.length === 2) {
     const minutes = parseInt(parts[0], 10);
@@ -21,22 +13,17 @@ export function parseKmTimeToSeconds(kmTime?: string | null): number | null {
     return minutes * 60 + seconds;
   }
 
-  // Om bara sekunder och tiondelar angavs, t.ex. "12,3" (underförstått 1 minut)
   const secondsOnly = parseFloat(clean.replace(',', '.'));
   if (isNaN(secondsOnly)) return null;
   return secondsOnly > 30 ? secondsOnly : 60 + secondsOnly;
 }
 
-/**
- * Hittar den bästa (snabbaste) kilometertiden ur sparade resultat och rekord.
- */
 export function getBestKmTime(profile?: HorseProfileResponse | null): string | null {
   if (!profile) return null;
 
   let bestSeconds = Infinity;
   let bestTimeStr: string | null = null;
 
-  // 1. Kontrollera officiella rekord
   const autoRecord = profile.horse?.records?.auto;
   const voltRecord = profile.horse?.records?.volt;
 
@@ -56,7 +43,6 @@ export function getBestKmTime(profile?: HorseProfileResponse | null): string | n
     }
   }
 
-  // 2. Kontrollera tidigare lopp
   const starts = profile.pastStarts || [];
   for (const st of starts) {
     if (st.kmTime) {
@@ -71,9 +57,6 @@ export function getBestKmTime(profile?: HorseProfileResponse | null): string | n
   return bestTimeStr;
 }
 
-/**
- * Beräknar antal vilodagar mellan loppets tävlingsdag och hästens senaste start.
- */
 export function calculateRestDays(raceDateStr?: string, lastStartDateStr?: string): number | null {
   if (!raceDateStr || !lastStartDateStr) return null;
 
@@ -93,9 +76,6 @@ export function calculateRestDays(raceDateStr?: string, lastStartDateStr?: strin
   }
 }
 
-/**
- * Formaterar vilodagar på svenska.
- */
 export function formatRestDays(days: number | null): string {
   if (days === null || days === undefined) return '–';
   if (days === 0) return 'Startar idag';
@@ -106,10 +86,7 @@ export function formatRestDays(days: number | null): string {
   return `${months} månader`;
 }
 
-/**
- * Formaterar de 5 senaste starternas placeringar (t.ex. "1 · 3 · d · 2 · 1").
- */
-export function formatFormRecent(pastStarts?: HorsePastStart[] | null): string {
+export function formatFormRecent(pastStarts?: Array<{ place?: string }> | null): string {
   if (!pastStarts || pastStarts.length === 0) return '–';
 
   const five = pastStarts.slice(0, 5);
@@ -121,11 +98,7 @@ export function formatFormRecent(pastStarts?: HorsePastStart[] | null): string {
     .join(' · ');
 }
 
-/**
- * Beräknar en poäng för de senaste 5 starterna för att diskret utse den i bäst form.
- * 1:a = 12p, 2:a = 8p, 3:a = 5p, 4:a = 3p, 5:a = 2p, övrig = 1p, galopp/disk = 0p.
- */
-export function calculateFormScore(pastStarts?: HorsePastStart[] | null): number | null {
+export function calculateFormScore(pastStarts?: Array<{ place?: string }> | null): number | null {
   if (!pastStarts || pastStarts.length === 0) return null;
 
   const five = pastStarts.slice(0, 5);
@@ -150,17 +123,11 @@ export function calculateFormScore(pastStarts?: HorsePastStart[] | null): number
   return count > 0 ? totalScore : null;
 }
 
-/**
- * Formaterar spårets utfall: "33 % (2 av 6)" eller "–".
- */
 export function formatTrackPositionStat(stat?: TrackPositionStat | null): string {
   if (!stat || stat.starts === 0) return '–';
   return `${stat.winPercent} % (${stat.wins} av ${stat.starts})`;
 }
 
-/**
- * Skobeskrivning på ren svenska med ikonnamn.
- */
 export function getShoeDescription(
   shoesFront?: boolean,
   shoesBack?: boolean,
@@ -188,11 +155,6 @@ export function getShoeDescription(
   };
 }
 
-/**
- * Tar en lista med numeriska värden för hästarna på en rad och returnerar index
- * för de hästar som har det bästa värdet (stödjer delad förstaplats).
- * Saknade värden (null) markeras aldrig.
- */
 export function getBestIndices(
   values: (number | null | undefined)[],
   direction: 'high' | 'low'
@@ -210,7 +172,6 @@ export function getBestIndices(
     return result;
   }
 
-  // Om alla har 0 eller alla har exakt samma värde, markera ingen som "bäst"
   const allEqual = validEntries.every((e) => e.val === validEntries[0].val);
   if (allEqual) {
     return result;
@@ -225,7 +186,6 @@ export function getBestIndices(
     }
   }
 
-  // Lägg till alla hästar som har detta målvärde
   for (const e of validEntries) {
     if (e.val === targetVal) {
       result.add(e.idx);

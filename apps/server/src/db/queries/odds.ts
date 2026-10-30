@@ -1,6 +1,3 @@
-// Databasfrågor för odds och streckprocent
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import Database from 'better-sqlite3';
 import { RaceOddsData, HorseOdds } from '@stallbacken/shared';
 
@@ -25,9 +22,6 @@ interface RawOddsRow {
   game_type: string | null;
 }
 
-/**
- * Sparar en odds-post i tidsserien för en start.
- */
 export function upsertOdds(db: Database.Database, input: DbOddsInput): void {
   const stmt = db.prepare(`
     INSERT INTO odds (
@@ -54,9 +48,6 @@ export function upsertOdds(db: Database.Database, input: DbOddsInput): void {
   );
 }
 
-/**
- * Sparar alla odds och streck i en samlad RaceOddsData.
- */
 export function saveRaceOdds(
   db: Database.Database,
   oddsData: RaceOddsData,
@@ -80,9 +71,6 @@ export function saveRaceOdds(
   insertMany(oddsData.odds);
 }
 
-/**
- * Hämtar senaste sparade odds och streck för ett lopp.
- */
 export function getLatestOddsForRace(db: Database.Database, raceId: string): RaceOddsData | null {
   const stmt = db.prepare(`
     SELECT
@@ -106,7 +94,6 @@ export function getLatestOddsForRace(db: Database.Database, raceId: string): Rac
     return null;
   }
 
-  // Kontrollera om det finns minst ett registrerat odds
   const hasAnyOdds = rows.some((r) => r.recorded_at !== null);
   if (!hasAnyOdds) {
     return null;
@@ -119,7 +106,6 @@ export function getLatestOddsForRace(db: Database.Database, raceId: string): Rac
       .sort()
       .reverse()[0] || new Date().toISOString();
 
-  // Formatera t.ex. "2026-10-29T18:42:00" -> "18:42"
   const timeFormatted = latestRecordedAt.includes('T')
     ? latestRecordedAt.split('T')[1].slice(0, 5)
     : latestRecordedAt.slice(11, 16);

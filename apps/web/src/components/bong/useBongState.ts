@@ -8,7 +8,11 @@ import {
   ReductionConditions,
   SourceStatus,
 } from '@stallbacken/shared';
-import { BongCompetition, formatCompetitionFromApi, buildFallbackBongRaceDay } from './competitions';
+import {
+  BongCompetition,
+  formatCompetitionFromApi,
+  buildFallbackBongRaceDay,
+} from './competitions';
 import { apiFetch } from '../../lib/api';
 
 export function useBongState(
@@ -52,16 +56,18 @@ export function useBongState(
     let isSubscribed = true;
 
     async function loadUpcoming() {
-      const res = await apiFetch<Array<{
-        id: string;
-        gameType: BongGameType;
-        gameName: string;
-        date: string;
-        trackName: string;
-        startTime: string;
-        turnover: number;
-        jackpotPool: number;
-      }>>('/api/omganger/kommande');
+      const res = await apiFetch<
+        Array<{
+          id: string;
+          gameType: BongGameType;
+          gameName: string;
+          date: string;
+          trackName: string;
+          startTime: string;
+          turnover: number;
+          jackpotPool: number;
+        }>
+      >('/api/omganger/kommande');
 
       if (!isSubscribed) return;
 

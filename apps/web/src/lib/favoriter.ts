@@ -1,6 +1,3 @@
-// Hantering av favoriter i Stallbacken (banor, hästar, kuskar, tränare)
-// Sparas lokalt i webbläsaren med fallback
-
 const FAVORITE_TRACKS_KEY = 'stallbacken_fav_tracks';
 const FAVORITE_HORSES_KEY = 'stallbacken_fav_horses';
 const FAVORITE_DRIVERS_KEY = 'stallbacken_fav_drivers';
@@ -19,9 +16,7 @@ function getStorage(): Storage | null {
     if (typeof localStorage !== 'undefined') {
       return localStorage;
     }
-  } catch {
-    // Inget storage tillgängligt
-  }
+  } catch {}
   return null;
 }
 
@@ -44,14 +39,8 @@ function setJsonList<T>(key: string, list: T[]): void {
     if (storage) {
       storage.setItem(key, JSON.stringify(list));
     }
-  } catch {
-    // Ignorera fel vid privat surfläge
-  }
+  } catch {}
 }
-
-// ==========================================
-// BANOR
-// ==========================================
 
 export function getFavoriteTracks(): FavoriteItem[] {
   const rawList = getJsonList<string | FavoriteItem>(FAVORITE_TRACKS_KEY);
@@ -91,10 +80,6 @@ export function removeFavoriteTrack(trackId: string): void {
   setJsonList(FAVORITE_TRACKS_KEY, current);
 }
 
-// ==========================================
-// HÄSTAR
-// ==========================================
-
 export function getFavoriteHorses(): FavoriteItem[] {
   const rawList = getJsonList<string | FavoriteItem>(FAVORITE_HORSES_KEY);
   return rawList.map((item) => {
@@ -133,10 +118,6 @@ export function removeFavoriteHorse(horseId: string): void {
   setJsonList(FAVORITE_HORSES_KEY, current);
 }
 
-// ==========================================
-// KUSKAR
-// ==========================================
-
 export function getFavoriteDrivers(): string[] {
   return getJsonList<string>(FAVORITE_DRIVERS_KEY);
 }
@@ -169,10 +150,6 @@ export function removeFavoriteDriver(driverName: string): void {
   const current = getFavoriteDrivers().filter((d) => d.trim().toLowerCase() !== trimmed);
   setJsonList(FAVORITE_DRIVERS_KEY, current);
 }
-
-// ==========================================
-// TRÄNARE
-// ==========================================
 
 export function getFavoriteTrainers(): string[] {
   return getJsonList<string>(FAVORITE_TRAINERS_KEY);
@@ -207,10 +184,6 @@ export function removeFavoriteTrainer(trainerName: string): void {
   setJsonList(FAVORITE_TRAINERS_KEY, current);
 }
 
-// ==========================================
-// HJÄLPFUNKTIONER
-// ==========================================
-
 export function getTotalFavoritesCount(): number {
   return (
     getFavoriteTrackIds().length +
@@ -220,10 +193,6 @@ export function getTotalFavoritesCount(): number {
   );
 }
 
-/**
- * Sorterar tävlingsdagar så att favoritbanor alltid placeras överst,
- * med bevarad inbördes ordning baserat på första starttid.
- */
 export function sortRaceDaysWithFavorites<T extends { trackId: string }>(
   raceDays: T[],
   favoriteIds?: string[]

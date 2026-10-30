@@ -9,22 +9,14 @@ const __dirname = path.dirname(__filename);
 
 let dbInstance: Database.Database | null = null;
 
-/**
- * Returnerar standardsökvägen till SQLite-databasen.
- */
 export function getDefaultDbPath(): string {
   if (process.env.DB_PATH) {
     return process.env.DB_PATH;
   }
-  // Standardmässigt i data/ i roten av projektet
   const repoRoot = path.resolve(__dirname, '../../../../');
   return path.join(repoRoot, 'data', 'stallbacken.db');
 }
 
-/**
- * Initierar eller hämtar den aktiva SQLite-anslutningen.
- * Aktiverar WAL-mode och främmande nycklar.
- */
 export function getDb(dbPath?: string): Database.Database {
   if (dbInstance && !dbPath) {
     return dbInstance;
@@ -41,7 +33,6 @@ export function getDb(dbPath?: string): Database.Database {
 
   const db = new Database(targetPath);
 
-  // WAL-mode för säker och snabb samtidig läsning/skrivning
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
 
@@ -53,9 +44,6 @@ export function getDb(dbPath?: string): Database.Database {
   return db;
 }
 
-/**
- * Stänger databasanslutningen vid avstängning eller i tester.
- */
 export function closeDb(): void {
   if (dbInstance) {
     dbInstance.close();

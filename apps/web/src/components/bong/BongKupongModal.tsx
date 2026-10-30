@@ -34,8 +34,6 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
   const isV86 = gameType === 'V86';
   const model = buildBongCouponViewModel(raceDay, selectedHorses, gameType, costSek);
 
-  // Exakta procentkoordinater baserat på uppmätta kuponger
-  // Justerad placering: sidhuvud sänkt något, hästnummer bibehållna i optimal höjd
   const config = isV86
     ? {
         aspectRatio: '1434 / 1830',
@@ -68,7 +66,7 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
         className="relative w-full max-w-[340px] sm:max-w-[380px] bg-amber-50 rounded-2xl shadow-2xl overflow-hidden border border-amber-900/20"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Stängknapp X */}
+        {}
         <button
           type="button"
           onClick={onClose}
@@ -78,18 +76,15 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
           <X className="w-4 h-4 stroke-[2.5]" />
         </button>
 
-        {/* Kupongyta med bild och textöverlägg */}
-        <div
-          className="relative w-full select-none"
-          style={{ aspectRatio: config.aspectRatio }}
-        >
+        {}
+        <div className="relative w-full select-none" style={{ aspectRatio: config.aspectRatio }}>
           <img
             src={model.couponSrc}
             alt={`Kupong ${model.gameType}`}
             className="w-full h-full object-contain pointer-events-none"
           />
 
-          {/* Bana */}
+          {}
           <div
             className="absolute font-mono font-bold text-slate-950 text-[11px] sm:text-xs leading-none whitespace-nowrap"
             style={{ left: config.bana.left, top: config.bana.top }}
@@ -97,7 +92,7 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
             {model.trackName}
           </div>
 
-          {/* Datum */}
+          {}
           <div
             className="absolute font-mono font-bold text-slate-950 text-[11px] sm:text-xs leading-none whitespace-nowrap"
             style={{ left: config.datum.left, top: config.datum.top }}
@@ -105,7 +100,7 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
             {model.dateStr}
           </div>
 
-          {/* Starttid */}
+          {}
           <div
             className="absolute font-mono font-bold text-slate-950 text-[11px] sm:text-xs leading-none whitespace-nowrap"
             style={{ left: config.start.left, top: config.start.top }}
@@ -113,7 +108,7 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
             {model.startTime}
           </div>
 
-          {/* Beräknad kostnad */}
+          {}
           <div
             className="absolute font-mono font-bold text-slate-950 text-[11px] sm:text-xs leading-none whitespace-nowrap"
             style={{ left: config.kostnad.left, top: config.kostnad.top }}
@@ -121,7 +116,7 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
             {model.costSekStr}
           </div>
 
-          {/* Hästrader för AVD 1..N */}
+          {}
           {model.rows.map((row) => {
             const top = config.rowTops[row.legIndex];
             if (!top) return null;

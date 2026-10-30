@@ -13,13 +13,9 @@ interface MigrationRow {
   applied_at: string;
 }
 
-/**
- * Kör alla oapplicerade SQL-migrationer i nummerordning.
- */
 export function runMigrations(database?: Database.Database): void {
   const db = database || getDb();
 
-  // Skapa migrationstabellen om den saknas
   db.exec(`
     CREATE TABLE IF NOT EXISTS schema_migrations (
       version TEXT PRIMARY KEY,
@@ -29,7 +25,6 @@ export function runMigrations(database?: Database.Database): void {
 
   let migrationsDir = path.resolve(__dirname, 'migrations');
   if (!fs.existsSync(migrationsDir)) {
-    // Om koden körs från dist/, sök efter migrationsmappen i src/
     const srcMigrations = path.resolve(__dirname, '../../src/db/migrations');
     if (fs.existsSync(srcMigrations)) {
       migrationsDir = srcMigrations;

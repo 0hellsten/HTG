@@ -1,6 +1,3 @@
-// API-rutter för banor, banfakta, banstatistik och SMHI-väder
-// Stallbacken — HTG
-
 import { FastifyPluginAsync } from 'fastify';
 import { ApiResponse, TrackProfile, TrackStats, TrackWeather } from '@stallbacken/shared';
 import { getDb } from '../db/connection.js';
@@ -15,9 +12,6 @@ import { logger } from '../lib/logger.js';
 export const banorRoutes: FastifyPluginAsync = async (app) => {
   const db = getDb();
 
-  /**
-   * Hämtar samtliga banor med grundfakta.
-   */
   app.get('/api/banor', async (_request, reply) => {
     try {
       const tracks = getAllTrackProfiles(db);
@@ -40,9 +34,6 @@ export const banorRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
-  /**
-   * Hämtar banprofil för en specifik bana.
-   */
   app.get<{
     Params: { trackId: string };
   }>('/api/banor/:trackId', async (request, reply) => {
@@ -78,13 +69,6 @@ export const banorRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
-  /**
-   * Hämtar härledd statistik för Banvisaren ur sparad historik:
-   * - "Så brukar spåren gå" (vinstprocent per startspår, volt och auto)
-   * - "Leder man, vinner man?"
-   * - Vanliga vinnartider
-   * - Underlag (antal lopp)
-   */
   app.get<{
     Params: { trackId: string };
   }>('/api/banor/:trackId/statistik', async (request, reply) => {
@@ -112,10 +96,6 @@ export const banorRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
-  /**
-   * Hämtar aktuellt väder för en bana via SMHI.
-   * Stödjer simulateDown=true för verifiering av degradering i UI.
-   */
   app.get<{
     Params: { trackId: string };
     Querystring: { refresh?: string; simulateDown?: string };

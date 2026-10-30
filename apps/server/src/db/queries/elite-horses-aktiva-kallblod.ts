@@ -1,6 +1,3 @@
-// Aktiva kallblodsstjärnor som tävlar i Kallblodseliten
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { SeedHorse } from './elite-horses-varmblod.js';
 
 export const ELITE_AKTIVA_KALLBLOD: SeedHorse[] = [

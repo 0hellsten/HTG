@@ -1,9 +1,3 @@
-// Kö och hastighetsbegränsning för externa anrop
-// Domän: flertalet
-// Status: intern verktygsmodul för artig hämtning
-// Anropsbudget: max 1 anrop per sekund per domän
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { logger } from '../lib/logger.js';
 
 interface QueuedTask<T> {
@@ -12,10 +6,6 @@ interface QueuedTask<T> {
   reject: (reason?: unknown) => void;
 }
 
-/**
- * Global hastighetsbegränsare per domän.
- * Garanterar sekventiella anrop och minst 1000 ms mellan anrop mot samma domän.
- */
 export class DomainRateLimiter {
   private lastCallTimes = new Map<string, number>();
   private queues = new Map<string, QueuedTask<unknown>[]>();
@@ -26,9 +16,6 @@ export class DomainRateLimiter {
     this.minIntervalMs = minIntervalMs;
   }
 
-  /**
-   * Lägger till ett anrop i kön för en viss domän och returnerar ett promise.
-   */
   async schedule<T>(domain: string, task: () => Promise<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       const queue = this.queues.get(domain) || [];
@@ -75,14 +62,10 @@ export class DomainRateLimiter {
     } catch (err) {
       item.reject(err);
     } finally {
-      // Fortsätt processa kön
       this.processQueue(domain);
     }
   }
 
-  /**
-   * Återställer intern kö och historik (används främst i enhetstester).
-   */
   reset(): void {
     this.lastCallTimes.clear();
     this.queues.clear();
@@ -101,13 +84,6 @@ export interface FetchOptions {
   headers?: Record<string, string>;
 }
 
-/**
- * Utför HTTP-hämtning med artighetsregler:
- * - Sekventiell anropskö per domän
- * - User-Agent med appnamn och kontaktadress
- * - 10 s timeout
- * - Upp till 3 försök med backoff
- */
 export async function fetchWithPolicy(url: string, options: FetchOptions = {}): Promise<Response> {
   const {
     timeoutMs = 10000,
@@ -150,7 +126,6 @@ export async function fetchWithPolicy(url: string, options: FetchOptions = {}): 
     try {
       const res = await executeAttempt(attempt);
 
-      // Vid rate limit eller serverfel kan retry göras om det finns försök kvar
       if (res.status === 429 || (res.status >= 500 && res.status < 600)) {
         if (attempt < maxRetries - 1) {
           const delay = backoffDelays[attempt] ?? 2000;

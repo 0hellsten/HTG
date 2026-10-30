@@ -192,7 +192,7 @@ export const HjalpScreen: React.FC<HjalpScreenProps> = ({ onBack }) => {
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto pb-16">
-      {/* Tillbakaknapp och rubrik */}
+      {}
       <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
         <button
           type="button"
@@ -214,7 +214,7 @@ export const HjalpScreen: React.FC<HjalpScreenProps> = ({ onBack }) => {
         </p>
       </div>
 
-      {/* Frågor och svar i lugna kort */}
+      {}
       <div className="space-y-3">
         {sections.map((sec, idx) => {
           const isOpen = openIndex === idx;
@@ -247,7 +247,7 @@ export const HjalpScreen: React.FC<HjalpScreenProps> = ({ onBack }) => {
         })}
       </div>
 
-      {/* Fotnot */}
+      {}
       <div className="pt-6 border-t border-slate-200 text-center text-slate-500 text-sm space-y-1">
         <div className="pt-3">
           <span className="text-[11px] font-mono tracking-widest text-slate-400 select-none block">

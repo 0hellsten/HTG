@@ -13,6 +13,8 @@ export interface SourceResult<T> {
 export interface FetchContext {
   forceRefresh?: boolean;
   signal?: AbortSignal;
+  trackId?: string;
+  raceId?: string;
 }
 
 export interface SourceAdapter<T> {

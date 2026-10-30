@@ -1,6 +1,3 @@
-// Autentisk svensk och internationell travsportselit (Varmblod del 3)
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { SeedHorse } from './elite-horses-varmblod.js';
 
 export const ELITE_VARMBLOD_PART3: SeedHorse[] = [

@@ -52,14 +52,14 @@ export const FormBackspegelnBlock: React.FC<FormBackspegelnBlockProps> = ({
           </div>
         ) : (
           <div>
-            {/* Mobilvy: Tydliga startkort (under 1024px) */}
+            {}
             <div className="lg:hidden space-y-3">
               {starts.map((s) => (
                 <MobilLoppKort key={s.id} item={s} />
               ))}
             </div>
 
-            {/* Laptopvy: Rymlig tabell (från 1024px) */}
+            {}
             <div className="hidden lg:block overflow-hidden border border-slate-200 rounded-xl bg-white">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -107,7 +107,7 @@ const MobilLoppKort: React.FC<{ item: HorsePastStart }> = ({ item }) => {
           </span>
         </div>
 
-        {/* Placering som tydlig bricka */}
+        {}
         <div
           className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold shrink-0 ${
             isWin

@@ -1,16 +1,13 @@
-// Delade typer för tips och expertrankingar
-// Stallbacken — HTG
-
 export interface TipItem {
   id: string;
   raceId?: string;
   startId?: string;
   trackName?: string;
-  provider: string; // T.ex. "Tips från Expressen" eller "Tips från Travronden"
-  author?: string; // T.ex. "Eskil Hellberg"
+  provider: string;
+  author?: string;
   title: string;
   summary?: string;
-  rank?: number; // 1:a, 2:a, 3:a etc.
+  rank?: number;
   horseNumber?: number;
   horseName?: string;
   publishedAt: string;

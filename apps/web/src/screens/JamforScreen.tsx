@@ -6,6 +6,7 @@ import {
   SourceStatus,
   HorseProfileResponse,
   HorseBatchResponse,
+  RaceOddsData,
 } from '@stallbacken/shared';
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
@@ -38,13 +39,12 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
   const [statusMessage, setStatusMessage] = useState<string>('Allt är färskt och uppdaterat.');
   const [showHelp, setShowHelp] = useState<boolean>(false);
 
-  // 1. Hämta grunddata för loppet och odds
   const fetchRaceAndOdds = async () => {
     setLoading(true);
     try {
       const [raceRes, oddsRes] = await Promise.all([
         apiFetch<{ race: Race; starts: Start[] }>(`/api/lopp/${raceId}`),
-        apiFetch<any>(`/api/lopp/${raceId}/odds`),
+        apiFetch<RaceOddsData | null>(`/api/lopp/${raceId}/odds`),
       ]);
 
       if (raceRes?.data) {
@@ -52,7 +52,6 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
         const starts: Start[] = raceRes.data.starts || [];
         setAllStarts(starts);
 
-        // Skapa oddsMap
         const newOddsMap: HorseOddsMap = {};
         if (oddsRes?.data?.odds) {
           for (const o of oddsRes.data.odds) {
@@ -65,7 +64,6 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
         }
         setOddsMap(newOddsMap);
 
-        // Om inga hästar skickades med, välj de tre mest streckade eller de tre första
         if (selectedIds.length === 0 && starts.length > 0) {
           const sorted = [...starts].sort((a, b) => {
             const stakeA = newOddsMap[a.startNumber]?.stakePercent || 0;
@@ -87,7 +85,6 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
     }
   };
 
-  // 2. Hämta profiler för de valda hästarna
   const fetchProfiles = async (ids: string[]) => {
     if (ids.length === 0) return;
     try {
@@ -113,7 +110,6 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
 
   useEffect(() => {
     if (selectedIds.length > 0) {
-      // Hämta bara de som saknas i cachen
       const missing = selectedIds.filter((id) => profiles[id] === undefined);
       if (missing.length > 0) {
         fetchProfiles(missing);
@@ -133,7 +129,6 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
     setSelectedIds(selectedIds.filter((id) => id !== horseId));
   };
 
-  // Filtrera fram de valda starterna i ordning efter startnummer
   const selectedStarts = allStarts
     .filter((s) => selectedIds.includes(s.horseId))
     .sort((a, b) => a.startNumber - b.startNumber);
@@ -145,7 +140,7 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-16">
-      {/* Tillbaka-knapp och rubrik */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <button
           type="button"
@@ -172,7 +167,7 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
 
       {!loading && race && (
         <div className="space-y-6">
-          {/* Rubrikblock */}
+          {}
           <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
             <div className="text-sm font-semibold text-amber-700 uppercase tracking-wider mb-1">
               {race.trackName || 'Bana'}
@@ -187,7 +182,7 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
               </span>
             </div>
 
-            {/* Hjälpruta: Så här läser du tabellen (hopfällbar) */}
+            {}
             <div className="mt-4 pt-3.5 border-t border-slate-100">
               <button
                 type="button"
@@ -228,7 +223,7 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
             </div>
           </div>
 
-          {/* Hästvaljare / Snabbknappar */}
+          {}
           <section className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h2 className="text-base font-bold text-slate-900">
@@ -241,7 +236,7 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
               </span>
             </div>
 
-            {/* Knappar för att lägga till övriga hästar i loppet */}
+            {}
             {availableStarts.length > 0 && selectedStarts.length < 6 && (
               <div className="flex flex-wrap gap-2 pt-1 border-t border-slate-100">
                 {availableStarts.map((start) => (
@@ -261,7 +256,7 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
             )}
           </section>
 
-          {/* Jämförelsetabell skyddad av felgräns */}
+          {}
           <BlockErrorBoundary
             fallbackTitle="Jämförelsetabellen saknas just nu"
             onRetry={() => fetchProfiles(selectedIds)}

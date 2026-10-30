@@ -27,7 +27,8 @@ export function mapSwedishTrackCondition(raw?: string): string | undefined {
 export function mapSwedishSulky(raw?: string): string | undefined {
   if (!raw) return undefined;
   const lower = raw.toLowerCase();
-  if (lower.includes('amerikansk') || lower === 'american' || lower === 'custom') return 'Amerikansk sulky';
+  if (lower.includes('amerikansk') || lower === 'american' || lower === 'custom')
+    return 'Amerikansk sulky';
   if (lower.includes('vanlig') || lower === 'regular' || lower === 'standard') return 'Vanlig vagn';
   return raw;
 }
@@ -59,9 +60,7 @@ export function saveCalendarToDb(
     if (!biggestGame) {
       for (const [gameType, gameList] of Object.entries(games)) {
         if (
-          gameList.some(
-            (g) => g.trackId === track.id || (g.tracks && g.tracks.includes(track.id))
-          )
+          gameList.some((g) => g.trackId === track.id || (g.tracks && g.tracks.includes(track.id)))
         ) {
           biggestGame = gameType;
           break;
@@ -251,8 +250,12 @@ function saveEquipage(
   const winsCount = lifeStats?.placement ? lifeStats.placement['1'] : undefined;
   const secondsCount = lifeStats?.placement ? lifeStats.placement['2'] : undefined;
   const thirdsCount = lifeStats?.placement ? lifeStats.placement['3'] : undefined;
-  const winPercent = lifeStats?.winPercentage ? Math.round(lifeStats.winPercentage / 100) : undefined;
-  const placePercent = lifeStats?.placePercentage ? Math.round(lifeStats.placePercentage / 100) : undefined;
+  const winPercent = lifeStats?.winPercentage
+    ? Math.round(lifeStats.winPercentage / 100)
+    : undefined;
+  const placePercent = lifeStats?.placePercentage
+    ? Math.round(lifeStats.placePercentage / 100)
+    : undefined;
   const earningsPerStart = lifeStats?.earningsPerStart
     ? Math.round(lifeStats.earningsPerStart / 100)
     : undefined;

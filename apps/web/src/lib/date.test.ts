@@ -3,7 +3,6 @@ import { formatSwedishDate, formatSwedishTime, isEvening } from './date';
 
 describe('Svensk datumformatering (Fas 1)', () => {
   it('formaterar datum enligt svensk modell (vd d mån)', () => {
-    // 2026-10-29 är en torsdag
     const testDate = new Date(2026, 9, 29, 14, 30);
     const formatted = formatSwedishDate(testDate);
     expect(formatted).toBe('tor 29 okt');

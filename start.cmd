@@ -1,7 +1,7 @@
 @echo off
-title HTG - Hellstens Trav och Galopp
+title Stallbacken
 echo ===================================================
-echo   Startar HTG (Hellstens Trav och Galopp)...
+echo   Startar Stallbacken...
 echo ===================================================
 echo.
 cd /d "%~dp0"
@@ -12,6 +12,6 @@ if not exist "node_modules" (
   call pnpm install
 )
 
-start "" http://localhost:5173
+start "" http://localhost:5180
 call pnpm dev
 pause

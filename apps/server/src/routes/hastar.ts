@@ -1,6 +1,3 @@
-// Fastify API-rutter för hästar och historik
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { FastifyInstance } from 'fastify';
 import {
   ApiResponse,
@@ -17,7 +14,6 @@ import { getDb } from '../db/connection.js';
 import { logger } from '../lib/logger.js';
 
 export const hastarRoutes = async (fastify: FastifyInstance): Promise<void> => {
-  // Hästrankings och topplistor
   fastify.get<{
     Querystring: { kategori?: string; limit?: string };
   }>('/api/hastar/ranking', async (request, reply) => {
@@ -64,7 +60,6 @@ export const hastarRoutes = async (fastify: FastifyInstance): Promise<void> => {
     }
   });
 
-  // Sök hästar i databasen
   fastify.get<{
     Querystring: { q?: string; limit?: string };
   }>('/api/hastar/sok', async (request, reply) => {
@@ -98,7 +93,6 @@ export const hastarRoutes = async (fastify: FastifyInstance): Promise<void> => {
     }
   });
 
-  // Hämta fullständig profil och historik för en häst
   fastify.get<{
     Params: { horseId: string };
     Querystring: { refresh?: string; simulateDown?: string };
@@ -109,7 +103,6 @@ export const hastarRoutes = async (fastify: FastifyInstance): Promise<void> => {
 
     try {
       if (simulateDown) {
-        // Simulerat fel för hästkällan / historiken vid test av degradering
         const response: ApiResponse<HorseProfileResponse | null> = {
           data: null,
           status: 'failed',
@@ -142,7 +135,6 @@ export const hastarRoutes = async (fastify: FastifyInstance): Promise<void> => {
     }
   });
 
-  // Batch-hämtning för jämförvyn ("Ställ dem mot varandra")
   fastify.post<{
     Body: { horseIds?: string[]; simulateDown?: boolean };
     Querystring: { refresh?: string; simulateDown?: string };

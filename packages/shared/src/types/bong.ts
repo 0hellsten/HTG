@@ -1,31 +1,28 @@
-// Datamodell och typer för Bong-maskinen (V75 och V86)
-// Högpresterande kalkylator, reduceringsmotor och kuponggenerator
-
 export type BongGameType = 'V75' | 'V86';
 
 export type HorseRank = 'A' | 'B' | 'C' | 'D' | 'Unranked';
 
 export interface BongHorseInput {
   id: string;
-  startNumber: number; // 1-16
+  startNumber: number;
   name?: string;
   scratched?: boolean;
-  betDistribution: number; // Streckprocent (0.0001 - 1.00)
-  winOdds?: number; // Vinnarodds för värdeberäkning
+  betDistribution: number;
+  winOdds?: number;
   driverName?: string;
   trainerName?: string;
   postPosition?: number;
-  shoeFront?: boolean; // false = barfota fram, true = skor
-  shoeBack?: boolean; // false = barfota bak, true = skor
-  shoeChanged?: boolean; // barfotaändring/skoryck
-  sulkyType?: 'american' | 'regular'; // vagn
+  shoeFront?: boolean;
+  shoeBack?: boolean;
+  shoeChanged?: boolean;
+  sulkyType?: 'american' | 'regular';
   earningsTotal?: number;
   record?: string;
   driverWinPercentage?: number;
 }
 
 export interface BongRaceLeg {
-  legIndex: number; // 0..N-1 eller 1..N
+  legIndex: number;
   raceNumber?: number;
   trackName?: string;
   raceName?: string;
@@ -37,8 +34,8 @@ export interface BongRaceLeg {
 
 export interface BongRaceDayData {
   gameType: BongGameType;
-  turnover: number; // Aktuell omsättning i SEK
-  jackpotPool?: number; // Extra jackpot adderad till högsta vinstgruppen i SEK
+  turnover: number;
+  jackpotPool?: number;
   trackName?: string;
   date?: string;
   startTime?: string;
@@ -47,9 +44,9 @@ export interface BongRaceDayData {
 
 export interface LegSelection {
   legIndex: number;
-  selectedHorseIds: string[]; // Valda häst-id:n eller startnummer
-  ranks?: Record<string, HorseRank>; // Häst-ID -> Rank
-  reserves?: string[] | 'AUTO'; // Valda reserv-id:n eller 'AUTO'
+  selectedHorseIds: string[];
+  ranks?: Record<string, HorseRank>;
+  reserves?: string[] | 'AUTO';
 }
 
 export interface AbcdCondition {
@@ -67,18 +64,18 @@ export interface KravGruppCondition {
   id: string;
   name?: string;
   horses: KravGruppHorseRef[];
-  min: number; // Minst X av dessa hästar måste ingå
-  max?: number; // Högst Y av dessa hästar får ingå
+  min: number;
+  max?: number;
 }
 
 export interface StrecksummaFilter {
-  minSum?: number; // T.ex. 150 (%)
-  maxSum?: number; // T.ex. 350 (%)
+  minSum?: number;
+  maxSum?: number;
 }
 
 export interface PayoutFilter {
-  minPayout?: number; // Minsta estimerade utdelning i kr
-  maxPayout?: number; // Högsta estimerade utdelning i kr
+  minPayout?: number;
+  maxPayout?: number;
 }
 
 export interface ReductionConditions {
@@ -89,9 +86,9 @@ export interface ReductionConditions {
 }
 
 export interface CouponSettings {
-  onlyTopPool?: boolean; // V7 eller V8 (endast högsta vinstgruppen för 2.5x utdelning)
-  flerbongMultiplier?: number; // Multiplikator (1, 2, 5, 10...)
-  sharesCount?: number; // Antal andelar i bolagssystem (default 1)
+  onlyTopPool?: boolean;
+  flerbongMultiplier?: number;
+  sharesCount?: number;
 }
 
 export interface CouponSelection {
@@ -101,10 +98,10 @@ export interface CouponSelection {
 }
 
 export interface PayoutHistogram {
-  under1k: number; // < 1 000 kr
-  from1kTo10k: number; // 1 000 - 10 000 kr
-  from10kTo100k: number; // 10 000 - 100 000 kr
-  over100k: number; // > 100 000 kr
+  under1k: number;
+  from1kTo10k: number;
+  from10kTo100k: number;
+  over100k: number;
 }
 
 export interface PayoutDistribution {
@@ -121,8 +118,8 @@ export interface HorseValueMetric {
   betDistribution: number;
   winOdds: number;
   implicitProbability: number;
-  valueRatio: number; // implicitProbability / betDistribution
-  assessment: 'overvalued' | 'fair' | 'undervalued'; // Överstreckad, neutral, understreckad
+  valueRatio: number;
+  assessment: 'overvalued' | 'fair' | 'undervalued';
 }
 
 export interface ReducedSingleRow {
@@ -133,20 +130,20 @@ export interface ReducedSingleRow {
     rank: HorseRank;
     betDistribution: number;
   }>;
-  strecksumma: number; // Summa i procent (t.ex. 225.5)
-  productDistribution: number; // Produkt av streckprocent (t.ex. 0.00012)
-  estimatedPayout: number; // Estimerad utdelning i högsta vinstgruppen i SEK
+  strecksumma: number;
+  productDistribution: number;
+  estimatedPayout: number;
 }
 
 export interface BongCalculationResult {
   gameType: BongGameType;
   legsCount: number;
-  mathRows: number; // Antal matematiska rader före reducering
-  reducedRows: number; // Antal rader efter reducering
-  reductionPercentage: number; // Reduceringsgrad i % (0 - 100)
-  totalCost: number; // Total kostnad i SEK
-  costPerShare: number; // Kostnad per andel i SEK
-  radpris: number; // Radpris i SEK (0.50 för V75, 0.25 för V86)
+  mathRows: number;
+  reducedRows: number;
+  reductionPercentage: number;
+  totalCost: number;
+  costPerShare: number;
+  radpris: number;
   flerbongMultiplier: number;
   sharesCount: number;
   onlyTopPool: boolean;

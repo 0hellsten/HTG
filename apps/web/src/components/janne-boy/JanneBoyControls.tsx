@@ -30,7 +30,7 @@ export const JanneBoyControls: React.FC<JanneBoyControlsProps> = ({
 }) => {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-6">
-      {/* 1. Spelformsinformation och budget */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
         <div>
           <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1.5">
@@ -75,7 +75,7 @@ export const JanneBoyControls: React.FC<JanneBoyControlsProps> = ({
         </div>
       </div>
 
-      {/* 2. Välj Jannes strategi */}
+      {}
       <div>
         <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2.5">
           Hur vill du att Janne tänker idag?
@@ -117,7 +117,7 @@ export const JanneBoyControls: React.FC<JanneBoyControlsProps> = ({
         </div>
       </div>
 
-      {/* 3. Genereringsknapp */}
+      {}
       <div className="pt-2">
         <button
           type="button"

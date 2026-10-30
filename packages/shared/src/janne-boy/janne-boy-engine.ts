@@ -1,6 +1,3 @@
-// Janne Boy — Superintelligent travkalkylator och kupongmotor
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { BongRaceDayData, BongRaceLeg, BongHorseInput } from '../types/bong.js';
 import {
   JanneBoyConfig,
@@ -27,18 +24,14 @@ export class JanneBoyEngine {
 
     const legs = raceDay.races;
 
-    // 1. Djup travkunskaps- och sannolikhetsanalys per häst i alla avdelningar
     const scoredLegs = legs.map((leg) => this.scoreHorsesInLeg(leg, config));
 
-    // 2. Beräkna avdelningens öppenhet (hur mycket loppet kräver gardering)
     const legOpenness = scoredLegs.map((scoredList, idx) =>
       this.calculateLegOpenness(scoredList, idx, config)
     );
 
-    // 3. Kombinatorisk budgetoptimerare
     const allocation = this.optimizeAllocation(legOpenness, targetRows, scoredLegs, config);
 
-    // 4. Bygg avdelningsförslag med hästval och omsorgsfulla motiveringar
     const legSuggestions: JanneBoyLegSuggestion[] = legs.map((leg, idx) => {
       const count = allocation[idx] || 1;
       const scoredList = scoredLegs[idx];
@@ -60,7 +53,6 @@ export class JanneBoyEngine {
       };
     });
 
-    // 5. Beräkna rader, kostnad och nyckeltal
     const totalRows = legSuggestions.reduce((acc, leg) => acc * leg.selectedHorses.length, 1);
     const costSek = totalRows * rowPrice;
     const spikarCount = legSuggestions.filter((l) => l.isSpik).length;
@@ -98,7 +90,6 @@ export class JanneBoyEngine {
 
   private scoreHorsesInLeg(leg: BongRaceLeg, config: JanneBoyConfig): ScoredHorse[] {
     const available = leg.horses.filter((h) => !h.scratched);
-    // Hitta andrahästen för att bedöma marginal till spik
     const sortedByProb = [...available].sort(
       (a, b) => (b.betDistribution || 0) - (a.betDistribution || 0)
     );
@@ -142,11 +133,9 @@ export class JanneBoyEngine {
             break;
         }
 
-        // Bonus för manuellt låsta hästar
         const lockedInLeg = config.lockedHorses?.[leg.legIndex] || [];
         if (lockedInLeg.includes(h.id)) score += 5000;
 
-        // Uteslutna hästar
         const excludedInLeg = config.excludedHorses?.[leg.legIndex] || [];
         if (excludedInLeg.includes(h.id)) score = -500;
 
@@ -167,7 +156,6 @@ export class JanneBoyEngine {
     const top1 = scoredList[0];
     const top2 = scoredList[1];
 
-    // Om top1 är en omsorgsfullt verifierad solid spik:
     if (top1.analysis.isSolidSpik && config.strategy !== 'miljondrag') {
       return 0.05;
     }
@@ -228,7 +216,6 @@ export class JanneBoyEngine {
         const currentCount = allocation[i];
         if (currentCount >= scoredLegs[i].length) continue;
 
-        // Om användaren manuellt låst en spik i detta lopp, låt det aldrig växa
         if (userSpikIndices.includes(i)) continue;
 
         if (spikIndices.includes(i) && currentCount === 1) {

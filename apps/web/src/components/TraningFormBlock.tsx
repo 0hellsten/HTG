@@ -22,7 +22,6 @@ export const TraningFormBlock: React.FC<TraningFormBlockProps> = ({
   statusMessage,
   onRetry,
 }) => {
-  // Formkurva baserad på senaste 5 starterna
   const lastFive = pastStarts.slice(0, 5);
 
   return (
@@ -43,7 +42,7 @@ export const TraningFormBlock: React.FC<TraningFormBlockProps> = ({
           />
         </div>
 
-        {/* Formkurva */}
+        {}
         <div className="space-y-2">
           <span className="text-xs font-bold text-slate-600 uppercase tracking-wider block">
             Formkurva (senaste 5 loppen)
@@ -81,7 +80,7 @@ export const TraningFormBlock: React.FC<TraningFormBlockProps> = ({
           )}
         </div>
 
-        {/* Tränarens och kuskens form */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-100">
           <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-100">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-1">
@@ -113,7 +112,7 @@ export const TraningFormBlock: React.FC<TraningFormBlockProps> = ({
           </div>
         </div>
 
-        {/* Kvallopp & Träningsnoteringar */}
+        {}
         <div className="pt-3 border-t border-slate-100 space-y-2">
           <span className="text-xs font-bold text-slate-600 uppercase tracking-wider block">
             Kvallopp & träningsnoteringar

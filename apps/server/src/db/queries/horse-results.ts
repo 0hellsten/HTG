@@ -1,6 +1,3 @@
-// Databasfrågor för hästars historiska lopp och spårstatistik
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import Database from 'better-sqlite3';
 import { HorsePastStart, TrackPositionStat } from '@stallbacken/shared';
 

@@ -41,7 +41,7 @@ export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({
 
   return (
     <div className="space-y-3">
-      {/* Tidsstämpel / info för odds i startlistan */}
+      {}
       <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 px-1">
         <span>
           {isOddsFailed
@@ -55,7 +55,7 @@ export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({
         </span>
       </div>
 
-      {/* Mobil: Tydliga startkort (visas under 1024px) */}
+      {}
       <div className="lg:hidden space-y-3">
         {starts.map((start) => (
           <MobilStartKort
@@ -70,7 +70,7 @@ export const StartlistaTabell: React.FC<StartlistaTabellProps> = ({
         ))}
       </div>
 
-      {/* Laptop: Lugn tabell (visas från 1024px) */}
+      {}
       <div className="hidden lg:block overflow-hidden border border-slate-200 rounded-xl bg-white shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>

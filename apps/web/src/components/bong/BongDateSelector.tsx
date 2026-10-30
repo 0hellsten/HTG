@@ -1,6 +1,3 @@
-// Dragbar datumväljare med kommande travtävlingar för Bong-maskinen
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import React, { useRef, useState, MouseEvent } from 'react';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { BongCompetition } from './competitions';
@@ -51,7 +48,7 @@ export const BongDateSelector: React.FC<BongDateSelectorProps> = ({
 
   return (
     <div className="relative group/selector">
-      {/* Scroll-knappar för dator */}
+      {}
       <button
         type="button"
         onClick={() => scrollBy(-240)}
@@ -70,7 +67,7 @@ export const BongDateSelector: React.FC<BongDateSelectorProps> = ({
         <ChevronRight className="w-5 h-5" />
       </button>
 
-      {/* Horisontellt dragbart band */}
+      {}
       <div
         ref={scrollRef}
         onMouseDown={handleMouseDown}
@@ -85,9 +82,6 @@ export const BongDateSelector: React.FC<BongDateSelectorProps> = ({
           const isSelected = comp.dateIso === selectedDateIso;
           const isToday = comp.isToday;
 
-          // Färgbelysning enligt instruktion:
-          // Dagens datum belyses med en färg (smaragdgrön accent)
-          // Valt datum får en egen distinkt färg (bärnstensgul)
           let cardStyle =
             'bg-white text-slate-800 border-slate-300 hover:bg-slate-100 hover:border-slate-400 shadow-xs';
 

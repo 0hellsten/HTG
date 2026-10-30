@@ -5,6 +5,54 @@ import { logger } from '../lib/logger.js';
 import { mapSwedishSulky } from '../adapters/atg-storage.js';
 import { formatAtgKmTime } from '../adapters/atg-horse-storage.js';
 
+interface RawPoolInfo {
+  odds?: number | null;
+  minOdds?: number | null;
+  maxOdds?: number | null;
+  betDistribution?: number | null;
+}
+
+interface RawStartItem {
+  id?: string;
+  number: number;
+  postPosition?: number;
+  distance?: number;
+  pools?: Record<string, RawPoolInfo>;
+  horse?: {
+    id?: string | number;
+    name?: string;
+    money?: number;
+    record?: { time?: { minutes?: number; seconds?: number; tenths?: number; code?: string }; startMethod?: string };
+    sulky?: { type?: { text?: string } };
+    trainer?: { name?: string; firstName?: string; lastName?: string };
+    shoes?: { front?: boolean | { hasShoe?: boolean }; back?: boolean | { hasShoe?: boolean } };
+    statistics?: { life?: { earnings?: number } };
+  };
+  sulky?: { type?: { text?: string } };
+  driver?: { name?: string; firstName?: string; lastName?: string };
+  scratched?: boolean;
+}
+
+interface RawRaceItem {
+  id: string;
+  number: number;
+  name?: string;
+  startTime?: string;
+  distance?: number;
+  startMethod?: 'volt' | 'auto';
+  track?: { name?: string };
+  starts?: RawStartItem[];
+}
+
+interface RawGameResponse {
+  id: string;
+  type?: string;
+  turnover?: number;
+  jackpotAmount?: number;
+  startTime?: string;
+  races?: RawRaceItem[];
+}
+
 export const janneBoyRoutes: FastifyPluginAsync = async (app) => {
   const baseUrl = 'https://www.atg.se/services/racinginfo/v1/api';
 
@@ -22,12 +70,14 @@ export const janneBoyRoutes: FastifyPluginAsync = async (app) => {
           const dateStr = d.toISOString().split('T')[0];
           const calRes = await fetchWithPolicy(`${baseUrl}/calendar/day/${dateStr}`);
           if (!calRes.ok) continue;
-          const calJson = (await calRes.json()) as any;
+          const calJson = (await calRes.json()) as { games?: Record<string, Array<{ id?: string }>> };
           const targetKey = gameType === 'V86' ? 'V86' : 'V75';
           const found =
             calJson.games?.[targetKey]?.[0] ||
             (gameType === 'V75'
-              ? calJson.games?.['V85']?.[0] || calJson.games?.['GS75']?.[0] || calJson.games?.['V64']?.[0]
+              ? calJson.games?.['V85']?.[0] ||
+                calJson.games?.['GS75']?.[0] ||
+                calJson.games?.['V64']?.[0]
               : undefined);
           if (found?.id) {
             targetGameId = found.id;
@@ -39,9 +89,9 @@ export const janneBoyRoutes: FastifyPluginAsync = async (app) => {
       if (targetGameId) {
         const gameRes = await fetchWithPolicy(`${baseUrl}/games/${targetGameId}`);
         if (gameRes.ok) {
-          const gJson = (await gameRes.json()) as any;
-          const races: BongRaceLeg[] = (gJson.races || []).map((r: any, legIdx: number) => {
-            const horses: BongHorseInput[] = (r.starts || []).map((s: any) => {
+          const gJson = (await gameRes.json()) as RawGameResponse;
+          const races: BongRaceLeg[] = (gJson.races || []).map((r: RawRaceItem, legIdx: number) => {
+            const horses: BongHorseInput[] = (r.starts || []).map((s: RawStartItem) => {
               let betDistribution = 0.05;
               if (s.pools) {
                 for (const [poolKey, poolVal] of Object.entries(s.pools)) {
@@ -49,9 +99,9 @@ export const janneBoyRoutes: FastifyPluginAsync = async (app) => {
                     poolKey !== 'vinnare' &&
                     poolKey !== 'plats' &&
                     poolVal &&
-                    typeof (poolVal as any).betDistribution === 'number'
+                    typeof poolVal.betDistribution === 'number'
                   ) {
-                    betDistribution = Number(((poolVal as any).betDistribution / 10000).toFixed(4));
+                    betDistribution = Number((poolVal.betDistribution / 10000).toFixed(4));
                     break;
                   }
                 }
@@ -66,7 +116,9 @@ export const janneBoyRoutes: FastifyPluginAsync = async (app) => {
                   : undefined;
 
               const lifeStats = s.horse?.statistics?.life;
-              const earningsTotal = lifeStats?.earnings ? Math.round(lifeStats.earnings / 100) : s.horse?.money || 0;
+              const earningsTotal = lifeStats?.earnings
+                ? Math.round(lifeStats.earnings / 100)
+                : s.horse?.money || 0;
 
               let recordStr: string | undefined;
               if (s.horse?.record?.time) {
@@ -74,7 +126,8 @@ export const janneBoyRoutes: FastifyPluginAsync = async (app) => {
               }
 
               const sulkyRaw = s.horse?.sulky?.type?.text || s.sulky?.type?.text;
-              const sulkyType = mapSwedishSulky(sulkyRaw) === 'Amerikansk sulky' ? 'american' : 'regular';
+              const sulkyType =
+                mapSwedishSulky(sulkyRaw) === 'Amerikansk sulky' ? 'american' : 'regular';
 
               const trainer = s.horse?.trainer;
               const trainerName = trainer
@@ -98,7 +151,9 @@ export const janneBoyRoutes: FastifyPluginAsync = async (app) => {
                 winOdds,
                 shoeFront: s.horse?.shoes?.front?.hasShoe,
                 shoeBack: s.horse?.shoes?.back?.hasShoe,
-                shoeChanged: Boolean(s.horse?.shoes?.front?.changed || s.horse?.shoes?.back?.changed),
+                shoeChanged: Boolean(
+                  s.horse?.shoes?.front?.changed || s.horse?.shoes?.back?.changed
+                ),
                 sulkyType,
                 earningsTotal,
                 record: recordStr,
@@ -110,7 +165,9 @@ export const janneBoyRoutes: FastifyPluginAsync = async (app) => {
               raceNumber: r.number,
               trackName: r.track?.name || 'Bana',
               raceName: r.name || `Avdelning ${legIdx + 1}`,
-              startTime: r.scheduledStartTime ? r.scheduledStartTime.slice(11, 16) : r.startTime?.slice(11, 16),
+              startTime: r.scheduledStartTime
+                ? r.scheduledStartTime.slice(11, 16)
+                : r.startTime?.slice(11, 16),
               distance: r.distance || 2140,
               startMethod: r.startMethod === 'volt' || r.startMethod === 'volte' ? 'volt' : 'auto',
               horses,
@@ -122,7 +179,9 @@ export const janneBoyRoutes: FastifyPluginAsync = async (app) => {
             const trackNames = Array.from(new Set(races.map((leg) => leg.trackName))).join(' / ');
             const turnoverPool = gJson.pools?.[targetGameId.split('_')[0]];
             const turnover = turnoverPool?.turnover ? Math.round(turnoverPool.turnover / 100) : 0;
-            const jackpotPool = turnoverPool?.jackpotAmount ? Math.round(turnoverPool.jackpotAmount / 100) : 0;
+            const jackpotPool = turnoverPool?.jackpotAmount
+              ? Math.round(turnoverPool.jackpotAmount / 100)
+              : 0;
 
             const liveRaceDay: BongRaceDayData = {
               gameType,

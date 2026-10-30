@@ -23,7 +23,6 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
   const [results, setResults] = useState<HorseDetail[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
 
-  // Sökhistorik från localStorage
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       try {
@@ -36,12 +35,10 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
     return [];
   });
 
-  // Rankinglista state
   const [rankingCategory, setRankingCategory] = useState<HorseRankingCategory>('elit');
   const [rankingItems, setRankingItems] = useState<HorseRankingItem[]>([]);
   const [rankingLoading, setRankingLoading] = useState(false);
 
-  // Spara historik i localStorage
   const saveSearchTerm = (term: string) => {
     const trimmed = term.trim();
     if (!trimmed || trimmed.length < 2) return;
@@ -72,13 +69,14 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
     } catch {}
   };
 
-  // Hämta rankinglistan
   useEffect(() => {
     let isCancelled = false;
     const fetchRankings = async () => {
       setRankingLoading(true);
       try {
-        const json: ApiResponse<HorseRankingsResponse> = await apiFetch<HorseRankingsResponse>(`/api/hastar/ranking?kategori=${rankingCategory}`);
+        const json: ApiResponse<HorseRankingsResponse> = await apiFetch<HorseRankingsResponse>(
+          `/api/hastar/ranking?kategori=${rankingCategory}`
+        );
         if (!isCancelled && json?.data?.items) {
           setRankingItems(json.data.items);
         }
@@ -95,7 +93,6 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
     };
   }, [rankingCategory]);
 
-  // Sökning med debounce
   useEffect(() => {
     const trimmed = query.trim();
     if (!trimmed) {
@@ -107,7 +104,9 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
     const timer = setTimeout(async () => {
       setSearchLoading(true);
       try {
-        const json: ApiResponse<HorseDetail[]> = await apiFetch<HorseDetail[]>(`/api/hastar/sok?q=${encodeURIComponent(trimmed)}`);
+        const json: ApiResponse<HorseDetail[]> = await apiFetch<HorseDetail[]>(
+          `/api/hastar/sok?q=${encodeURIComponent(trimmed)}`
+        );
         setResults(json?.data || []);
       } catch {
         setResults([]);
@@ -128,7 +127,7 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-16">
-      {/* Rubrik */}
+      {}
       <div className="border-b border-slate-200 pb-4">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           Hästar
@@ -138,7 +137,7 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
         </p>
       </div>
 
-      {/* Sökruta */}
+      {}
       <div className="space-y-2">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -163,7 +162,7 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
           )}
         </div>
 
-        {/* Tidigare sökningar (historik) */}
+        {}
         <HastarSokHistorik
           searches={recentSearches}
           onSelectSearch={(term) => setQuery(term)}
@@ -172,7 +171,7 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
         />
       </div>
 
-      {/* Visning vid sökning eller ranking */}
+      {}
       {isSearching ? (
         searchLoading ? (
           <div className="py-12 text-center text-slate-500 text-base">Söker hästar...</div>
@@ -223,7 +222,6 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
           </div>
         )
       ) : (
-        /* Rankinglista när sökrutan är tom */
         <HastarRankingLista
           category={rankingCategory}
           items={rankingItems}

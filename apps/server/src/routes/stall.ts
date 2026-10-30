@@ -80,9 +80,7 @@ export const stallRoutes: FastifyPluginAsync = async (app) => {
               const mm = String(d.getMinutes()).padStart(2, '0');
               formattedTime = `${hh}:${mm}`;
             }
-          } catch {
-            // Ignorera
-          }
+          } catch {}
         }
 
         return {

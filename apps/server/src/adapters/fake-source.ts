@@ -71,9 +71,6 @@ export class FakeSourceAdapter implements SourceAdapter<unknown> {
     this.ageSeconds = 0;
   }
 
-  /**
-   * Hämtar testdata. Kastar aldrig uppåt — returnerar SourceResult.
-   */
   async fetch(_ctx?: FetchContext): Promise<SourceResult<unknown>> {
     try {
       if (this.simulateThrow) {
@@ -111,7 +108,7 @@ export class FakeSourceAdapter implements SourceAdapter<unknown> {
           status: 'stale',
           data: this.mockData,
           fetchedAt,
-          ageSeconds: this.ageSeconds || 120, // standard 2 minuter gammalt
+          ageSeconds: this.ageSeconds || 120,
           message: this.customMessage || 'Uppdaterat för 2 minuter sedan',
         };
       }
@@ -125,7 +122,6 @@ export class FakeSourceAdapter implements SourceAdapter<unknown> {
         message: this.customMessage || '',
       };
     } catch (err) {
-      // En adapter fångar allt och kastar aldrig uppåt
       return {
         sourceId: this.id,
         status: 'failed',

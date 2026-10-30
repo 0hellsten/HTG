@@ -1,10 +1,6 @@
-// Kallblodseliten och historiska svenska ikoner
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { SeedHorse } from './elite-horses-varmblod.js';
 
 export const ELITE_KALLBLOD_OCH_IKONER: SeedHorse[] = [
-  // --- KALLBLODSELITEN ---
   {
     id: 'h_jarvsofaks',
     name: 'Järvsöfaks',
@@ -153,7 +149,6 @@ export const ELITE_KALLBLOD_OCH_IKONER: SeedHorse[] = [
     record_volt: '1.21,1',
   },
 
-  // --- SVENSKA OCH INTERNATIONELLA IKONER ---
   {
     id: 'h_ina_scot',
     name: 'Ina Scot',

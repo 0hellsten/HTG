@@ -1,9 +1,5 @@
 import React from 'react';
 
-/**
- * Skelettkort för dagens omgång (IdagScreen).
- * Lugna, pulserande block som speglar ban-kortens struktur under hämtning.
- */
 export const IdagSkelett: React.FC = () => {
   return (
     <div className="space-y-6 animate-pulse" aria-label="Laddar dagens banor">
@@ -12,7 +8,7 @@ export const IdagSkelett: React.FC = () => {
           key={i}
           className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4"
         >
-          {/* Banans rubrik och info */}
+          {}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
             <div className="space-y-2">
               <div className="flex items-center gap-2.5">
@@ -24,7 +20,7 @@ export const IdagSkelett: React.FC = () => {
             <div className="h-8 w-8 bg-slate-200 rounded-full" />
           </div>
 
-          {/* Lopprutor i banan */}
+          {}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
             {[1, 2, 3, 4].map((j) => (
               <div
@@ -45,14 +41,10 @@ export const IdagSkelett: React.FC = () => {
   );
 };
 
-/**
- * Skelettkort för loppkortet (LoppScreen).
- * Matchar lopphuvud och ekipage i startlistan.
- */
 export const LoppSkelett: React.FC = () => {
   return (
     <div className="space-y-6 animate-pulse" aria-label="Laddar loppkort och startlista">
-      {/* Lopphuvud */}
+      {}
       <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-3">
         <div className="h-4 w-24 bg-amber-200/60 rounded" />
         <div className="h-8 w-64 bg-slate-200 rounded-md" />
@@ -60,14 +52,14 @@ export const LoppSkelett: React.FC = () => {
         <div className="h-4 w-80 bg-slate-200 rounded pt-2" />
       </div>
 
-      {/* Startlista skelett */}
+      {}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="h-6 w-32 bg-slate-200 rounded" />
           <div className="h-4 w-20 bg-slate-200 rounded" />
         </div>
 
-        {/* Startkort / rader */}
+        {}
         <div className="space-y-2.5">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div

@@ -9,9 +9,7 @@ export function saveLastSyncTime(date: Date = new Date()): void {
     if (typeof window !== 'undefined' && window.localStorage) {
       window.localStorage.setItem(LAST_SYNC_KEY, date.toISOString());
     }
-  } catch {
-    // Ignorera
-  }
+  } catch {}
 }
 
 export function getLastSyncTime(): Date | null {
@@ -23,9 +21,7 @@ export function getLastSyncTime(): Date | null {
         if (!isNaN(d.getTime())) return d;
       }
     }
-  } catch {
-    // Ignorera
-  }
+  } catch {}
   return null;
 }
 
@@ -57,7 +53,6 @@ export const OfflineRemsa: React.FC = () => {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Initial synk-tid
     const saved = getLastSyncTime();
     if (!saved) {
       saveLastSyncTime(new Date());

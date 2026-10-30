@@ -1,6 +1,3 @@
-// Autentisk svensk och internationell travsportselit (Varmblod del 1)
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 export interface SeedHorse {
   id: string;
   name: string;

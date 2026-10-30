@@ -29,7 +29,7 @@ export const HastarRankingLista: React.FC<HastarRankingListaProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      {/* Flikrad för rankingkategorier */}
+      {}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none" role="tablist">
         {CATEGORIES.map((cat) => {
           const isActive = category === cat.id;
@@ -52,7 +52,7 @@ export const HastarRankingLista: React.FC<HastarRankingListaProps> = ({
         })}
       </div>
 
-      {/* Innehåll */}
+      {}
       {loading ? (
         <div className="py-12 text-center text-slate-500 text-base">Hämtar ranking...</div>
       ) : items.length === 0 ? (
@@ -80,7 +80,7 @@ export const HastarRankingLista: React.FC<HastarRankingListaProps> = ({
                   className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors text-left group cursor-pointer"
                 >
                   <div className="flex items-center gap-3.5 min-w-0 flex-1 mr-3">
-                    {/* Rankningsnummer */}
+                    {}
                     <div
                       className={`w-8 h-8 rounded-lg flex items-center justify-center font-extrabold text-sm shrink-0 ${
                         isGold

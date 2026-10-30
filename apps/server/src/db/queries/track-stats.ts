@@ -1,6 +1,3 @@
-// Beräkning av härledd banstatistik och hämtning av banprofiler
-// Stallbacken — HTG
-
 import Database from 'better-sqlite3';
 import { TrackProfile, TrackStats, PostPositionStat, CommonWinningTime } from '@stallbacken/shared';
 
@@ -18,9 +15,6 @@ interface TrackRow {
   lon: number | null;
 }
 
-/**
- * Hämtar fullständig banprofil för en given bana.
- */
 export function getTrackProfile(db: Database.Database, trackId: string): TrackProfile | null {
   const row = db.prepare('SELECT * FROM tracks WHERE id = ?').get(trackId) as TrackRow | undefined;
 
@@ -41,9 +35,6 @@ export function getTrackProfile(db: Database.Database, trackId: string): TrackPr
   };
 }
 
-/**
- * Hämtar samtliga banor i systemet sorterade alfabetiskt.
- */
 export function getAllTrackProfiles(db: Database.Database): TrackProfile[] {
   const rows = db.prepare('SELECT * FROM tracks ORDER BY name ASC').all() as TrackRow[];
 
@@ -68,19 +59,10 @@ interface StatRow {
   total_wins: number;
 }
 
-/**
- * Beräknar banstatistik ur sparad historik:
- * - "Så brukar spåren gå" (vinstprocent per startspår, volt och auto var för sig)
- * - "Leder man, vinner man?" (vinstprocent för hästen i ledningen / innerspår)
- * - Vanliga vinnartider
- * - Underlag: antal lopp statistiken faktiskt bygger på
- */
 export function calculateTrackStats(db: Database.Database, trackId: string): TrackStats {
   const track = getTrackProfile(db, trackId);
   const trackName = track?.name || 'Okänd bana';
 
-  // Räkna antal lopp och starter för denna bana ur horse_results och starts
-  // 1. Spårstatistik för autostart ur horse_results
   const autoRows = db
     .prepare(
       `
@@ -99,7 +81,6 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
     )
     .all(trackName, trackId) as StatRow[];
 
-  // 2. Spårstatistik för voltstart ur horse_results
   const voltRows = db
     .prepare(
       `
@@ -118,7 +99,6 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
     )
     .all(trackName, trackId) as StatRow[];
 
-  // Räkna totalt antal lopp på denna bana i historiken
   const raceCountRow = db
     .prepare(
       `
@@ -131,7 +111,6 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
 
   const totalRaces = raceCountRow?.race_count || 0;
 
-  // Bygg spårstatistik för auto (spår 1-12)
   const autoMap = new Map<number, StatRow>();
   for (const r of autoRows) {
     autoMap.set(r.post_position, r);
@@ -151,7 +130,6 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
     });
   }
 
-  // Bygg spårstatistik för volt (spår 1-15)
   const voltMap = new Map<number, StatRow>();
   for (const r of voltRows) {
     voltMap.set(r.post_position, r);
@@ -171,8 +149,6 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
     });
   }
 
-  // 3. "Leder man, vinner man?": Vinstprocent för hästar från spår 1 i auto som håller ledningen,
-  // eller total vinstprocent för framspår (spår 1-3) i lopp på banan
   let leaderWinPercent: number | null = null;
   const leaderRow = db
     .prepare(
@@ -191,11 +167,9 @@ export function calculateTrackStats(db: Database.Database, trackId: string): Tra
   if (leaderRow && leaderRow.total_starts >= 5) {
     leaderWinPercent = Math.round((leaderRow.total_wins / leaderRow.total_starts) * 100);
   } else if (totalRaces >= 20) {
-    // Om banan har många lopp men få i spår 1-2, beräkna ur spår 1
-    leaderWinPercent = 42; // Standardgenomsnitt i svensk travsport
+    leaderWinPercent = 42;
   }
 
-  // 4. Vanliga vinnartider per distans och startsätt
   interface WinTimeRow {
     distance_m: number;
     start_method: string;

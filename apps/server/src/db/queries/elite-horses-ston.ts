@@ -1,6 +1,3 @@
-// Aktiva toppston som tävlar i Stoeliten och Diamantstoet
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { SeedHorse } from './elite-horses-varmblod.js';
 
 export const ELITE_STON: SeedHorse[] = [

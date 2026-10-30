@@ -106,7 +106,7 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col lg:flex-row font-sans">
-      {/* Laptop: Vänstermeny */}
+      {}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-slate-900 text-slate-100 p-6 border-r border-slate-800 shrink-0">
         <div className="mb-8 flex items-center justify-start">
           <img
@@ -154,11 +154,11 @@ export const App: React.FC = () => {
         </div>
       </aside>
 
-      {/* Huvudinnehåll */}
+      {}
       <div className="flex-1 flex flex-col min-w-0">
         <OfflineRemsa />
 
-        {/* Mobil: Topprad */}
+        {}
         <header className="lg:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-0 z-10 shadow-sm">
           <div className="flex items-center">
             <img
@@ -267,7 +267,7 @@ export const App: React.FC = () => {
 
         <ScrollToTopKnapp />
 
-        {/* Mobil: Bottennavigering */}
+        {}
         <nav
           className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex items-center justify-around z-30 px-1 py-1 shadow-lg"
           aria-label="Mobil bottenmeny"

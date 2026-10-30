@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Scale, Award } from 'lucide-react';
+import { ArrowLeft, Scale } from 'lucide-react';
 import {
   Race,
   Start,
@@ -14,8 +14,8 @@ import { LoppSkelett } from '../components/SkelettKort';
 import { StartlistaTabell, HorseOddsMap } from '../components/StartlistaTabell';
 import { OddsOchStreckBlock } from '../components/OddsOchStreckBlock';
 import { JamforScreen } from './JamforScreen';
-import { formatDistance, formatStartMethod } from '../lib/format';
-
+import { LoppHeaderCard } from '../components/lopp/LoppHeaderCard';
+import { LoppTipsBlock } from '../components/lopp/LoppTipsBlock';
 import { apiFetch } from '../lib/api';
 
 interface LoppScreenProps {
@@ -43,26 +43,26 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
   const [statusMessage, setStatusMessage] = useState<string>('Allt är färskt och uppdaterat.');
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Egen state och livscykel för odds och streck
   const [oddsData, setOddsData] = useState<RaceOddsData | null>(null);
   const [oddsStatus, setOddsStatus] = useState<SourceStatus>('ok');
   const [oddsMessage, setOddsMessage] = useState<string>(
     'Oddsen uppdateras inte just nu. Allt annat på sidan är färskt.'
   );
 
-  // Egen state för tips (Vad tycker stallbacken?)
   const [tipsData, setTipsData] = useState<RaceTipsData | null>(null);
   const [tipsStatus, setTipsStatus] = useState<SourceStatus>('ok');
   const [tipsMessage, setTipsMessage] = useState<string>('Tipsen är färska.');
 
-  // Jämför-läge och valda hästar
   const [isComparing, setIsComparing] = useState<boolean>(false);
   const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
 
   const fetchRaceData = async () => {
     setLoading(true);
     try {
-      const json: ApiResponse<{ race: Race; starts: Start[] }> = await apiFetch<{ race: Race; starts: Start[] }>(`/api/lopp/${raceId}`);
+      const json: ApiResponse<{ race: Race; starts: Start[] }> = await apiFetch<{
+        race: Race;
+        starts: Start[];
+      }>(`/api/lopp/${raceId}`);
       if (json && json.data) {
         setRace(json.data.race);
         setStarts(json.data.starts);
@@ -87,7 +87,9 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
         new URLSearchParams(window.location.search).get('simulateOddsDown') === 'true';
 
       const queryParam = isSimulateDown ? '?simulateDown=true' : '';
-      const json: ApiResponse<RaceOddsData | null> = await apiFetch<RaceOddsData | null>(`/api/lopp/${raceId}/odds${queryParam}`);
+      const json: ApiResponse<RaceOddsData | null> = await apiFetch<RaceOddsData | null>(
+        `/api/lopp/${raceId}/odds${queryParam}`
+      );
 
       if (json && json.data) {
         setOddsData(json.data);
@@ -107,7 +109,9 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
 
   const fetchTipsData = async () => {
     try {
-      const json: ApiResponse<RaceTipsData> = await apiFetch<RaceTipsData>(`/api/lopp/${raceId}/tips`);
+      const json: ApiResponse<RaceTipsData> = await apiFetch<RaceTipsData>(
+        `/api/lopp/${raceId}/tips`
+      );
       if (json && json.data) {
         setTipsData(json.data);
         setTipsStatus(json.status);
@@ -140,7 +144,6 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
     }
   };
 
-  // Om vi är i jämförvyn, rendera JamforScreen
   if (isComparing) {
     return (
       <JamforScreen
@@ -151,12 +154,6 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
       />
     );
   }
-
-  const raceNumber = race?.number || '–';
-  const distanceStr = formatDistance(race?.distanceM);
-  const methodStr = formatStartMethod(race?.startMethod);
-  const startTimeStr = race?.scheduledStart ? race.scheduledStart.slice(11, 16) : '–';
-  const purseStr = race?.purse || '–';
 
   const oddsMap: HorseOddsMap = {};
   if (oddsData?.odds && oddsStatus !== 'failed') {
@@ -169,7 +166,6 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
     }
   }
 
-  // Beräkna "Dagens spik" (hästen med högst streckprocent)
   const sortedByStake =
     oddsData?.odds && oddsStatus !== 'failed'
       ? [...oddsData.odds]
@@ -188,7 +184,6 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-16">
-      {/* Tillbaka-knappar och loppväljare */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div className="flex items-center gap-2.5 flex-wrap">
           {onBackToTips && (
@@ -236,68 +231,16 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
 
       {!loading && (
         <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-8 items-start">
-          {/* Vänster: Lopphuvud + Startlista */}
           <div className="lg:col-span-8 space-y-6">
-            <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm">
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                <div>
-                  {onOpenTrack ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const trackId = raceId.split('_')[1] || '1';
-                        onOpenTrack(trackId);
-                      }}
-                      className="text-sm font-bold text-amber-700 uppercase tracking-wider mb-1 hover:text-amber-900 inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>{race?.trackName || 'Bana'}</span>
-                      <span className="text-xs font-normal text-slate-500 normal-case underline ml-1">
-                        Visa Banvisaren &rarr;
-                      </span>
-                    </button>
-                  ) : (
-                    <div className="text-sm font-semibold text-amber-700 uppercase tracking-wider mb-1">
-                      {race?.trackName || 'Bana'}
-                    </div>
-                  )}
-                  <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">
-                    Lopp {raceNumber} · {distanceStr} · {methodStr}
-                  </h1>
-                  {race?.name && (
-                    <p className="text-base sm:text-lg font-medium text-slate-700 mt-1">
-                      {race.name}
-                    </p>
-                  )}
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm sm:text-base text-slate-600 mt-2.5">
-                    <span>Start kl. {startTimeStr}</span>
-                    <span>·</span>
-                    <span>Förstapris: {purseStr}</span>
-                    {race?.trackCondition && (
-                      <>
-                        <span>·</span>
-                        <span>{race.trackCondition}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
+            <LoppHeaderCard
+              race={race}
+              raceId={raceId}
+              status={status}
+              statusMessage={statusMessage}
+              onOpenTrack={onOpenTrack}
+              onRetry={fetchRaceData}
+            />
 
-                <div className="shrink-0 pt-1">
-                  <FarskhetsPrick
-                    status={status}
-                    explanation={statusMessage}
-                    onRetry={fetchRaceData}
-                  />
-                </div>
-              </div>
-
-              {race?.terms && (
-                <div className="mt-4 pt-3.5 border-t border-slate-100 text-sm text-slate-500 leading-relaxed">
-                  {race.terms}
-                </div>
-              )}
-            </div>
-
-            {/* Block 1: Startlista */}
             <BlockErrorBoundary fallbackTitle="Startlistan saknas just nu" onRetry={fetchRaceData}>
               <section className="space-y-3" aria-labelledby="startlista-rubrik">
                 <div className="flex items-center justify-between">
@@ -329,9 +272,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
             </BlockErrorBoundary>
           </div>
 
-          {/* Höger: Odds, Tips, Jämför */}
           <div className="lg:col-span-4 space-y-6">
-            {/* Block 2: Odds och streck */}
             <OddsOchStreckBlock
               oddsData={oddsData}
               oddsStatus={oddsStatus}
@@ -341,64 +282,13 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
               onRetry={fetchOddsData}
             />
 
-            {/* Block 3: Vad tycker stallbacken? */}
-            <BlockErrorBoundary fallbackTitle="Vad tycker stallbacken?" onRetry={fetchTipsData}>
-              <section className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <div className="flex items-center gap-2">
-                    <Award className="w-5 h-5 text-amber-600 shrink-0" />
-                    <h2 className="text-lg font-bold text-slate-900">Vad tycker stallbacken?</h2>
-                  </div>
-                  <FarskhetsPrick
-                    status={tipsStatus}
-                    explanation={tipsMessage}
-                    onRetry={fetchTipsData}
-                  />
-                </div>
+            <LoppTipsBlock
+              tipsData={tipsData}
+              tipsStatus={tipsStatus}
+              tipsMessage={tipsMessage}
+              onRetry={fetchTipsData}
+            />
 
-                {tipsData && tipsData.tips.length > 0 ? (
-                  <div className="space-y-3">
-                    {tipsData.aggregatedSummary && (
-                      <div className="p-3 bg-amber-50/70 rounded-lg text-xs sm:text-sm text-slate-700 font-medium border border-amber-200/60">
-                        {tipsData.aggregatedSummary}
-                      </div>
-                    )}
-                    <div className="space-y-2.5">
-                      {tipsData.tips.map((tip) => (
-                        <div
-                          key={tip.id}
-                          className="p-3.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1.5"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-bold text-slate-900 text-base">
-                              {tip.horseName || `Häst ${tip.horseNumber || '–'}`}
-                              {tip.horseNumber ? ` (nr ${tip.horseNumber})` : ''}
-                            </span>
-                            {typeof tip.rank === 'number' && (
-                              <span className="px-2 py-0.5 bg-amber-100 text-amber-950 rounded text-xs font-bold">
-                                Rank {tip.rank}
-                              </span>
-                            )}
-                          </div>
-                          {tip.summary && (
-                            <p className="text-slate-600 text-sm leading-relaxed">{tip.summary}</p>
-                          )}
-                          <div className="text-xs text-slate-500 font-semibold pt-1">
-                            {tip.provider.startsWith('Tips från ') ? tip.provider : `Tips från ${tip.provider}`}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                    Inga tips har kommit in för det här loppet än.
-                  </p>
-                )}
-              </section>
-            </BlockErrorBoundary>
-
-            {/* Block 4: Knapp för att jämföra hästarna */}
             <div>
               <button
                 type="button"
@@ -416,7 +306,6 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
         </div>
       )}
 
-      {/* Flytande snabbknapp på mobil om hästar valts för jämförelse */}
       {selectedForCompare.length >= 2 && !loading && (
         <aside aria-label="Jämförelseval" className="lg:hidden fixed bottom-16 left-4 right-4 z-20">
           <button

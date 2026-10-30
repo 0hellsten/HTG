@@ -1,6 +1,3 @@
-// Databasfrågor för banor och tävlingsdagar
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import Database from 'better-sqlite3';
 import { RaceDay } from '@stallbacken/shared';
 
@@ -25,9 +22,6 @@ export interface DbRaceDayInput {
   fetchedAt: string;
 }
 
-/**
- * Sparar eller uppdaterar en bana i databasen.
- */
 export function upsertTrack(db: Database.Database, track: DbTrackInput): void {
   const stmt = db.prepare(`
     INSERT INTO tracks (id, name, country, length_m, surface, covered, source_id, fetched_at, updated_at)
@@ -55,9 +49,6 @@ export function upsertTrack(db: Database.Database, track: DbTrackInput): void {
   );
 }
 
-/**
- * Sparar eller uppdaterar en tävlingsdag.
- */
 export function upsertRaceDay(db: Database.Database, raceDay: DbRaceDayInput): void {
   const stmt = db.prepare(`
     INSERT INTO race_days (id, date, track_id, biggest_game, first_start, source_id, fetched_at, updated_at)
@@ -91,9 +82,6 @@ interface RaceDayRow {
   races_count: number;
 }
 
-/**
- * Hämtar alla tävlingsdagar för ett givet datum inklusive baninformation.
- */
 export function getRaceDaysByDate(db: Database.Database, date: string): RaceDay[] {
   const stmt = db.prepare(`
     SELECT 

@@ -1,6 +1,3 @@
-// Seedar Sveriges mest kända elithästar, kallblodsstjärnor och topprankade hästar
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import Database from 'better-sqlite3';
 import { ELITE_VARMBLOD_PART1, SeedHorse } from './elite-horses-varmblod.js';
 import { ELITE_VARMBLOD_PART2 } from './elite-horses-varmblod-del2.js';
@@ -113,7 +110,6 @@ export function ensureEliteHorsesSeeded(db: Database.Database): void {
       updateHorseTrainer.run(pId, targetId);
     }
 
-    // Skapa ett par representativa loppresultat för historikvyn
     const baseDate = new Date();
     for (let r = 0; r < 5; r++) {
       const rDate = new Date(baseDate.getTime() - r * 28 * 24 * 3600 * 1000)

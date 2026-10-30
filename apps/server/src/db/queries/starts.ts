@@ -1,6 +1,3 @@
-// Databasfrågor för starter
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import Database from 'better-sqlite3';
 import { Start } from '@stallbacken/shared';
 
@@ -25,9 +22,6 @@ export interface DbStartInput {
   fetchedAt: string;
 }
 
-/**
- * Sparar eller uppdaterar en start.
- */
 export function upsertStart(db: Database.Database, start: DbStartInput): void {
   const stmt = db.prepare(`
     INSERT INTO starts (
@@ -98,9 +92,6 @@ interface StartRow {
   earnings_total: number | null;
 }
 
-/**
- * Hämtar alla starter för ett givet lopp med kusk, tränare, hästnamn, skor etc.
- */
 export function getStartsByRaceId(db: Database.Database, raceId: string): Start[] {
   const stmt = db.prepare(`
     SELECT 

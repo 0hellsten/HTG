@@ -1,21 +1,20 @@
-// Konfigurationslager och fasta parametrar för V75 och V86
 import { BongGameType } from '../types/bong.js';
 
 export interface GameConfig {
   gameType: BongGameType;
   legsCount: number;
-  radpris: number; // SEK
+  radpris: number;
   pools: {
-    levels: number[]; // [7, 6, 5] eller [8, 7, 6]
-    distribution: number[]; // [0.40, 0.20, 0.40]
+    levels: number[];
+    distribution: number[];
   };
-  vMultiplier: number; // 2.5x vid endast högsta vinstgruppen
-  atgDeduction: number; // 0.35 (35%)
-  netPrizePoolFactor: number; // 0.65 (65% till vinstpott)
-  topPoolShare: number; // 0.40 (40% av vinstpotten går till 7/8 rätt)
-  underutdelningsgrans: number; // 15 SEK
-  maxHorsesPerLeg: number; // 16
-  vinnarPayback: number; // 0.85 (85% återbetalning i Vinnar-poolen)
+  vMultiplier: number;
+  atgDeduction: number;
+  netPrizePoolFactor: number;
+  topPoolShare: number;
+  underutdelningsgrans: number;
+  maxHorsesPerLeg: number;
+  vinnarPayback: number;
 }
 
 export const V75_CONFIG: GameConfig = {

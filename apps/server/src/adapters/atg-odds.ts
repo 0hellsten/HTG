@@ -14,7 +14,6 @@ import {
   SourceResult,
   FetchContext,
   RaceOddsData,
-  HorseOdds,
 } from '@stallbacken/shared';
 import { fetchWithPolicy, FetchOptions } from '../collect/queue.js';
 import { HealthManager } from '../health/health-manager.js';
@@ -22,6 +21,7 @@ import { logger } from '../lib/logger.js';
 import { getDb } from '../db/connection.js';
 import { getLatestOddsForRace, saveRaceOdds } from '../db/queries/odds.js';
 import { AtgGameResponseSchema, AtgGameResponse } from './atg-odds-schemas.js';
+import { normalizeOdds, syncOddsToStarts } from './atg-odds-utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,19 +47,15 @@ export class AtgOddsAdapter implements SourceAdapter<RaceOddsData | null> {
   setBaseUrl(url: string): void {
     this.baseUrl = url;
   }
-
   setFetchOptions(options: Partial<FetchOptions>): void {
     this.fetchOptions = { ...this.fetchOptions, ...options };
   }
-
   setAllowFixtureFallback(allow: boolean): void {
     this.allowFixtureFallback = allow;
   }
-
   setSimulatedFailure(fail: boolean): void {
     this.simulatedFailure = fail;
   }
-
   isSimulatedFailure(): boolean {
     return this.simulatedFailure;
   }
@@ -145,9 +141,9 @@ export class AtgOddsAdapter implements SourceAdapter<RaceOddsData | null> {
       }
 
       const markingGameData = await this.fetchMarkingGameData(raceId);
-      const normalized = this.normalizeOdds(parseResult.data, markingGameData, raceId, nowIso);
+      const normalized = normalizeOdds(parseResult.data, markingGameData, raceId, nowIso);
       saveRaceOdds(this.db, normalized, this.id);
-      this.syncOddsToStarts(normalized);
+      syncOddsToStarts(this.db, normalized);
 
       this.healthManager.recordAttempt({
         sourceId: this.id,
@@ -178,9 +174,14 @@ export class AtgOddsAdapter implements SourceAdapter<RaceOddsData | null> {
     if (!date) return null;
 
     try {
-      const calRes = await fetchWithPolicy(`${this.baseUrl}/calendar/day/${date}`, this.fetchOptions);
+      const calRes = await fetchWithPolicy(
+        `${this.baseUrl}/calendar/day/${date}`,
+        this.fetchOptions
+      );
       if (!calRes.ok) return null;
-      const calJson = (await calRes.json()) as { games?: Record<string, Array<{ id?: string; races?: string[] }>> };
+      const calJson = (await calRes.json()) as {
+        games?: Record<string, Array<{ id?: string; races?: string[] }>>;
+      };
       if (!calJson.games) return null;
 
       const markingTypes = ['V85', 'V75', 'V86', 'GS75', 'V64', 'V65', 'V5', 'V4'];
@@ -199,111 +200,16 @@ export class AtgOddsAdapter implements SourceAdapter<RaceOddsData | null> {
 
       if (!targetGameId) return null;
 
-      const gameRes = await fetchWithPolicy(`${this.baseUrl}/games/${targetGameId}`, this.fetchOptions);
+      const gameRes = await fetchWithPolicy(
+        `${this.baseUrl}/games/${targetGameId}`,
+        this.fetchOptions
+      );
       if (!gameRes.ok) return null;
       const gameJson = await gameRes.json();
       const parsed = AtgGameResponseSchema.safeParse(gameJson);
       return parsed.success ? parsed.data : null;
     } catch {
       return null;
-    }
-  }
-
-  private normalizeOdds(
-    vinnareData: AtgGameResponse,
-    markingGameData: AtgGameResponse | null,
-    raceId: string,
-    nowIso: string
-  ): RaceOddsData {
-    const race = vinnareData.races.find((r) => r.id === raceId) || vinnareData.races[0];
-    const starts = race?.starts || [];
-
-    const recordedAt = race?.startTime || nowIso;
-    const timeFormatted = recordedAt.includes('T')
-      ? recordedAt.split('T')[1].slice(0, 5)
-      : recordedAt.slice(11, 16) || '–';
-
-    const markingStarts =
-      markingGameData?.races.find((r) => r.id === raceId)?.starts || [];
-    const markingMap = new Map<number, number>();
-
-    for (const ms of markingStarts) {
-      if (ms.pools) {
-        for (const [poolKey, poolVal] of Object.entries(ms.pools)) {
-          if (
-            poolKey !== 'vinnare' &&
-            poolKey !== 'plats' &&
-            poolVal &&
-            typeof poolVal.betDistribution === 'number'
-          ) {
-            markingMap.set(ms.number, Math.round((poolVal.betDistribution / 100) * 10) / 10);
-            break;
-          }
-        }
-      }
-    }
-
-    const odds: HorseOdds[] = starts.map((s) => {
-      const vPool = s.pools?.vinnare;
-      const pPool = s.pools?.plats;
-
-      const winOdds =
-        vPool?.odds !== null && vPool?.odds !== undefined
-          ? vPool.odds > 99
-            ? Math.round((vPool.odds / 100) * 100) / 100
-            : vPool.odds
-          : undefined;
-
-      const placeOdds =
-        pPool?.minOdds !== null && pPool?.minOdds !== undefined
-          ? pPool.minOdds > 99
-            ? Math.round((pPool.minOdds / 100) * 100) / 100
-            : pPool.minOdds
-          : undefined;
-
-      let stakePercent = markingMap.get(s.number);
-      if (stakePercent === undefined && s.pools?.streck?.betDistribution !== undefined) {
-        const rawDist = s.pools.streck.betDistribution;
-        stakePercent = rawDist !== null ? Math.round((rawDist / 100) * 10) / 10 : undefined;
-      }
-
-      return {
-        startId: `${raceId}_${s.number}`,
-        startNumber: s.number,
-        winOdds,
-        placeOdds,
-        stakePercent,
-      };
-    });
-
-    return {
-      raceId,
-      recordedAt,
-      timeFormatted,
-      gameType: markingGameData?.type || 'Vinnare',
-      odds,
-    };
-  }
-
-  private syncOddsToStarts(oddsData: RaceOddsData): void {
-    const stmt = this.db.prepare(`
-      UPDATE starts
-      SET win_odds = COALESCE(?, win_odds),
-          stake_percent = COALESCE(?, stake_percent),
-          updated_at = datetime('now')
-      WHERE race_id = ? AND start_number = ?
-    `);
-
-    const updateMany = this.db.transaction(() => {
-      for (const h of oddsData.odds) {
-        stmt.run(h.winOdds || null, h.stakePercent || null, oddsData.raceId, h.startNumber);
-      }
-    });
-
-    try {
-      updateMany();
-    } catch {
-      // Ignorera synkfel till starts
     }
   }
 

@@ -1,6 +1,3 @@
-// Artikelkort för analys och nyheter med markering för läst läge
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
 import { TipItem } from '@stallbacken/shared';
@@ -45,7 +42,9 @@ export const AnalysArtikelKort: React.FC<AnalysArtikelKortProps> = ({
             isRead ? 'text-amber-900/80 bg-amber-50/80' : 'text-amber-800 bg-amber-50'
           }`}
         >
-          {article.provider.startsWith('Tips från ') ? article.provider : `Tips från ${article.provider}`}
+          {article.provider.startsWith('Tips från ')
+            ? article.provider
+            : `Tips från ${article.provider}`}
         </span>
       </div>
 

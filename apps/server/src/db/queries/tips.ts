@@ -1,6 +1,3 @@
-// Databasfrågor för tips och redaktionella artiklar
-// Stallbacken — HTG
-
 import Database from 'better-sqlite3';
 import { TipItem } from '@stallbacken/shared';
 
@@ -31,9 +28,6 @@ export interface DbRaceTipInput {
   fetchedAt: string;
 }
 
-/**
- * Sparar eller uppdaterar en redaktionell tipsartikel.
- */
 export function saveTipArticle(db: Database.Database, item: DbTipArticleInput): void {
   const stmt = db.prepare(`
     INSERT INTO tip_articles (id, provider, author, title, summary, content, url, published_at, source_id, fetched_at, updated_at)
@@ -65,9 +59,6 @@ export function saveTipArticle(db: Database.Database, item: DbTipArticleInput): 
   );
 }
 
-/**
- * Hämtar senaste redaktionella artiklar och tips.
- */
 export function getLatestTipArticles(db: Database.Database, limit = 20): TipItem[] {
   interface ArticleRow {
     id: string;
@@ -103,9 +94,6 @@ export function getLatestTipArticles(db: Database.Database, limit = 20): TipItem
   }));
 }
 
-/**
- * Sparar eller uppdaterar ett loppspecifikt tips.
- */
 export function saveRaceTip(db: Database.Database, tip: DbRaceTipInput): void {
   try {
     const hasRace = db.prepare('SELECT 1 FROM races WHERE id = ?').get(tip.raceId);
@@ -145,14 +133,9 @@ export function saveRaceTip(db: Database.Database, tip: DbRaceTipInput): void {
       tip.sourceId,
       tip.fetchedAt
     );
-  } catch {
-    // Tyst felhantering så att artiklar sparas även om lopprelationer saknas
-  }
+  } catch {}
 }
 
-/**
- * Hämtar loppspecifika tips för ett visst lopp med hästnamn och nummer.
- */
 export function getTipsForRace(db: Database.Database, raceId: string): TipItem[] {
   interface TipRow {
     id: string;
@@ -205,9 +188,6 @@ export function getTipsForRace(db: Database.Database, raceId: string): TipItem[]
   }));
 }
 
-/**
- * Hämtar alla sparade lopptips i systemet.
- */
 export function getAllRaceTips(db: Database.Database): TipItem[] {
   interface TipRow {
     id: string;

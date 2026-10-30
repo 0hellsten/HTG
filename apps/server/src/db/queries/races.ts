@@ -1,6 +1,3 @@
-// Databasfrågor för lopp
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import Database from 'better-sqlite3';
 import { Race } from '@stallbacken/shared';
 
@@ -24,9 +21,6 @@ export interface DbRaceInput {
   fetchedAt: string;
 }
 
-/**
- * Sparar eller uppdaterar ett lopp.
- */
 export function upsertRace(db: Database.Database, race: DbRaceInput): void {
   const stmt = db.prepare(`
     INSERT INTO races (
@@ -85,9 +79,6 @@ interface RaceRow {
   track_name?: string | null;
 }
 
-/**
- * Hämtar ett specifikt lopp via dess ID.
- */
 export function getRaceById(db: Database.Database, raceId: string): Race | null {
   const stmt = db.prepare(`
     SELECT 
@@ -130,9 +121,6 @@ export function getRaceById(db: Database.Database, raceId: string): Race | null 
   };
 }
 
-/**
- * Hämtar alla lopp för en viss tävlingsdag.
- */
 export function getRacesByRaceDayId(db: Database.Database, raceDayId: string): Race[] {
   const stmt = db.prepare(`
     SELECT 

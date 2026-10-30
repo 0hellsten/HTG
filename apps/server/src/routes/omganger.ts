@@ -16,6 +16,54 @@ interface UpcomingGameSummary {
   jackpotPool: number;
 }
 
+interface RawPoolInfo {
+  odds?: number | null;
+  minOdds?: number | null;
+  maxOdds?: number | null;
+  betDistribution?: number | null;
+}
+
+interface RawStartItem {
+  id?: string;
+  number: number;
+  postPosition?: number;
+  distance?: number;
+  pools?: Record<string, RawPoolInfo>;
+  horse?: {
+    id?: string | number;
+    name?: string;
+    money?: number;
+    record?: { time?: { minutes?: number; seconds?: number; tenths?: number; code?: string }; startMethod?: string };
+    sulky?: { type?: { text?: string } };
+    trainer?: { name?: string; firstName?: string; lastName?: string };
+    shoes?: { front?: boolean | { hasShoe?: boolean }; back?: boolean | { hasShoe?: boolean } };
+    statistics?: { life?: { earnings?: number } };
+  };
+  sulky?: { type?: { text?: string } };
+  driver?: { name?: string; firstName?: string; lastName?: string };
+  scratched?: boolean;
+}
+
+interface RawRaceItem {
+  id: string;
+  number: number;
+  name?: string;
+  startTime?: string;
+  distance?: number;
+  startMethod?: 'volt' | 'auto';
+  track?: { name?: string };
+  starts?: RawStartItem[];
+}
+
+interface RawGameResponse {
+  id: string;
+  type?: string;
+  turnover?: number;
+  jackpotAmount?: number;
+  startTime?: string;
+  races?: RawRaceItem[];
+}
+
 export const omgangerRoutes: FastifyPluginAsync = async (app) => {
   const baseUrl = 'https://www.atg.se/services/racinginfo/v1/api';
 
@@ -33,7 +81,16 @@ export const omgangerRoutes: FastifyPluginAsync = async (app) => {
           if (!res.ok) continue;
           const calJson = (await res.json()) as {
             tracks?: Array<{ id: number | string; name: string }>;
-            games?: Record<string, Array<{ id?: string; scheduledStartTime?: string; tracks?: number[]; jackpotAmount?: number; turnover?: number }>>;
+            games?: Record<
+              string,
+              Array<{
+                id?: string;
+                scheduledStartTime?: string;
+                tracks?: number[];
+                jackpotAmount?: number;
+                turnover?: number;
+              }>
+            >;
           };
 
           const trackMap = new Map<string, string>();
@@ -67,7 +124,7 @@ export const omgangerRoutes: FastifyPluginAsync = async (app) => {
             }
           }
         } catch (dayErr) {
-          logger.warn(`Kunde inte läsa kalender för ${dateStr}`, dayErr);
+          logger.warn(`Kunde inte läsa kalender för ${dateStr}`, { error: String(dayErr) });
         }
       }
 
@@ -99,11 +156,11 @@ export const omgangerRoutes: FastifyPluginAsync = async (app) => {
         throw new Error(`HTTP ${res.status}`);
       }
 
-      const gJson = (await res.json()) as any;
+      const gJson = (await res.json()) as RawGameResponse;
       const gameType: BongGameType = gameId.startsWith('V86') ? 'V86' : 'V75';
 
-      const races: BongRaceLeg[] = (gJson.races || []).map((r: any, legIdx: number) => {
-        const horses: BongHorseInput[] = (r.starts || []).map((s: any) => {
+      const races: BongRaceLeg[] = (gJson.races || []).map((r: RawRaceItem, legIdx: number) => {
+        const horses: BongHorseInput[] = (r.starts || []).map((s: RawStartItem) => {
           let betDistribution = 0.05;
           if (s.pools) {
             for (const [poolKey, poolVal] of Object.entries(s.pools)) {
@@ -111,9 +168,9 @@ export const omgangerRoutes: FastifyPluginAsync = async (app) => {
                 poolKey !== 'vinnare' &&
                 poolKey !== 'plats' &&
                 poolVal &&
-                typeof (poolVal as any).betDistribution === 'number'
+                typeof poolVal.betDistribution === 'number'
               ) {
-                betDistribution = Number(((poolVal as any).betDistribution / 10000).toFixed(4));
+                betDistribution = Number((poolVal.betDistribution / 10000).toFixed(4));
                 break;
               }
             }
@@ -128,7 +185,9 @@ export const omgangerRoutes: FastifyPluginAsync = async (app) => {
               : undefined;
 
           const lifeStats = s.horse?.statistics?.life;
-          const earningsTotal = lifeStats?.earnings ? Math.round(lifeStats.earnings / 100) : s.horse?.money || 0;
+          const earningsTotal = lifeStats?.earnings
+            ? Math.round(lifeStats.earnings / 100)
+            : s.horse?.money || 0;
 
           let recordStr: string | undefined;
           if (s.horse?.record?.time) {
@@ -172,7 +231,9 @@ export const omgangerRoutes: FastifyPluginAsync = async (app) => {
           raceNumber: r.number,
           trackName: r.track?.name || 'Bana',
           raceName: r.name || `Avdelning ${legIdx + 1}`,
-          startTime: r.scheduledStartTime ? r.scheduledStartTime.slice(11, 16) : r.startTime?.slice(11, 16),
+          startTime: r.scheduledStartTime
+            ? r.scheduledStartTime.slice(11, 16)
+            : r.startTime?.slice(11, 16),
           distance: r.distance || 2140,
           startMethod: r.startMethod === 'volt' || r.startMethod === 'volte' ? 'volt' : 'auto',
           horses,
@@ -182,7 +243,9 @@ export const omgangerRoutes: FastifyPluginAsync = async (app) => {
       const trackNames = Array.from(new Set(races.map((leg) => leg.trackName))).join(' / ');
       const turnoverPool = gJson.pools?.[gameId.split('_')[0]];
       const turnover = turnoverPool?.turnover ? Math.round(turnoverPool.turnover / 100) : 0;
-      const jackpotPool = turnoverPool?.jackpotAmount ? Math.round(turnoverPool.jackpotAmount / 100) : 0;
+      const jackpotPool = turnoverPool?.jackpotAmount
+        ? Math.round(turnoverPool.jackpotAmount / 100)
+        : 0;
 
       const raceDayData: BongRaceDayData = {
         gameType,

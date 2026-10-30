@@ -54,7 +54,7 @@ export const kallorRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
         await Promise.allSettled([
           atgRacingInfoAdapter.fetchCalendar(undefined, true),
           atgOddsAdapter.fetch({ forceRefresh: true }),
-          smhiWeatherAdapter.fetch({ forceRefresh: true } as any),
+          smhiWeatherAdapter.fetch({ forceRefresh: true }),
           tipsExpressenAdapter.fetch({ forceRefresh: true }),
           tipsTravrondenAdapter.fetch({ forceRefresh: true }),
           tipsAftonbladetAdapter.fetch({ forceRefresh: true }),

@@ -3,10 +3,7 @@ import { ApiResponse, SourceStatus } from '@stallbacken/shared';
 
 const CACHE_PREFIX = 'stallbacken_api_cache_';
 
-export async function apiFetch<T>(
-  path: string,
-  init?: RequestInit
-): Promise<ApiResponse<T>> {
+export async function apiFetch<T>(path: string, init?: RequestInit): Promise<ApiResponse<T>> {
   const baseUrl = getApiBaseUrl();
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
   const targetUrl = `${baseUrl}${cleanPath}`;
@@ -33,15 +30,13 @@ export async function apiFetch<T>(
       if (json && json.status && (json.status === 'ok' || json.status === 'stale')) {
         try {
           localStorage.setItem(cacheKey, JSON.stringify(json));
-        } catch {
-          // Ignorera quota-fel
-        }
+        } catch {}
       }
       return json;
     }
 
     return fallbackFromStorage<T>(cacheKey);
-  } catch (err) {
+  } catch {
     return fallbackFromStorage<T>(cacheKey);
   }
 }
@@ -57,9 +52,7 @@ function fallbackFromStorage<T>(cacheKey: string): ApiResponse<T> {
         message: 'Sparad data visas — kunde inte nå servern just nu',
       };
     }
-  } catch {
-    // Ignorera fel vid parsning
-  }
+  } catch {}
 
   return {
     data: null as unknown as T,

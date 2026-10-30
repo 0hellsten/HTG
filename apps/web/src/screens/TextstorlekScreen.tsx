@@ -42,7 +42,7 @@ export const TextstorlekScreen: React.FC<TextstorlekScreenProps> = ({
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto pb-16">
-      {/* Tillbakaknapp och rubrik */}
+      {}
       <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
         <button
           type="button"
@@ -64,7 +64,7 @@ export const TextstorlekScreen: React.FC<TextstorlekScreenProps> = ({
         </p>
       </div>
 
-      {/* Alternativ */}
+      {}
       <div className="space-y-3" role="radiogroup" aria-label="Välj textstorlek">
         {options.map((opt) => {
           const isSelected = currentSize === opt.id;
@@ -107,7 +107,7 @@ export const TextstorlekScreen: React.FC<TextstorlekScreenProps> = ({
         })}
       </div>
 
-      {/* Förhandsvisning */}
+      {}
       <div className="mt-8 bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-3">
         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block border-b border-slate-100 pb-2">
           Förhandsgranskning av text

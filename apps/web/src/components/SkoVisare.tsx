@@ -20,7 +20,7 @@ export const SkoVisare: React.FC<SkoVisareProps> = ({
 
   return (
     <div className="flex flex-wrap items-center gap-1.5 text-xs sm:text-sm">
-      {/* Skokod */}
+      {}
       <span
         title={shoe.label}
         className={`inline-flex items-center px-2 py-0.5 rounded font-mono font-medium ${
@@ -34,7 +34,7 @@ export const SkoVisare: React.FC<SkoVisareProps> = ({
         {shoe.code}
       </span>
 
-      {/* Skoändring */}
+      {}
       {shoe.changed && (
         <span
           className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 text-xs font-semibold"
@@ -44,7 +44,7 @@ export const SkoVisare: React.FC<SkoVisareProps> = ({
         </span>
       )}
 
-      {/* Sulkytyp */}
+      {}
       {sulky !== '–' && (
         <span
           className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${

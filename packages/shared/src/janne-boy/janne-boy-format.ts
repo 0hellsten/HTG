@@ -1,6 +1,3 @@
-// Formaterings- och förklaringshjälpare för Janne Boy
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { JanneBoyStrategy, JanneBoyLegSuggestion } from '../types/janne-boy.js';
 import { JANNE_QUOTES } from './constants.js';
 

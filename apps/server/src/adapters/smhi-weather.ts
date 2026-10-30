@@ -8,7 +8,6 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { z } from 'zod';
 import Database from 'better-sqlite3';
 import { SourceAdapter, SourceResult, FetchContext, TrackWeather } from '@stallbacken/shared';
 import { fetchWithPolicy, FetchOptions } from '../collect/queue.js';
@@ -21,71 +20,15 @@ import { getTrackProfile } from '../db/queries/track-stats.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Zod-schema för SMHI snow1g/v1 API-svar
-const SmhiWeatherSchema = z.object({
-  approvedTime: z.string().optional(),
-  referenceTime: z.string().optional(),
-  timeSeries: z.array(
-    z.object({
-      time: z.string(),
-      data: z.object({
-        air_temperature: z.number().optional(),
-        wind_speed: z.number().optional(),
-        precipitation_amount_mean: z.number().optional(),
-        symbol_code: z.number().optional(),
-      }),
-    })
-  ),
-});
-
-export type SmhiWeatherResponse = z.infer<typeof SmhiWeatherSchema>;
-
-export function getSymbolDescription(code?: number): string {
-  switch (code) {
-    case 1:
-      return 'Klart';
-    case 2:
-      return 'Lätt molnighet';
-    case 3:
-      return 'Halvklart';
-    case 4:
-      return 'Molnigt';
-    case 5:
-      return 'Mycket moln';
-    case 6:
-      return 'Mulet';
-    case 7:
-      return 'Dimma';
-    case 8:
-      return 'Lätta regnskurar';
-    case 9:
-      return 'Måttliga regnskurar';
-    case 10:
-      return 'Kraftiga regnskurar';
-    case 11:
-      return 'Åskskurar';
-    case 18:
-      return 'Lätt regn';
-    case 19:
-      return 'Måttligt regn';
-    case 20:
-      return 'Kraftigt regn';
-    case 25:
-      return 'Lätt snöfall';
-    case 26:
-      return 'Måttligt snöfall';
-    case 27:
-      return 'Kraftigt snöfall';
-    default:
-      return 'Uppehåll och växlande molnighet';
-  }
-}
+import { SmhiWeatherSchema, SmhiWeatherResponse, getSymbolDescription } from './smhi-schema.js';
+export { getSymbolDescription };
+export type { SmhiWeatherResponse };
 
 export class SmhiWeatherAdapter implements SourceAdapter<TrackWeather | null> {
   readonly id = 'smhi';
   readonly label = 'SMHI Väder';
-  readonly ttlSeconds = 3600; // 1 timme
-  readonly staleAfterSeconds = 7200; // 2 timmar
+  readonly ttlSeconds = 3600;
+  readonly staleAfterSeconds = 7200;
 
   private baseUrl = 'https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1';
   private db: Database.Database;
@@ -149,7 +92,6 @@ export class SmhiWeatherAdapter implements SourceAdapter<TrackWeather | null> {
       };
     }
 
-    // Kontrollera cache-färskhet om forceRefresh inte begärts
     if (!forceRefresh && existing) {
       const ageSec = Math.floor((now.getTime() - new Date(existing.observedAt).getTime()) / 1000);
       if (ageSec < this.ttlSeconds) {
@@ -261,7 +203,6 @@ export class SmhiWeatherAdapter implements SourceAdapter<TrackWeather | null> {
     } catch (err) {
       logger.error(`Misslyckades hämta väder för bana ${trackId} från SMHI`, err);
 
-      // Reservfixtur om tillåtet (t.ex. vid offlinetest)
       if (this.allowFixtureFallback) {
         const fixturePath = path.resolve(__dirname, '../../test/fixtures/smhi-weather.json');
         if (fs.existsSync(fixturePath)) {
@@ -316,9 +257,7 @@ export class SmhiWeatherAdapter implements SourceAdapter<TrackWeather | null> {
               ageSeconds: 0,
               message: 'Väder hämtat (lokalt exempel).',
             };
-          } catch {
-            // Ignorera fixturfel och gå till failed nedan
-          }
+          } catch {}
         }
       }
 

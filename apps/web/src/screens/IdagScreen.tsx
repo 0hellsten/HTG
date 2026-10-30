@@ -34,7 +34,8 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace, onOpenTrack 
   const fetchDagar = async () => {
     setLoading(true);
     try {
-      const endpoint = selectedOffset === 0 ? '/api/dagar/idag' : `/api/dagar?datum=${targetDateStr}`;
+      const endpoint =
+        selectedOffset === 0 ? '/api/dagar/idag' : `/api/dagar?datum=${targetDateStr}`;
       const json: ApiResponse<RaceDay[]> = await apiFetch<RaceDay[]>(endpoint);
       if (json && json.data) {
         setRaceDays(json.data);
@@ -64,7 +65,8 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace, onOpenTrack 
   };
 
   const sortedRaceDays = sortRaceDaysWithFavorites(raceDays, favoriteTrackIds);
-  const heading = selectedOffset === 0 ? (isEvening() ? 'Kvällens omgång' : 'Dagens omgång') : 'Kommande omgång';
+  const heading =
+    selectedOffset === 0 ? (isEvening() ? 'Kvällens omgång' : 'Dagens omgång') : 'Kommande omgång';
   const displayDateFormatted = formatSwedishDate(targetDate);
 
   const dateOptions = [

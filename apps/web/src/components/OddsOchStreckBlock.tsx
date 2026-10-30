@@ -60,7 +60,7 @@ export const OddsOchStreckBlock: React.FC<OddsOchStreckBlockProps> = ({
               <span>Odds från {oddsData.timeFormatted}</span>
             </div>
 
-            {/* Dagens spik / mest streckade häst */}
+            {}
             {favoriteHorse && (
               <div className="p-3.5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1">
                 <span className="text-xs font-bold text-amber-900 uppercase tracking-wider block">
@@ -78,7 +78,7 @@ export const OddsOchStreckBlock: React.FC<OddsOchStreckBlockProps> = ({
               </div>
             )}
 
-            {/* Snabböversikt per häst */}
+            {}
             <div className="divide-y divide-slate-100 pt-1 text-sm">
               {oddsData.odds.map((item) => {
                 const start = starts.find((s) => s.startNumber === item.startNumber);

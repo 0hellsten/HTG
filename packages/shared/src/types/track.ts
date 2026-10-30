@@ -1,6 +1,3 @@
-// Delade typer för banprofiler, banstatistik och väder
-// Stallbacken — HTG
-
 export interface TrackProfile {
   id: string;
   name: string;
@@ -20,13 +17,13 @@ export interface PostPositionStat {
   startMethod: 'volt' | 'auto';
   starts: number;
   wins: number;
-  winPercent: number | null; // null om 0 starter
+  winPercent: number | null;
 }
 
 export interface CommonWinningTime {
   distanceM: number;
   startMethod: 'volt' | 'auto';
-  typicalTime: string; // T.ex. "1.12,8a"
+  typicalTime: string;
   raceCount: number;
 }
 
@@ -37,9 +34,9 @@ export interface TrackStats {
   basedOnRaces: number;
   postStatsAuto: PostPositionStat[];
   postStatsVolt: PostPositionStat[];
-  leaderWinPercent: number | null; // Hur ofta ledaren vinner
+  leaderWinPercent: number | null;
   commonWinningTimes: CommonWinningTime[];
-  isLowSample: boolean; // true om basedOnRaces < 20
+  isLowSample: boolean;
 }
 
 export interface TrackWeather {

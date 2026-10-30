@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { formatCompetitionFromApi, buildFallbackBongRaceDay } from '../components/bong/competitions';
+import {
+  formatCompetitionFromApi,
+  buildFallbackBongRaceDay,
+} from '../components/bong/competitions';
 import { JanneBoyEngine, JanneBoyConfig } from '@stallbacken/shared';
 
 describe('Janne Boy och omgångar', () => {

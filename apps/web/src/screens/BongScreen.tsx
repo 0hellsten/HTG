@@ -162,7 +162,7 @@ export const BongScreen: React.FC<BongScreenProps> = ({
         onOpenFullHorse={onSelectHorse}
       />
 
-      {/* Flytande Bong-knapp för att se ifylld kupong */}
+      {}
       <button
         type="button"
         onClick={() => setIsKupongModalOpen((prev) => !prev)}

@@ -5,7 +5,6 @@ describe('ScrollToTopKnapp logik', () => {
   const originalWindow = globalThis.window;
 
   beforeEach(() => {
-    // Mocka window.scrollTo
     globalThis.window = {
       ...originalWindow,
       scrollTo: vi.fn(),

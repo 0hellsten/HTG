@@ -17,15 +17,16 @@ export class StallbackenScheduler {
     if (this.isRunning || process.env.NODE_ENV === 'test') return;
     this.isRunning = true;
 
-    // Starta uppvärmning direkt i bakgrunden
     setTimeout(() => {
       this.warmup().catch((err) => logger.error('Fel under uppvärmning', err));
     }, 1000);
 
-    // Schemalagd loop var 5:e minut
-    this.intervalTimer = setInterval(() => {
-      this.tick().catch((err) => logger.error('Fel i schemaläggare', err));
-    }, 5 * 60 * 1000);
+    this.intervalTimer = setInterval(
+      () => {
+        this.tick().catch((err) => logger.error('Fel i schemaläggare', err));
+      },
+      5 * 60 * 1000
+    );
   }
 
   stop(): void {
@@ -76,7 +77,7 @@ export class StallbackenScheduler {
         .all() as Array<{ track_id: string }>;
 
       for (const t of activeTracks.slice(0, 3)) {
-        await smhiWeatherAdapter.fetch({ trackId: t.track_id } as any);
+        await smhiWeatherAdapter.fetch({ trackId: t.track_id });
       }
 
       const upcomingRaces = db
@@ -95,7 +96,7 @@ export class StallbackenScheduler {
 
       logger.info('Uppvärmning slutförd med färsk travdata');
     } catch (err) {
-      logger.warn('Uppvärmning avbröts eller fick delvis fel', err);
+      logger.warn('Uppvärmning avbröts eller fick delvis fel', { error: String(err) });
     } finally {
       this.isWarmingUp = false;
     }
@@ -123,7 +124,7 @@ export class StallbackenScheduler {
         await atgOddsAdapter.fetchOddsForRace(r.id, false);
       }
     } catch (err) {
-      logger.warn('Tick i schemaläggare avslutades med varning', err);
+      logger.warn('Tick i schemaläggare avslutades med varning', { error: String(err) });
     }
   }
 }

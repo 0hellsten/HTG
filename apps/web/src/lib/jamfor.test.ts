@@ -109,14 +109,11 @@ describe('jamfor hjälplogik', () => {
         { place: '1' },
         { place: '4' },
       ];
-      // @ts-expect-error test mock
       expect(formatFormRecent(starts)).toBe('1 · 3 · d · 2 · 1');
     });
 
     it('räknar ut formpoäng där segrar väger tyngst', () => {
-      // @ts-expect-error test mock
       const scoreHigh = calculateFormScore([{ place: '1' }, { place: '1' }]);
-      // @ts-expect-error test mock
       const scoreLow = calculateFormScore([{ place: '5' }, { place: 'd' }]);
 
       expect(scoreHigh).toBeGreaterThan(scoreLow!);
