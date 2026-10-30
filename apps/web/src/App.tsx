@@ -126,28 +126,6 @@ export const App: React.FC = () => {
             const isActive = activeTab === item.id;
             const isJanne = item.id === 'janneboy';
 
-            if (isJanne) {
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleTabChange(item.id)}
-                  aria-label="Janne Boy"
-                  className={`w-full flex items-center justify-center py-2 px-1 transition-all cursor-pointer bg-transparent border-0 shadow-none group ${
-                    isActive ? 'scale-105' : 'hover:scale-105 opacity-85 hover:opacity-100'
-                  }`}
-                >
-                  <JanneBoyIcon
-                    className={`h-16 w-auto max-w-[80px] object-contain transition-all ${
-                      isActive
-                        ? 'drop-shadow-[0_0_12px_rgba(245,158,11,0.9)]'
-                        : 'drop-shadow-sm group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]'
-                    }`}
-                  />
-                  <span className="sr-only">Janne Boy</span>
-                </button>
-              );
-            }
-
             return (
               <button
                 key={item.id}
@@ -158,7 +136,11 @@ export const App: React.FC = () => {
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }`}
               >
-                <Icon className="w-5 h-5 shrink-0" />
+                {isJanne ? (
+                  <JanneBoyIcon className="w-5 h-5 object-contain shrink-0" />
+                ) : (
+                  <Icon className="w-5 h-5 shrink-0" />
+                )}
                 <span>{item.label}</span>
               </button>
             );
@@ -320,26 +302,6 @@ export const App: React.FC = () => {
             const isActive = activeTab === item.id;
             const isJanne = item.id === 'janneboy';
 
-            if (isJanne) {
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleTabChange(item.id)}
-                  aria-label="Janne Boy"
-                  className={`flex flex-col items-center justify-center flex-1 py-0.5 px-0 min-h-[44px] cursor-pointer bg-transparent border-0 shadow-none transition-transform ${
-                    isActive ? 'scale-110' : 'hover:scale-105 opacity-90'
-                  }`}
-                >
-                  <JanneBoyIcon
-                    className={`h-10 w-auto object-contain transition-all ${
-                      isActive ? 'drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]' : 'drop-shadow-xs'
-                    }`}
-                  />
-                  <span className="sr-only">Janne</span>
-                </button>
-              );
-            }
-
             return (
               <button
                 key={item.id}
@@ -348,9 +310,13 @@ export const App: React.FC = () => {
                   isActive ? 'text-amber-600 font-semibold' : 'text-slate-500'
                 }`}
               >
-                <Icon
-                  className={`w-5 h-5 mb-0.5 shrink-0 ${isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'}`}
-                />
+                {isJanne ? (
+                  <JanneBoyIcon className="w-5 h-5 mb-0.5 object-contain shrink-0" />
+                ) : (
+                  <Icon
+                    className={`w-5 h-5 mb-0.5 shrink-0 ${isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'}`}
+                  />
+                )}
                 <span className="text-[10px] font-medium leading-none truncate max-w-full">
                   {item.mobileLabel || item.label}
                 </span>

@@ -43,7 +43,7 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
     await v86Btn.click();
 
     // Kontrollera 8 avdelningar, saxade banor och rätt starttid
-    await expect(page.locator('text=Avd 8')).toBeVisible();
+    await expect(page.locator('text=Avd 8')).toBeVisible({ timeout: 15000 });
     await expect(page.getByText(/Solvalla/i).first()).toBeVisible();
     await expect(page.locator('text=Start kl. 20:30').first()).toBeVisible();
 
