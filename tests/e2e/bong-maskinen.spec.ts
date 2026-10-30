@@ -16,8 +16,17 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
 
     // 2. Verifiera rubrik och grundläggande element
     await expect(page.locator('h1')).toContainText('Bong-maskinen');
-    await expect(page.locator('text=Matematiska rader')).toBeVisible();
-    await expect(page.locator('text=Reducerade rader')).toBeVisible();
+    await expect(page.locator('text=Snabbkupong:')).toBeVisible();
+    await expect(page.locator('button:has-text("Liten (~50 kr)")')).toBeVisible();
+    await expect(page.locator('button:has-text("Lagom (~100 kr)")')).toBeVisible();
+    await expect(page.locator('button:has-text("Större (~200 kr)")')).toBeVisible();
+    await expect(page.locator('button:has-text("Favoritrad (1 häst/lopp)")')).toBeVisible();
+    await expect(page.locator('button:has-text("Visa kupong")')).toBeVisible();
+
+    // Testa snabbkupongsval
+    await page.locator('button:has-text("Favoritrad (1 häst/lopp)")').click();
+    await expect(page.locator('text=1 rader')).toBeVisible();
+    await page.locator('button:has-text("Lagom (~100 kr)")').click();
 
     // 3. Verifiera dragbar datumväljare med kommande tävlingar
     await expect(page.locator('text=Kommande tävlingar')).toBeVisible();

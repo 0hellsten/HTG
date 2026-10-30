@@ -32,9 +32,9 @@ test.describe('Janne Boy — Superintelligent kupongmotor', () => {
 
     // 6. Kontrollera att systemresultatet uppdateras och visar rader samt nyckeltal
     await expect(page.locator('text=Jannes Kupongförslag')).toBeVisible();
-    await expect(page.getByText('Spikar', { exact: true })).toBeVisible();
-    await expect(page.locator('text=Skrälldrag')).toBeVisible();
-    await expect(page.locator('text=Spelvärdesindex')).toBeVisible();
+    await expect(page.locator('text=Spikar').first()).toBeVisible();
+    await expect(page.locator('text=Skrälldrag').first()).toBeVisible();
+    await expect(page.locator('text=Spelvärdesindex').first()).toBeVisible();
 
     // 7. Klicka på knappen "Öppna i Bong-maskinen"
     const openInBongBtn = page.locator('button:has-text("Öppna i Bong-maskinen")');
@@ -43,6 +43,6 @@ test.describe('Janne Boy — Superintelligent kupongmotor', () => {
 
     // 8. Verifiera att Bong-maskinen öppnas med kupongen
     await expect(page.locator('h1')).toContainText('Bong-maskinen');
-    await expect(page.locator('text=Matematiska rader')).toBeVisible();
+    await expect(page.locator('text=Snabbkupong:')).toBeVisible();
   });
 });

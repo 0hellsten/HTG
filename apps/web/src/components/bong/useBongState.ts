@@ -8,12 +8,14 @@ import {
   ReductionConditions,
   SourceStatus,
 } from '@stallbacken/shared';
+import { QuickCouponPreset } from './BongSummaryCard';
 import {
   BongCompetition,
   formatCompetitionFromApi,
   getDefaultUpcomingCompetitions,
   buildFallbackBongRaceDay,
 } from './competitions';
+import { buildPresetSelection } from './bongPresets';
 import { apiFetch } from '../../lib/api';
 
 export function useBongState(
@@ -31,18 +33,13 @@ export function useBongState(
   );
   const [status, setStatus] = useState<SourceStatus>('ok');
   const [fetchedAt, setFetchedAt] = useState<string>(new Date().toISOString());
-
-  const [selectedHorses, setSelectedHorses] = useState<Record<number, string[]>>(() => {
-    if (initialSelectedHorses) return initialSelectedHorses;
-    return {};
-  });
-
+  const [selectedHorses, setSelectedHorses] = useState<Record<number, string[]>>(
+    () => initialSelectedHorses || {}
+  );
   const [ranks, setRanks] = useState<Record<string, HorseRank>>({});
-
   const [onlyTopPool, setOnlyTopPool] = useState<boolean>(false);
   const [flerbongMultiplier, setFlerbongMultiplier] = useState<number>(1);
   const [sharesCount, setSharesCount] = useState<number>(1);
-
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [minA, setMinA] = useState<number>(2);
   const [maxA, setMaxA] = useState<number>(5);
@@ -51,7 +48,6 @@ export function useBongState(
   const [minStrecksumma, setMinStrecksumma] = useState<number>(140);
   const [maxStrecksumma, setMaxStrecksumma] = useState<number>(320);
   const [minPayout, setMinPayout] = useState<number>(5000);
-
   const [copied, setCopied] = useState<boolean>(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
@@ -157,6 +153,12 @@ export function useBongState(
     setSelectedHorses(emptySel);
   };
 
+  const handleApplyPreset = (preset: QuickCouponPreset) => {
+    const { sel, ranks: nextRanks } = buildPresetSelection(preset, raceDay, gameType);
+    setSelectedHorses(sel);
+    setRanks(nextRanks);
+  };
+
   const engine = useMemo(() => new BongEngine(gameType), [gameType]);
 
   const calculationResult = useMemo(() => {
@@ -239,48 +241,13 @@ export function useBongState(
   };
 
   return {
-    competitions,
-    selectedDateIso: selectedCompId,
-    gameType,
-    activeLegIndex,
-    setActiveLegIndex,
-    raceDay,
-    status,
-    fetchedAt,
-    selectedHorses,
-    ranks,
-    onlyTopPool,
-    flerbongMultiplier,
-    sharesCount,
-    showFilters,
-    setShowFilters,
-    minA,
-    setMinA,
-    maxA,
-    setMaxA,
-    maxC,
-    setMaxC,
-    maxD,
-    setMaxD,
-    minStrecksumma,
-    setMinStrecksumma,
-    maxStrecksumma,
-    setMaxStrecksumma,
-    minPayout,
-    setMinPayout,
-    copied,
-    saveMessage,
-    calculationResult,
-    handleSelectCompetition,
-    handleToggleHorse,
-    handleSetRank,
-    handleClearLeg,
-    handleResetCoupon,
-    handleCopyRows,
-    handleDownloadFile,
-    handleSaveBong,
-    setOnlyTopPool,
-    setFlerbongMultiplier,
+    competitions, selectedDateIso: selectedCompId, gameType, activeLegIndex, setActiveLegIndex,
+    raceDay, status, fetchedAt, selectedHorses, ranks, onlyTopPool, flerbongMultiplier,
+    sharesCount, showFilters, setShowFilters, minA, setMinA, maxA, setMaxA, maxC, setMaxC,
+    maxD, setMaxD, minStrecksumma, setMinStrecksumma, maxStrecksumma, setMaxStrecksumma,
+    minPayout, setMinPayout, copied, saveMessage, calculationResult, handleSelectCompetition,
+    handleToggleHorse, handleSetRank, handleClearLeg, handleResetCoupon, handleApplyPreset,
+    handleCopyRows, handleDownloadFile, handleSaveBong, setOnlyTopPool, setFlerbongMultiplier,
     setSharesCount,
   };
 }

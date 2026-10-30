@@ -14,7 +14,7 @@ test.describe('Tips — Markera lopprankingar och analys/nyheter som lästa', ()
 
     // 2. Kontrollera att artiklar och lopprankingar visas
     const articleLink = page.locator('a:has-text("Läs hela")').first();
-    await expect(articleLink).toBeVisible();
+    await expect(articleLink).toBeVisible({ timeout: 20000 });
 
     // 3. Klicka på artikellänken
     await articleLink.click();

@@ -57,6 +57,7 @@ export const BongScreen: React.FC<BongScreenProps> = ({
     handleSetRank,
     handleClearLeg,
     handleResetCoupon,
+    handleApplyPreset,
     handleCopyRows,
     handleDownloadFile,
     handleSaveBong,
@@ -80,7 +81,7 @@ export const BongScreen: React.FC<BongScreenProps> = ({
   const modalHorseRank = selectedModalHorse ? ranks[selectedModalHorse.id] || 'A' : 'A';
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-4 pb-20">
       <BongOmgangHeader
         raceDay={raceDay}
         competitions={competitions}
@@ -90,15 +91,14 @@ export const BongScreen: React.FC<BongScreenProps> = ({
 
       <BongSummaryCard
         calculationResult={calculationResult}
-        flerbongMultiplier={flerbongMultiplier}
-        sharesCount={sharesCount}
-        onlyTopPool={onlyTopPool}
-        gameType={gameType}
         copied={copied}
         saveMessage={saveMessage}
         onCopyRows={handleCopyRows}
         onDownloadFile={handleDownloadFile}
         onSaveBong={handleSaveBong}
+        onApplyPreset={handleApplyPreset}
+        onResetCoupon={handleResetCoupon}
+        onOpenKupongModal={() => setIsKupongModalOpen(true)}
       />
 
       <BongLegTabs
