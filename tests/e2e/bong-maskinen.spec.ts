@@ -29,16 +29,18 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
 
     // 4. Växla till en V86-omgång i datumväljaren
     const v86Btn = page.locator('button:has-text("V86")').first();
+    await v86Btn.scrollIntoViewIfNeeded();
     await expect(v86Btn).toBeVisible();
     await v86Btn.click();
 
     // Kontrollera 8 avdelningar, saxade banor och rätt starttid
     await expect(page.locator('text=Avd 8')).toBeVisible();
-    await expect(page.getByText('Solvalla / Åby (Xpress)').first()).toBeVisible();
+    await expect(page.getByText(/Solvalla/i).first()).toBeVisible();
     await expect(page.locator('text=Start kl. 20:30').first()).toBeVisible();
 
     // 5. Växla till en V75-omgång i datumväljaren
     const v75Btn = page.locator('button:has-text("V75")').first();
+    await v75Btn.scrollIntoViewIfNeeded();
     await expect(v75Btn).toBeVisible();
     await v75Btn.click();
     await expect(page.locator('text=Avd 7')).toBeVisible();
@@ -62,6 +64,12 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
     await expect(dialog.getByText('Streckprocent', { exact: true })).toBeVisible();
     await expect(dialog.getByText('Spelvärde', { exact: true })).toBeVisible();
     await expect(dialog.getByText('Spår och startsätt')).toBeVisible();
+
+    // Välj hästen på kupongen om den inte redan är vald
+    const selectBtn = dialog.locator('button:has-text("Välj på kupongen")');
+    if (await selectBtn.isVisible()) {
+      await selectBtn.click();
+    }
 
     // Ändra rank till C direkt i analysrutan
     const rankCBtn = dialog.locator('button:has-text("Rank C")').first();

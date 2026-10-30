@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import path from 'path';
 
 const ARTIFACTS_DIR =
-  'C:/Users/hells/.gemini/antigravity/brain/48948aed-71f7-43ba-a72f-51c883ce3e00';
+  'C:/Users/hells/.gemini/antigravity/brain/f232951c-e31e-490a-92b8-0527c7f439ba';
 
 test.describe('Verifierande skärmdumpar', () => {
   test('Laptop (1440x900)', async ({ page }) => {

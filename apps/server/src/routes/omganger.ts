@@ -23,6 +23,11 @@ interface RawPoolInfo {
   betDistribution?: number | null;
 }
 
+interface RawShoeInfo {
+  hasShoe?: boolean;
+  changed?: boolean;
+}
+
 interface RawStartItem {
   id?: string;
   number: number;
@@ -33,10 +38,13 @@ interface RawStartItem {
     id?: string | number;
     name?: string;
     money?: number;
-    record?: { time?: { minutes?: number; seconds?: number; tenths?: number; code?: string }; startMethod?: string };
+    record?: {
+      time?: { minutes?: number; seconds?: number; tenths?: number; code?: string };
+      startMethod?: string;
+    };
     sulky?: { type?: { text?: string } };
     trainer?: { name?: string; firstName?: string; lastName?: string };
-    shoes?: { front?: boolean | { hasShoe?: boolean }; back?: boolean | { hasShoe?: boolean } };
+    shoes?: { front?: boolean | RawShoeInfo; back?: boolean | RawShoeInfo };
     statistics?: { life?: { earnings?: number } };
   };
   sulky?: { type?: { text?: string } };
@@ -48,9 +56,11 @@ interface RawRaceItem {
   id: string;
   number: number;
   name?: string;
+  date?: string;
   startTime?: string;
+  scheduledStartTime?: string;
   distance?: number;
-  startMethod?: 'volt' | 'auto';
+  startMethod?: 'volt' | 'auto' | 'volte';
   track?: { name?: string };
   starts?: RawStartItem[];
 }
@@ -61,18 +71,30 @@ interface RawGameResponse {
   turnover?: number;
   jackpotAmount?: number;
   startTime?: string;
+  pools?: Record<string, { turnover?: number; jackpotAmount?: number }>;
   races?: RawRaceItem[];
 }
 
 export const omgangerRoutes: FastifyPluginAsync = async (app) => {
   const baseUrl = 'https://www.atg.se/services/racinginfo/v1/api';
+  let upcomingCache: { data: UpcomingGameSummary[]; fetchedAt: string; timestamp: number } | null =
+    null;
 
   app.get('/api/omganger/kommande', async (_request, reply) => {
+    if (upcomingCache && Date.now() - upcomingCache.timestamp < 300000) {
+      return reply.status(200).send({
+        data: upcomingCache.data,
+        status: 'ok',
+        fetchedAt: upcomingCache.fetchedAt,
+        message: 'Kommande huvudomgångar hämtade',
+      });
+    }
+
     try {
       const today = new Date();
       const upcoming: UpcomingGameSummary[] = [];
 
-      for (let offset = 0; offset <= 3; offset++) {
+      for (let offset = 0; offset <= 7; offset++) {
         const d = new Date(today.getTime() + offset * 86400000);
         const dateStr = d.toISOString().split('T')[0];
 
@@ -128,10 +150,17 @@ export const omgangerRoutes: FastifyPluginAsync = async (app) => {
         }
       }
 
+      const fetchedIso = new Date().toISOString();
+      upcomingCache = {
+        data: upcoming,
+        fetchedAt: fetchedIso,
+        timestamp: Date.now(),
+      };
+
       return reply.status(200).send({
         data: upcoming,
         status: 'ok',
-        fetchedAt: new Date().toISOString(),
+        fetchedAt: fetchedIso,
         message: 'Kommande huvudomgångar hämtade',
       });
     } catch (err) {
@@ -217,9 +246,18 @@ export const omgangerRoutes: FastifyPluginAsync = async (app) => {
             scratched: Boolean(s.scratched),
             betDistribution,
             winOdds,
-            shoeFront: s.horse?.shoes?.front?.hasShoe,
-            shoeBack: s.horse?.shoes?.back?.hasShoe,
-            shoeChanged: Boolean(s.horse?.shoes?.front?.changed || s.horse?.shoes?.back?.changed),
+            shoeFront:
+              typeof s.horse?.shoes?.front === 'boolean'
+                ? s.horse.shoes.front
+                : s.horse?.shoes?.front?.hasShoe,
+            shoeBack:
+              typeof s.horse?.shoes?.back === 'boolean'
+                ? s.horse.shoes.back
+                : s.horse?.shoes?.back?.hasShoe,
+            shoeChanged: Boolean(
+              (typeof s.horse?.shoes?.front === 'object' && s.horse?.shoes?.front?.changed) ||
+              (typeof s.horse?.shoes?.back === 'object' && s.horse?.shoes?.back?.changed)
+            ),
             sulkyType,
             earningsTotal,
             record: recordStr,

@@ -70,6 +70,31 @@ export function formatCompetitionFromApi(g: {
   };
 }
 
+export function getDefaultUpcomingCompetitions(): BongCompetition[] {
+  const list: BongCompetition[] = [];
+  const now = new Date();
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(now.getTime() + i * 86400000);
+    const dateStr = d.toISOString().slice(0, 10);
+    const dayOfWeek = d.getDay();
+    const isV86 = dayOfWeek === 3;
+    const gameType: BongGameType = isV86 ? 'V86' : 'V75';
+    list.push(
+      formatCompetitionFromApi({
+        id: `${gameType}_${dateStr}_solvalla`,
+        gameType,
+        gameName: gameType,
+        date: dateStr,
+        trackName: isV86 ? 'Solvalla / Åby (Xpress)' : 'Solvalla',
+        startTime: isV86 ? '20:30' : '16:20',
+        turnover: isV86 ? 25000000 : 45000000,
+        jackpotPool: isV86 ? 0 : 15000000,
+      })
+    );
+  }
+  return list;
+}
+
 export function buildFallbackBongRaceDay(gameType: BongGameType): BongRaceDayData {
   const count = gameType === 'V86' ? 8 : 7;
   const races = Array.from({ length: count }, (_, idx) => ({

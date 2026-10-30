@@ -12,6 +12,11 @@ interface RawPoolInfo {
   betDistribution?: number | null;
 }
 
+interface RawShoeInfo {
+  hasShoe?: boolean;
+  changed?: boolean;
+}
+
 interface RawStartItem {
   id?: string;
   number: number;
@@ -22,10 +27,13 @@ interface RawStartItem {
     id?: string | number;
     name?: string;
     money?: number;
-    record?: { time?: { minutes?: number; seconds?: number; tenths?: number; code?: string }; startMethod?: string };
+    record?: {
+      time?: { minutes?: number; seconds?: number; tenths?: number; code?: string };
+      startMethod?: string;
+    };
     sulky?: { type?: { text?: string } };
     trainer?: { name?: string; firstName?: string; lastName?: string };
-    shoes?: { front?: boolean | { hasShoe?: boolean }; back?: boolean | { hasShoe?: boolean } };
+    shoes?: { front?: boolean | RawShoeInfo; back?: boolean | RawShoeInfo };
     statistics?: { life?: { earnings?: number } };
   };
   sulky?: { type?: { text?: string } };
@@ -37,9 +45,11 @@ interface RawRaceItem {
   id: string;
   number: number;
   name?: string;
+  date?: string;
   startTime?: string;
+  scheduledStartTime?: string;
   distance?: number;
-  startMethod?: 'volt' | 'auto';
+  startMethod?: 'volt' | 'auto' | 'volte';
   track?: { name?: string };
   starts?: RawStartItem[];
 }
@@ -50,6 +60,7 @@ interface RawGameResponse {
   turnover?: number;
   jackpotAmount?: number;
   startTime?: string;
+  pools?: Record<string, { turnover?: number; jackpotAmount?: number }>;
   races?: RawRaceItem[];
 }
 
@@ -70,7 +81,9 @@ export const janneBoyRoutes: FastifyPluginAsync = async (app) => {
           const dateStr = d.toISOString().split('T')[0];
           const calRes = await fetchWithPolicy(`${baseUrl}/calendar/day/${dateStr}`);
           if (!calRes.ok) continue;
-          const calJson = (await calRes.json()) as { games?: Record<string, Array<{ id?: string }>> };
+          const calJson = (await calRes.json()) as {
+            games?: Record<string, Array<{ id?: string }>>;
+          };
           const targetKey = gameType === 'V86' ? 'V86' : 'V75';
           const found =
             calJson.games?.[targetKey]?.[0] ||
@@ -149,10 +162,17 @@ export const janneBoyRoutes: FastifyPluginAsync = async (app) => {
                 scratched: Boolean(s.scratched),
                 betDistribution,
                 winOdds,
-                shoeFront: s.horse?.shoes?.front?.hasShoe,
-                shoeBack: s.horse?.shoes?.back?.hasShoe,
+                shoeFront:
+                  typeof s.horse?.shoes?.front === 'boolean'
+                    ? s.horse.shoes.front
+                    : s.horse?.shoes?.front?.hasShoe,
+                shoeBack:
+                  typeof s.horse?.shoes?.back === 'boolean'
+                    ? s.horse.shoes.back
+                    : s.horse?.shoes?.back?.hasShoe,
                 shoeChanged: Boolean(
-                  s.horse?.shoes?.front?.changed || s.horse?.shoes?.back?.changed
+                  (typeof s.horse?.shoes?.front === 'object' && s.horse?.shoes?.front?.changed) ||
+                  (typeof s.horse?.shoes?.back === 'object' && s.horse?.shoes?.back?.changed)
                 ),
                 sulkyType,
                 earningsTotal,

@@ -16,6 +16,7 @@ import {
   BongCompetition,
   formatCompetitionFromApi,
   buildFallbackBongRaceDay,
+  getDefaultUpcomingCompetitions,
 } from '../components/bong/competitions';
 import { BongDateSelector } from '../components/bong/BongDateSelector';
 import { BongKupongModal } from '../components/bong/BongKupongModal';
@@ -26,7 +27,9 @@ interface JanneBoyScreenProps {
 }
 
 export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) => {
-  const [competitions, setCompetitions] = useState<BongCompetition[]>([]);
+  const [competitions, setCompetitions] = useState<BongCompetition[]>(() =>
+    getDefaultUpcomingCompetitions()
+  );
   const [selectedCompId, setSelectedCompId] = useState<string>('');
   const [gameType, setGameType] = useState<BongGameType>('V75');
   const [strategy, setStrategy] = useState<JanneBoyStrategy>('balanserad');
@@ -39,7 +42,14 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
 
   const engine = useMemo(() => new JanneBoyEngine(), []);
   const [raceDay, setRaceDay] = useState<BongRaceDayData>(() => buildFallbackBongRaceDay('V75'));
-  const [systemResult, setSystemResult] = useState<JanneBoySystemResult | null>(null);
+  const [systemResult, setSystemResult] = useState<JanneBoySystemResult | null>(() =>
+    new JanneBoyEngine().generate(buildFallbackBongRaceDay('V75'), {
+      gameType: 'V75',
+      strategy: 'balanserad',
+      budget: 100,
+      lockedHorses: {},
+    })
+  );
 
   const loadLiveOmgang = useCallback(
     async (
@@ -52,18 +62,26 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
       try {
         setLoadingLive(true);
         const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
-        if (res.data) {
-          setRaceDay(res.data);
-          setIsLive(true);
-          const config: JanneBoyConfig = {
-            gameType: type,
-            strategy: currentStrat,
-            budget: currentBudget,
-            lockedHorses: locks,
-          };
-          setSystemResult(engine.generate(res.data, config));
-        }
+        const activeRaceDay = res.data || buildFallbackBongRaceDay(type);
+        setRaceDay(activeRaceDay);
+        setIsLive(!!res.data);
+        const config: JanneBoyConfig = {
+          gameType: type,
+          strategy: currentStrat,
+          budget: currentBudget,
+          lockedHorses: locks,
+        };
+        setSystemResult(engine.generate(activeRaceDay, config));
       } catch {
+        const fallback = buildFallbackBongRaceDay(type);
+        setRaceDay(fallback);
+        const config: JanneBoyConfig = {
+          gameType: type,
+          strategy: currentStrat,
+          budget: currentBudget,
+          lockedHorses: locks,
+        };
+        setSystemResult(engine.generate(fallback, config));
       } finally {
         setLoadingLive(false);
       }
@@ -90,15 +108,17 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
 
       if (!isSubscribed) return;
 
-      if (res.data && res.data.length > 0) {
-        const formatted = res.data.map(formatCompetitionFromApi);
-        setCompetitions(formatted);
-        const initial = formatted[0];
-        if (initial) {
-          setSelectedCompId(initial.id);
-          setGameType(initial.gameType);
-          loadLiveOmgang(initial.id, initial.gameType, strategy, budget, lockedHorses);
-        }
+      const formatted =
+        res.data && res.data.length > 0
+          ? res.data.map(formatCompetitionFromApi)
+          : getDefaultUpcomingCompetitions();
+
+      setCompetitions(formatted);
+      const initial = formatted[0];
+      if (initial) {
+        setSelectedCompId(initial.id);
+        setGameType(initial.gameType);
+        loadLiveOmgang(initial.id, initial.gameType, 'balanserad', 100, {});
       }
     }
 
@@ -125,10 +145,26 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
 
   const handleSelectStrategy = (newStrat: JanneBoyStrategy) => {
     setStrategy(newStrat);
+    setSystemResult(
+      engine.generate(raceDay, {
+        gameType,
+        strategy: newStrat,
+        budget,
+        lockedHorses,
+      })
+    );
   };
 
   const handleChangeBudget = (newBudget: number) => {
     setBudget(newBudget);
+    setSystemResult(
+      engine.generate(raceDay, {
+        gameType,
+        strategy,
+        budget: newBudget,
+        lockedHorses,
+      })
+    );
   };
 
   const handleToggleLock = (legIndex: number, horseId: string) => {

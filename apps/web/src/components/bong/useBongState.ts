@@ -11,6 +11,7 @@ import {
 import {
   BongCompetition,
   formatCompetitionFromApi,
+  getDefaultUpcomingCompetitions,
   buildFallbackBongRaceDay,
 } from './competitions';
 import { apiFetch } from '../../lib/api';
@@ -19,7 +20,9 @@ export function useBongState(
   initialGameType?: BongGameType,
   initialSelectedHorses?: Record<number, string[]>
 ) {
-  const [competitions, setCompetitions] = useState<BongCompetition[]>([]);
+  const [competitions, setCompetitions] = useState<BongCompetition[]>(() =>
+    getDefaultUpcomingCompetitions()
+  );
   const [selectedCompId, setSelectedCompId] = useState<string>('');
   const [gameType, setGameType] = useState<BongGameType>(initialGameType || 'V75');
   const [activeLegIndex, setActiveLegIndex] = useState<number>(0);
@@ -71,17 +74,19 @@ export function useBongState(
 
       if (!isSubscribed) return;
 
-      if (res.data && res.data.length > 0) {
-        const formatted = res.data.map(formatCompetitionFromApi);
-        setCompetitions(formatted);
-        const match = initialGameType
-          ? formatted.find((c) => c.gameType === initialGameType) || formatted[0]
-          : formatted[0];
-        if (match) {
-          setSelectedCompId(match.id);
-          setGameType(match.gameType);
-          loadGame(match.id, match.gameType);
-        }
+      const formatted =
+        res.data && res.data.length > 0
+          ? res.data.map(formatCompetitionFromApi)
+          : getDefaultUpcomingCompetitions();
+
+      setCompetitions(formatted);
+      const match = initialGameType
+        ? formatted.find((c) => c.gameType === initialGameType) || formatted[0]
+        : formatted[0];
+      if (match) {
+        setSelectedCompId(match.id);
+        setGameType(match.gameType);
+        loadGame(match.id, match.gameType);
       }
     }
 

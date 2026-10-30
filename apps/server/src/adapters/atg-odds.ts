@@ -9,12 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Database from 'better-sqlite3';
-import {
-  SourceAdapter,
-  SourceResult,
-  FetchContext,
-  RaceOddsData,
-} from '@stallbacken/shared';
+import { SourceAdapter, SourceResult, FetchContext, RaceOddsData } from '@stallbacken/shared';
 import { fetchWithPolicy, FetchOptions } from '../collect/queue.js';
 import { HealthManager } from '../health/health-manager.js';
 import { logger } from '../lib/logger.js';
