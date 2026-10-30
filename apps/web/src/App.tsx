@@ -107,7 +107,7 @@ export const App: React.FC = () => {
       <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-slate-900 text-slate-100 p-6 border-r border-slate-800 shrink-0">
         <div className="mb-8 flex items-center justify-start">
           <img
-            src="/logo.png"
+            src="./logo.png"
             alt="Stallbacken"
             className="h-14 w-auto max-w-full object-contain rounded-lg drop-shadow-sm"
           />
@@ -159,7 +159,7 @@ export const App: React.FC = () => {
         <header className="lg:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-0 z-10 shadow-sm">
           <div className="flex items-center">
             <img
-              src="/logo.png"
+              src="./logo.png"
               alt="Stallbacken"
               className="h-10 w-auto max-w-[180px] object-contain rounded drop-shadow-xs"
             />
