@@ -22,15 +22,12 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         <Menu className="w-6 h-6" />
       </button>
 
-      <div className="flex flex-col items-center justify-center text-center select-none py-0.5">
+      <div className="flex items-center justify-center select-none py-1">
         <img
           src="./logo.png"
-          alt="Stallbacken"
-          className="h-8 w-auto max-w-[140px] object-contain rounded drop-shadow-xs"
+          alt="Tangitza"
+          className="h-9 w-auto max-w-[150px] object-contain rounded drop-shadow-xs"
         />
-        <span className="text-[9px] font-bold text-amber-400 tracking-wider uppercase leading-tight mt-0.5">
-          Harry Janne
-        </span>
       </div>
 
       <button

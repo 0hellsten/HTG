@@ -1,4 +1,4 @@
-# Stallbacken
+# Tangitza
 
 En lugn travapp som samlar dagens lopp, startlistor, odds och tips i ett tydligt och läsbart gränssnitt.
 

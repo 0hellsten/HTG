@@ -100,7 +100,7 @@ export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({
           </h1>
         </div>
         <p className="text-base text-slate-700 leading-relaxed">
-          Stallbacken samlar allt du behöver veta om dagens trav på ett lugnt och enkelt sätt. Inga
+          Tangitza samlar allt du behöver veta om dagens trav på ett lugnt och enkelt sätt. Inga
           konstiga ord, ingen reklam och inga krångliga menyer. Här nedanför ser du vad de olika
           delarna i appen gör:
         </p>
@@ -128,7 +128,7 @@ export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({
           </a>
         </div>
         <p className="text-xs text-slate-400 border-t border-slate-800 pt-3">
-          Öppna filen på Android-telefonen och tryck på "Installera" för att få Stallbacken direkt bland dina appar.
+          Öppna filen på Android-telefonen och tryck på "Installera" för att få Tangitza direkt bland dina appar.
         </p>
       </div>
 

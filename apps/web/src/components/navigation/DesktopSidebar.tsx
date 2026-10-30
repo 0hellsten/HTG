@@ -15,18 +15,12 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
 }) => {
   return (
     <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-slate-900 text-slate-100 p-6 border-r border-slate-800 shrink-0 shadow-lg">
-      <div className="mb-8 flex items-center gap-3 px-1">
+      <div className="mb-8 flex items-center justify-center px-1">
         <img
           src="./logo.png"
-          alt="Stallbacken"
-          className="h-12 w-auto max-w-[130px] object-contain rounded-lg drop-shadow-md"
+          alt="Tangitza"
+          className="h-12 w-auto max-w-[180px] object-contain rounded-lg drop-shadow-md"
         />
-        <div className="flex flex-col leading-tight select-none">
-          <span className="text-xs uppercase font-semibold tracking-wider text-slate-400">
-            Stallbacken
-          </span>
-          <span className="text-sm font-black text-amber-400">Harry Janne</span>
-        </div>
       </div>
 
       <nav className="space-y-1.5 flex-1" aria-label="Huvudmeny">

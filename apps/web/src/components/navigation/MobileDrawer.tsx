@@ -30,13 +30,12 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
       <aside className="relative flex flex-col w-72 max-w-[80vw] bg-slate-900 text-slate-100 p-5 shadow-2xl z-10 border-r border-slate-800">
         <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center">
             <img
               src="./logo.png"
-              alt="Stallbacken"
+              alt="Tangitza"
               className="h-10 w-auto object-contain rounded-md"
             />
-            <span className="text-xs font-bold text-amber-400">Harry Janne</span>
           </div>
           <button
             type="button"

@@ -1,10 +1,10 @@
-# AGENTS.md — Stallbacken
+# AGENTS.md — Tangitza
 
 Projektets grundlag. Läs den vid varje sessionsstart. Vid konflikt gäller filerna i `.agents/rules/` före denna.
 
 ## Vad projektet är
 
-**Stallbacken** är en privat travapp byggd åt en enskild person: en travkunnig man i 70-årsåldern som är
+**Tangitza** är en privat travapp byggd åt en enskild person: en travkunnig man i 70-årsåldern som är
 helt ointresserad av teknik. Den samlar startlistor, tips, odds, form, tidigare lopp och banstatistik
 från flera källor och visar det i ett lugnt, läsbart gränssnitt.
 
