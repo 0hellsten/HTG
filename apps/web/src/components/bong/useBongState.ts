@@ -6,84 +6,31 @@ import {
   CouponSelection,
   HorseRank,
   ReductionConditions,
+  SourceStatus,
 } from '@stallbacken/shared';
-import { BongCompetition, getUpcomingBongCompetitions } from './competitions';
-import { buildDefaultRaceDay, buildRaceDayFromCompetition } from './defaultRaceDay';
-
-const STORAGE_SESSION_KEY = 'stallbacken_active_bong_session';
+import { BongCompetition, formatCompetitionFromApi, buildFallbackBongRaceDay } from './competitions';
+import { apiFetch } from '../../lib/api';
 
 export function useBongState(
   initialGameType?: BongGameType,
   initialSelectedHorses?: Record<number, string[]>
 ) {
-  const competitions = useMemo(() => getUpcomingBongCompetitions(), []);
-
-  const initialComp = useMemo(() => {
-    if (initialGameType) {
-      const match = competitions.find((c) => c.gameType === initialGameType);
-      if (match) return match;
-    }
-    return competitions[0];
-  }, [competitions, initialGameType]);
-
-  const [selectedDateIso, setSelectedDateIso] = useState<string>(
-    () => initialComp?.dateIso || new Date().toISOString().slice(0, 10)
-  );
-  const [gameType, setGameType] = useState<BongGameType>(
-    initialComp?.gameType || initialGameType || 'V75'
-  );
+  const [competitions, setCompetitions] = useState<BongCompetition[]>([]);
+  const [selectedCompId, setSelectedCompId] = useState<string>('');
+  const [gameType, setGameType] = useState<BongGameType>(initialGameType || 'V75');
   const [activeLegIndex, setActiveLegIndex] = useState<number>(0);
-  const initialRaceDay = useMemo(
-    () =>
-      initialComp
-        ? buildRaceDayFromCompetition(initialComp)
-        : buildDefaultRaceDay(initialGameType || 'V75'),
-    [initialComp, initialGameType]
+  const [raceDay, setRaceDay] = useState<BongRaceDayData>(() =>
+    buildFallbackBongRaceDay(initialGameType || 'V75')
   );
-
-  const [raceDay, setRaceDay] = useState<BongRaceDayData>(initialRaceDay);
+  const [status, setStatus] = useState<SourceStatus>('ok');
+  const [fetchedAt, setFetchedAt] = useState<string>(new Date().toISOString());
 
   const [selectedHorses, setSelectedHorses] = useState<Record<number, string[]>>(() => {
     if (initialSelectedHorses) return initialSelectedHorses;
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      try {
-        const saved = sessionStorage.getItem(STORAGE_SESSION_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed.selectedHorses) return parsed.selectedHorses;
-        }
-      } catch {}
-    }
-    const initial: Record<number, string[]> = {};
-    const count = initialRaceDay.races.length;
-    for (let l = 0; l < count; l++) {
-      const horses = initialRaceDay.races[l]?.horses || [];
-      const h1 = horses[0]?.id;
-      const h2 = horses[1]?.id;
-      initial[l] = [h1, h2].filter(Boolean) as string[];
-    }
-    return initial;
+    return {};
   });
 
-  const [ranks, setRanks] = useState<Record<string, HorseRank>>(() => {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      try {
-        const saved = sessionStorage.getItem(STORAGE_SESSION_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed.ranks) return parsed.ranks;
-        }
-      } catch {}
-    }
-    const defaultRanks: Record<string, HorseRank> = {};
-    const count = initialRaceDay.races.length;
-    for (let l = 0; l < count; l++) {
-      const horses = initialRaceDay.races[l]?.horses || [];
-      if (horses[0]) defaultRanks[horses[0].id] = 'A';
-      if (horses[1]) defaultRanks[horses[1].id] = 'B';
-    }
-    return defaultRanks;
-  });
+  const [ranks, setRanks] = useState<Record<string, HorseRank>>({});
 
   const [onlyTopPool, setOnlyTopPool] = useState<boolean>(false);
   const [flerbongMultiplier, setFlerbongMultiplier] = useState<number>(1);
@@ -101,38 +48,75 @@ export function useBongState(
   const [copied, setCopied] = useState<boolean>(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
-  // Spara aktivt tillstånd i sessionStorage
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      try {
-        sessionStorage.setItem(
-          STORAGE_SESSION_KEY,
-          JSON.stringify({ gameType, selectedHorses, ranks })
-        );
-      } catch {}
+    let isSubscribed = true;
+
+    async function loadUpcoming() {
+      const res = await apiFetch<Array<{
+        id: string;
+        gameType: BongGameType;
+        gameName: string;
+        date: string;
+        trackName: string;
+        startTime: string;
+        turnover: number;
+        jackpotPool: number;
+      }>>('/api/omganger/kommande');
+
+      if (!isSubscribed) return;
+
+      if (res.data && res.data.length > 0) {
+        const formatted = res.data.map(formatCompetitionFromApi);
+        setCompetitions(formatted);
+        const match = initialGameType
+          ? formatted.find((c) => c.gameType === initialGameType) || formatted[0]
+          : formatted[0];
+        if (match) {
+          setSelectedCompId(match.id);
+          setGameType(match.gameType);
+          loadGame(match.id, match.gameType);
+        }
+      }
     }
-  }, [gameType, selectedHorses, ranks]);
+
+    loadUpcoming();
+    return () => {
+      isSubscribed = false;
+    };
+  }, [initialGameType]);
+
+  async function loadGame(gameId: string, gType: BongGameType) {
+    const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
+    if (res.data) {
+      setRaceDay(res.data);
+      setStatus(res.status);
+      setFetchedAt(res.fetchedAt);
+
+      if (!initialSelectedHorses) {
+        const newSel: Record<number, string[]> = {};
+        const newRanks: Record<string, HorseRank> = {};
+        res.data.races.forEach((r, idx) => {
+          const h1 = r.horses[0]?.id;
+          const h2 = r.horses[1]?.id;
+          newSel[idx] = [h1, h2].filter(Boolean) as string[];
+          if (h1) newRanks[h1] = 'A';
+          if (h2) newRanks[h2] = 'B';
+        });
+        setSelectedHorses(newSel);
+        setRanks(newRanks);
+      }
+    } else {
+      setRaceDay(buildFallbackBongRaceDay(gType));
+      setStatus(res.status);
+      setFetchedAt(res.fetchedAt);
+    }
+  }
 
   const handleSelectCompetition = (comp: BongCompetition) => {
-    setSelectedDateIso(comp.dateIso);
+    setSelectedCompId(comp.id);
     setGameType(comp.gameType);
     setActiveLegIndex(0);
-    const newRaceDay = buildRaceDayFromCompetition(comp);
-    setRaceDay(newRaceDay);
-
-    const newSel: Record<number, string[]> = {};
-    const newRanks: Record<string, HorseRank> = {};
-    const count = comp.gameType === 'V75' ? 7 : 8;
-    for (let l = 0; l < count; l++) {
-      const horses = newRaceDay.races[l]?.horses || [];
-      const h1 = horses[0]?.id;
-      const h2 = horses[1]?.id;
-      newSel[l] = [h1, h2].filter(Boolean) as string[];
-      if (h1) newRanks[h1] = 'A';
-      if (h2) newRanks[h2] = 'B';
-    }
-    setSelectedHorses(newSel);
-    setRanks(newRanks);
+    loadGame(comp.id, comp.gameType);
   };
 
   const handleToggleHorse = (horseId: string, legIdx = activeLegIndex) => {
@@ -165,7 +149,7 @@ export function useBongState(
   const engine = useMemo(() => new BongEngine(gameType), [gameType]);
 
   const calculationResult = useMemo(() => {
-    const legsCount = gameType === 'V75' ? 7 : 8;
+    const legsCount = raceDay.races.length || (gameType === 'V75' ? 7 : 8);
     const legs = Array.from({ length: legsCount }, (_, legIdx) => ({
       legIndex: legIdx,
       selectedHorseIds: selectedHorses[legIdx] || [],
@@ -236,20 +220,22 @@ export function useBongState(
     try {
       const saved = { gameType, selectedHorses, ranks, date: new Date().toISOString() };
       localStorage.setItem(`stallbacken_saved_bong_${gameType}`, JSON.stringify(saved));
-      setSaveMessage('Bongen har sparats i webbläsaren!');
+      setSaveMessage('Bongen har sparats i webbläsaren');
       setTimeout(() => setSaveMessage(null), 2500);
     } catch {
-      setSaveMessage('Kunde inte spara.');
+      setSaveMessage('Kunde inte spara');
     }
   };
 
   return {
     competitions,
-    selectedDateIso,
+    selectedDateIso: selectedCompId,
     gameType,
     activeLegIndex,
     setActiveLegIndex,
     raceDay,
+    status,
+    fetchedAt,
     selectedHorses,
     ranks,
     onlyTopPool,

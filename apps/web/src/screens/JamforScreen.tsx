@@ -4,7 +4,6 @@ import {
   Race,
   Start,
   SourceStatus,
-  ApiResponse,
   HorseProfileResponse,
   HorseBatchResponse,
 } from '@stallbacken/shared';
@@ -14,6 +13,7 @@ import { LoppSkelett } from '../components/SkelettKort';
 import { JamforTabell } from '../components/JamforTabell';
 import { HorseOddsMap } from '../components/StartlistaTabell';
 import { formatDistance, formatStartMethod } from '../lib/format';
+import { apiFetch } from '../lib/api';
 
 interface JamforScreenProps {
   raceId: string;
@@ -43,10 +43,8 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
     setLoading(true);
     try {
       const [raceRes, oddsRes] = await Promise.all([
-        fetch(`/api/lopp/${raceId}`).then((r) => r.json()),
-        fetch(`/api/lopp/${raceId}/odds`)
-          .then((r) => r.json())
-          .catch(() => null),
+        apiFetch<{ race: Race; starts: Start[] }>(`/api/lopp/${raceId}`),
+        apiFetch<any>(`/api/lopp/${raceId}/odds`),
       ]);
 
       if (raceRes?.data) {
@@ -93,12 +91,11 @@ export const JamforScreen: React.FC<JamforScreenProps> = ({
   const fetchProfiles = async (ids: string[]) => {
     if (ids.length === 0) return;
     try {
-      const res = await fetch('/api/hastar/jamfor', {
+      const json = await apiFetch<HorseBatchResponse>('/api/hastar/jamfor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ horseIds: ids }),
       });
-      const json: ApiResponse<HorseBatchResponse> = await res.json();
       if (json?.data) {
         setProfiles((prev) => ({ ...prev, ...json.data }));
         setStatus(json.status);

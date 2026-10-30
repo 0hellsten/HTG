@@ -28,6 +28,8 @@ interface StallScreenProps {
   onGoToSearchHorses: () => void;
 }
 
+import { apiFetch } from '../lib/api';
+
 export const StallScreen: React.FC<StallScreenProps> = ({
   onSelectHorse,
   onSelectTrack,
@@ -56,8 +58,7 @@ export const StallScreen: React.FC<StallScreenProps> = ({
 
   const fetchTodaysEntries = async () => {
     try {
-      const res = await fetch('/api/stall/anmalda-idag');
-      const json: ApiResponse<StallTodayResponse> = await res.json();
+      const json: ApiResponse<StallTodayResponse> = await apiFetch<StallTodayResponse>('/api/stall/anmalda-idag');
       if (json && json.data) {
         setTodayData(json.data);
       }

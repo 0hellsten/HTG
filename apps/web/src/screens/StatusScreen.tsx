@@ -9,6 +9,8 @@ interface StatusScreenProps {
   onBack: () => void;
 }
 
+import { apiFetch } from '../lib/api';
+
 export const StatusScreen: React.FC<StatusScreenProps> = ({ onBack }) => {
   const [sources, setSources] = useState<SourceHealthRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,8 +19,7 @@ export const StatusScreen: React.FC<StatusScreenProps> = ({ onBack }) => {
 
   const fetchKallor = async () => {
     try {
-      const res = await fetch('/api/kallor');
-      const json: ApiResponse<SourceHealthRecord[]> = await res.json();
+      const json: ApiResponse<SourceHealthRecord[]> = await apiFetch<SourceHealthRecord[]>('/api/kallor');
       if (json && json.data) {
         setSources(json.data);
         setLastRefreshedAt(json.fetchedAt);
@@ -37,8 +38,7 @@ export const StatusScreen: React.FC<StatusScreenProps> = ({ onBack }) => {
   const handleUpdateAll = async () => {
     setRefreshing(true);
     try {
-      const res = await fetch('/api/kallor/uppdatera-allt', { method: 'POST' });
-      const json: ApiResponse<SourceHealthRecord[]> = await res.json();
+      const json: ApiResponse<SourceHealthRecord[]> = await apiFetch<SourceHealthRecord[]>('/api/kallor/uppdatera-allt', { method: 'POST' });
       if (json && json.data) {
         setSources(json.data);
         setLastRefreshedAt(json.fetchedAt);

@@ -74,7 +74,7 @@ export const LoppRankingKort: React.FC<LoppRankingKortProps> = ({
 
       <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500 pt-1">
         <span className={isRead ? 'text-slate-600 font-medium' : 'text-slate-700 font-semibold'}>
-          {tip.provider}
+          {tip.provider.startsWith('Tips från ') ? tip.provider : `Tips från ${tip.provider}`}
         </span>
         {tip.raceId && onOpenRace && (
           <button

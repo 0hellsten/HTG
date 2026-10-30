@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, ChevronRight, CloudSun, Compass } from 'lucide-react';
+import { ChevronRight, CloudSun, Compass } from 'lucide-react';
 import { RaceDay, Race, SourceStatus, ApiResponse } from '@stallbacken/shared';
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
@@ -13,6 +13,7 @@ import {
 import { formatSwedishDate, isEvening } from '../lib/date';
 import { formatDistance, formatStartMethod } from '../lib/format';
 import { saveLastSyncTime } from '../components/OfflineRemsa';
+import { apiFetch } from '../lib/api';
 
 interface IdagScreenProps {
   onOpenRace: (raceId: string, siblingRaces: Race[]) => void;
@@ -20,17 +21,21 @@ interface IdagScreenProps {
 }
 
 export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace, onOpenTrack }) => {
+  const [selectedOffset, setSelectedOffset] = useState<number>(0);
   const [raceDays, setRaceDays] = useState<RaceDay[]>([]);
   const [favoriteTrackIds, setFavoriteTrackIds] = useState<string[]>([]);
   const [status, setStatus] = useState<SourceStatus>('ok');
   const [statusMessage, setStatusMessage] = useState<string>('Allt är färskt och uppdaterat.');
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchIdag = async () => {
+  const targetDate = new Date(Date.now() + selectedOffset * 86400000);
+  const targetDateStr = targetDate.toISOString().slice(0, 10);
+
+  const fetchDagar = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/dagar/idag');
-      const json: ApiResponse<RaceDay[]> = await res.json();
+      const endpoint = selectedOffset === 0 ? '/api/dagar/idag' : `/api/dagar?datum=${targetDateStr}`;
+      const json: ApiResponse<RaceDay[]> = await apiFetch<RaceDay[]>(endpoint);
       if (json && json.data) {
         setRaceDays(json.data);
         setStatus(json.status);
@@ -50,68 +55,78 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace, onOpenTrack 
 
   useEffect(() => {
     setFavoriteTrackIds(getFavoriteTrackIds());
-    fetchIdag();
-  }, []);
+    fetchDagar();
+  }, [selectedOffset]);
 
-  const handleToggleFavorite = (trackId: string) => {
-    toggleFavoriteTrack(trackId);
+  const handleToggleFavorite = (trackId: string, trackName: string) => {
+    toggleFavoriteTrack(trackId, trackName);
     setFavoriteTrackIds(getFavoriteTrackIds());
   };
 
   const sortedRaceDays = sortRaceDaysWithFavorites(raceDays, favoriteTrackIds);
-  const heading = isEvening() ? 'Kvällens omgång' : 'Dagens omgång';
-  const todayFormatted = formatSwedishDate();
+  const heading = selectedOffset === 0 ? (isEvening() ? 'Kvällens omgång' : 'Dagens omgång') : 'Kommande omgång';
+  const displayDateFormatted = formatSwedishDate(targetDate);
+
+  const dateOptions = [
+    { offset: 0, label: 'Idag' },
+    { offset: 1, label: 'Imorgon' },
+    { offset: 2, label: 'I övermorgon' },
+  ];
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-16">
-      {/* Rubrikrad med datum och färskhetsprick */}
       <div className="flex items-start justify-between border-b border-slate-200 pb-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
             {heading}
           </h1>
-          <p className="text-base text-slate-600 mt-0.5 capitalize">{todayFormatted}</p>
+          <p className="text-base text-slate-600 mt-0.5 capitalize">{displayDateFormatted}</p>
         </div>
         <div className="pt-1">
-          <FarskhetsPrick status={status} explanation={statusMessage} onRetry={fetchIdag} />
+          <FarskhetsPrick status={status} explanation={statusMessage} onRetry={fetchDagar} />
         </div>
       </div>
 
-      {/* Skelettkort under laddning (aldrig en spinnande cirkel) */}
-      {loading && <IdagSkelett />}
+      <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Välj tävlingsdag">
+        {dateOptions.map((opt) => (
+          <button
+            key={opt.offset}
+            type="button"
+            role="tab"
+            aria-selected={selectedOffset === opt.offset}
+            onClick={() => setSelectedOffset(opt.offset)}
+            className={`px-4 py-2 rounded-xl text-base font-bold min-h-[44px] cursor-pointer transition-colors shrink-0 ${
+              selectedOffset === opt.offset
+                ? 'bg-amber-600 text-white shadow-sm'
+                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
 
-      {/* Tomt läge om inga tävlingar körs idag */}
-      {!loading && sortedRaceDays.length === 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 p-8 sm:p-12 text-center space-y-3">
-          <Calendar className="w-12 h-12 text-slate-400 mx-auto" />
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Inga lopp idag</h2>
-          <p className="text-slate-600 text-base sm:text-lg max-w-md mx-auto leading-relaxed">
-            Inga lopp idag. Nästa omgång visas här så snart anmälningslistorna är klara.
-          </p>
-        </div>
-      )}
-
-      {/* Kort per bana — var och en skyddad av sin egen felgräns */}
-      {!loading && sortedRaceDays.length > 0 && (
+      {loading ? (
+        <IdagSkelett />
+      ) : sortedRaceDays.length > 0 ? (
         <div className="space-y-6">
-          {sortedRaceDays.map((day) => {
-            const isFavorite = favoriteTrackIds.includes(day.trackId);
-            return (
-              <BlockErrorBoundary
-                key={day.id}
-                fallbackTitle={`Uppgifterna för ${day.trackName} saknas just nu`}
-                onRetry={fetchIdag}
-              >
-                <BanaKort
-                  day={day}
-                  isFavorite={isFavorite}
-                  onToggleFavorite={() => handleToggleFavorite(day.trackId)}
-                  onOpenRace={onOpenRace}
-                  onOpenTrack={onOpenTrack}
-                />
-              </BlockErrorBoundary>
-            );
-          })}
+          {sortedRaceDays.map((day) => (
+            <BlockErrorBoundary key={day.id} fallbackTitle={`Bana ${day.trackName}`}>
+              <BanaKort
+                day={day}
+                isFavorite={favoriteTrackIds.includes(day.trackId)}
+                onToggleFavorite={() => handleToggleFavorite(day.trackId, day.trackName)}
+                onOpenRace={onOpenRace}
+                onOpenTrack={onOpenTrack}
+              />
+            </BlockErrorBoundary>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl border border-slate-200 p-8 text-center space-y-3">
+          <p className="text-lg font-medium text-slate-800">
+            Inga tävlingar hittades för det valda datumet.
+          </p>
         </div>
       )}
     </div>
@@ -137,10 +152,9 @@ const BanaKort: React.FC<BanaKortProps> = ({
   const [weather, setWeather] = useState<{ tempC: number; description: string } | null>(null);
 
   useEffect(() => {
-    fetch(`/api/banor/${day.trackId}/vader`)
-      .then((r) => r.json())
+    apiFetch<{ tempC: number; description: string }>(`/api/banor/${day.trackId}/vader`)
       .then((j) => {
-        if (j && j.data && j.status === 'ok') {
+        if (j && j.data) {
           setWeather({ tempC: j.data.tempC, description: j.data.description });
         }
       })
@@ -149,7 +163,6 @@ const BanaKort: React.FC<BanaKortProps> = ({
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
-      {/* Banans toppinfo med namn, spelform, hästsko och tider */}
       <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
@@ -188,16 +201,15 @@ const BanaKort: React.FC<BanaKortProps> = ({
               <button
                 type="button"
                 onClick={() => onOpenTrack(day.trackId)}
-                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-amber-700 hover:text-amber-900 min-h-[36px] py-1 cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-amber-700 hover:text-amber-900 min-h-[44px] py-1 cursor-pointer"
               >
-                <Compass className="w-3.5 h-3.5" />
+                <Compass className="w-4 h-4" />
                 <span>Banvisaren för {day.trackName} &rarr;</span>
               </button>
             </div>
           )}
         </div>
 
-        {/* Hästsko-knapp för att spara eller ta bort från favoritbanor */}
         <button
           type="button"
           onClick={onToggleFavorite}
@@ -211,13 +223,11 @@ const BanaKort: React.FC<BanaKortProps> = ({
               ? `Ta bort ${day.trackName} från dina favoriter`
               : `Lägg till ${day.trackName} som favoritbana`
           }
-          title={isFavorite ? 'Ta bort från dina favoriter' : 'Lägg till som favoritbana'}
         >
           <HastsKoIkon className="w-5 h-5" filled={isFavorite} />
         </button>
       </div>
 
-      {/* Lista över lopp på banan */}
       {races.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
           {races.map((race) => (

@@ -12,6 +12,7 @@ import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
 import { IdagSkelett } from '../components/SkelettKort';
 import { HastsKoIkon } from '../components/HastsKoIkon';
 import { isFavoriteTrack, toggleFavoriteTrack } from '../lib/favoriter';
+import { apiFetch } from '../lib/api';
 import { formatDistance } from '../lib/format';
 
 interface BanvisarenScreenProps {
@@ -42,8 +43,7 @@ export const BanvisarenScreen: React.FC<BanvisarenScreenProps> = ({
   useEffect(() => {
     const fetchAllTracks = async () => {
       try {
-        const res = await fetch('/api/banor');
-        const json: ApiResponse<TrackProfile[]> = await res.json();
+        const json: ApiResponse<TrackProfile[]> = await apiFetch<TrackProfile[]>('/api/banor');
         if (json && json.data) {
           setTracks(json.data);
         }
@@ -59,15 +59,13 @@ export const BanvisarenScreen: React.FC<BanvisarenScreenProps> = ({
     setLoading(true);
     try {
       // 1. Banprofil
-      const profRes = await fetch(`/api/banor/${trackId}`);
-      const profJson: ApiResponse<TrackProfile> = await profRes.json();
+      const profJson: ApiResponse<TrackProfile> = await apiFetch<TrackProfile>(`/api/banor/${trackId}`);
       if (profJson && profJson.data) {
         setProfile(profJson.data);
       }
 
       // 2. Banstatistik
-      const statsRes = await fetch(`/api/banor/${trackId}/statistik`);
-      const statsJson: ApiResponse<TrackStats> = await statsRes.json();
+      const statsJson: ApiResponse<TrackStats> = await apiFetch<TrackStats>(`/api/banor/${trackId}/statistik`);
       if (statsJson && statsJson.data) {
         setStats(statsJson.data);
       }
@@ -88,8 +86,7 @@ export const BanvisarenScreen: React.FC<BanvisarenScreenProps> = ({
         new URLSearchParams(window.location.search).get('simulateWeatherDown') === 'true';
 
       const queryParam = isSimulateDown ? '?simulateDown=true' : '';
-      const wRes = await fetch(`/api/banor/${trackId}/vader${queryParam}`);
-      const wJson: ApiResponse<TrackWeather | null> = await wRes.json();
+      const wJson: ApiResponse<TrackWeather | null> = await apiFetch<TrackWeather | null>(`/api/banor/${trackId}/vader${queryParam}`);
 
       if (wJson && wJson.data && wJson.status !== 'failed') {
         setWeather(wJson.data);

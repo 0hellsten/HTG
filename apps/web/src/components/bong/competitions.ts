@@ -1,7 +1,4 @@
-// Kommande travtävlingar och omgångar för Bong-maskinen
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
-import { BongGameType } from '@stallbacken/shared';
+import { BongGameType, BongRaceDayData } from '@stallbacken/shared';
 
 export interface BongCompetition {
   id: string;
@@ -18,110 +15,80 @@ export interface BongCompetition {
   isToday: boolean;
 }
 
-const MONTH_NAMES_SHORT = [
-  'jan',
-  'feb',
-  'mar',
-  'apr',
-  'maj',
-  'jun',
-  'jul',
-  'aug',
-  'sep',
-  'okt',
-  'nov',
-  'dec',
-];
-const WEEKDAY_NAMES_SHORT = ['Sön', 'Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör'];
-const WEEKDAY_NAMES_FULL = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
+export function formatCompetitionFromApi(g: {
+  id: string;
+  gameType: BongGameType;
+  gameName: string;
+  date: string;
+  trackName: string;
+  startTime: string;
+  turnover: number;
+  jackpotPool: number;
+}): BongCompetition {
+  const d = new Date(g.date);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const isToday = g.date === todayStr;
 
-/**
- * Genererar kommande tävlingar från dagens datum och 14 dagar framåt.
- */
-export function getUpcomingBongCompetitions(startDate: Date = new Date()): BongCompetition[] {
-  const result: BongCompetition[] = [];
+  const weekdays = ['Sön', 'Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör'];
+  const fullWeekdays = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
+  const months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
-  for (let offset = 0; offset < 14; offset++) {
-    const cur = new Date(startDate.getTime() + offset * 24 * 3600 * 1000);
-    const dayOfWeek = cur.getDay(); // 0 = Sön, 3 = Ons, 6 = Lör
-    const dateIso = cur.toISOString().slice(0, 10);
-    const dayNr = cur.getDate();
-    const month = MONTH_NAMES_SHORT[cur.getMonth()];
-    const isToday = offset === 0;
+  const dayOfWeek = isNaN(d.getDay()) ? 6 : d.getDay();
+  const dayNr = isNaN(d.getDate()) ? 1 : d.getDate();
+  const month = isNaN(d.getMonth()) ? 'okt' : months[d.getMonth()];
 
-    const weekdayShort = isToday ? 'Idag' : WEEKDAY_NAMES_SHORT[dayOfWeek];
-    const fullDateText = `${isToday ? 'Idag ' : ''}${WEEKDAY_NAMES_FULL[dayOfWeek]} ${dayNr} ${month}`;
-    const dateFormatted = `${dayNr} ${month}`;
+  const weekdayShort = isToday ? 'Idag' : weekdays[dayOfWeek];
+  const fullDateText = `${isToday ? 'Idag ' : ''}${fullWeekdays[dayOfWeek]} ${dayNr} ${month}`;
+  const dateFormatted = `${dayNr} ${month}`;
 
-    let gameType: BongGameType = 'V75';
-    let gameName = 'V75';
-    let trackName = 'Solvalla';
-    let startTime = '16:20';
-    let turnover = 48500000;
-    let jackpotPool: number | undefined = undefined;
+  return {
+    id: g.id,
+    dateIso: g.date,
+    weekday: weekdayShort,
+    dateFormatted,
+    fullDateText,
+    gameType: g.gameType,
+    gameName: g.gameName,
+    trackName: g.trackName,
+    startTime: g.startTime,
+    turnover: g.turnover,
+    jackpotPool: g.jackpotPool || undefined,
+    isToday,
+  };
+}
 
-    if (dayOfWeek === 6) {
-      // Lördagar = V75 Stora Rikstravet
-      gameType = 'V75';
-      gameName = 'V75';
-      trackName = offset === 2 ? 'Jägersro' : offset === 9 ? 'Bergsåker' : 'Solvalla';
-      startTime = '16:20';
-      turnover = 58200000;
-      jackpotPool = 14500000;
-    } else if (dayOfWeek === 3) {
-      // Onsdagar = V86 Xpress
-      gameType = 'V86';
-      gameName = 'V86';
-      trackName = 'Solvalla / Åby (Xpress)';
-      startTime = '20:30';
-      turnover = 24800000;
-      jackpotPool = 5200000;
-    } else if (dayOfWeek === 0) {
-      // Söndagar = Grand Slam 75
-      gameType = 'V75';
-      gameName = 'GS75';
-      trackName = offset === 3 ? 'Axevalla' : 'Kalmar';
-      startTime = '15:00';
-      turnover = 12500000;
-      jackpotPool = 2000000;
-    } else if (dayOfWeek === 5) {
-      // Fredagar = V64 / Fredagstrav
-      gameType = 'V75';
-      gameName = 'V64';
-      trackName = 'Romme';
-      startTime = '19:30';
-      turnover = 8900000;
-    } else {
-      // Vardagar (Mån, Tis, Tor)
-      gameType = 'V75';
-      gameName = 'V64';
-      trackName =
-        dayOfWeek === 1
-          ? 'Färjestad'
-          : dayOfWeek === 2
-            ? 'Eskilstuna'
-            : isToday
-              ? 'Solvalla'
-              : 'Åby';
-      startTime = '19:30';
-      turnover = 7500000;
-    }
+export function buildFallbackBongRaceDay(gameType: BongGameType): BongRaceDayData {
+  const count = gameType === 'V86' ? 8 : 7;
+  const races = Array.from({ length: count }, (_, idx) => ({
+    legIndex: idx,
+    raceNumber: idx + 1,
+    trackName: gameType === 'V86' ? (idx % 2 === 0 ? 'Solvalla' : 'Åby') : 'Solvalla',
+    raceName: `Avdelning ${idx + 1}`,
+    startTime: gameType === 'V86' ? '20:30' : '16:20',
+    distance: 2140,
+    startMethod: 'auto' as const,
+    horses: Array.from({ length: 12 }, (__, hIdx) => ({
+      id: `hb_${idx}_${hIdx + 1}`,
+      startNumber: hIdx + 1,
+      postPosition: hIdx + 1,
+      name: `Startande häst ${hIdx + 1}`,
+      driverName: 'Kusk',
+      trainerName: 'Tränare',
+      betDistribution: Number((1 / 12).toFixed(4)),
+      winOdds: 10.0,
+      sulkyType: 'regular' as const,
+      shoeFront: true,
+      shoeBack: true,
+      scratched: false,
+    })),
+  }));
 
-    result.push({
-      id: dateIso,
-      dateIso,
-      weekday: weekdayShort,
-      dateFormatted,
-      fullDateText,
-      gameType,
-      gameName,
-      trackName,
-      startTime,
-      turnover,
-      jackpotPool,
-      isToday,
-    });
-  }
-
-  return result;
+  return {
+    gameType,
+    turnover: 0,
+    trackName: 'Svensk travbana',
+    date: 'Idag',
+    startTime: gameType === 'V86' ? '20:30' : '16:20',
+    races,
+  };
 }

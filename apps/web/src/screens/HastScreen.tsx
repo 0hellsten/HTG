@@ -8,6 +8,7 @@ import { TraningFormBlock } from '../components/TraningFormBlock';
 import { HastsKoIkon } from '../components/HastsKoIkon';
 import { LoppSkelett } from '../components/SkelettKort';
 import { isFavoriteHorse, toggleFavoriteHorse } from '../lib/favoriter';
+import { apiFetch } from '../lib/api';
 
 interface HastScreenProps {
   horseId: string;
@@ -38,33 +39,25 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
       if (isSimulateDown) queryParams.set('simulateDown', 'true');
 
       const url = `/api/hastar/${horseId}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-      const res = await fetch(url);
-      const json: ApiResponse<HorseProfileResponse | null> = await res.json();
+      const json: ApiResponse<HorseProfileResponse | null> = await apiFetch<HorseProfileResponse | null>(url);
 
       if (json && json.data) {
         setProfile(json.data);
         setStatus(json.status);
         setStatusMessage(json.message);
       } else {
-        // Fallback: prova söka på hästens namn om id inte matchade direkt
         const cleanName = horseId.replace(/^h_/, '').replace(/_/g, ' ');
         if (cleanName.length >= 2) {
           try {
-            const searchRes = await fetch(`/api/hastar/sok?q=${encodeURIComponent(cleanName)}`);
-            if (searchRes.ok) {
-              const searchJson = await searchRes.json();
-              const matched = searchJson?.data?.[0];
-              if (matched) {
-                const matchedRes = await fetch(`/api/hastar/${matched.id}`);
-                if (matchedRes.ok) {
-                  const matchedJson = await matchedRes.json();
-                  if (matchedJson?.data) {
-                    setProfile(matchedJson.data);
-                    setStatus('ok');
-                    setStatusMessage('Allt är färskt och uppdaterat.');
-                    return;
-                  }
-                }
+            const searchJson = await apiFetch<any[]>(`/api/hastar/sok?q=${encodeURIComponent(cleanName)}`);
+            const matched = searchJson?.data?.[0];
+            if (matched) {
+              const matchedJson = await apiFetch<HorseProfileResponse | null>(`/api/hastar/${matched.id}`);
+              if (matchedJson?.data) {
+                setProfile(matchedJson.data);
+                setStatus(matchedJson.status);
+                setStatusMessage(matchedJson.message || 'Allt är färskt och uppdaterat.');
+                return;
               }
             }
           } catch {}
@@ -91,7 +84,7 @@ export const HastScreen: React.FC<HastScreenProps> = ({ horseId, onBack }) => {
   }, [horseId]);
 
   const handleFavoriteToggle = () => {
-    const nextState = toggleFavoriteHorse(horseId);
+    const nextState = toggleFavoriteHorse(horseId, profile?.horse?.name);
     setIsFav(nextState);
   };
 

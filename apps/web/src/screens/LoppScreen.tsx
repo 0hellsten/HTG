@@ -16,6 +16,8 @@ import { OddsOchStreckBlock } from '../components/OddsOchStreckBlock';
 import { JamforScreen } from './JamforScreen';
 import { formatDistance, formatStartMethod } from '../lib/format';
 
+import { apiFetch } from '../lib/api';
+
 interface LoppScreenProps {
   raceId: string;
   onBack: () => void;
@@ -60,8 +62,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
   const fetchRaceData = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/lopp/${raceId}`);
-      const json: ApiResponse<{ race: Race; starts: Start[] }> = await res.json();
+      const json: ApiResponse<{ race: Race; starts: Start[] }> = await apiFetch<{ race: Race; starts: Start[] }>(`/api/lopp/${raceId}`);
       if (json && json.data) {
         setRace(json.data.race);
         setStarts(json.data.starts);
@@ -86,8 +87,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
         new URLSearchParams(window.location.search).get('simulateOddsDown') === 'true';
 
       const queryParam = isSimulateDown ? '?simulateDown=true' : '';
-      const res = await fetch(`/api/lopp/${raceId}/odds${queryParam}`);
-      const json: ApiResponse<RaceOddsData | null> = await res.json();
+      const json: ApiResponse<RaceOddsData | null> = await apiFetch<RaceOddsData | null>(`/api/lopp/${raceId}/odds${queryParam}`);
 
       if (json && json.data) {
         setOddsData(json.data);
@@ -107,8 +107,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
 
   const fetchTipsData = async () => {
     try {
-      const res = await fetch(`/api/lopp/${raceId}/tips`);
-      const json: ApiResponse<RaceTipsData> = await res.json();
+      const json: ApiResponse<RaceTipsData> = await apiFetch<RaceTipsData>(`/api/lopp/${raceId}/tips`);
       if (json && json.data) {
         setTipsData(json.data);
         setTipsStatus(json.status);
@@ -308,7 +307,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
                     </h2>
                     <FarskhetsPrick
                       status={status}
-                      explanation="Startlistan är från 17:30. Kuskbyten efter det kan saknas."
+                      explanation={statusMessage || 'Startlistan är uppdaterad.'}
                       onRetry={fetchRaceData}
                     />
                   </div>
@@ -385,7 +384,7 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
                             <p className="text-slate-600 text-sm leading-relaxed">{tip.summary}</p>
                           )}
                           <div className="text-xs text-slate-500 font-semibold pt-1">
-                            {tip.provider}
+                            {tip.provider.startsWith('Tips från ') ? tip.provider : `Tips från ${tip.provider}`}
                           </div>
                         </div>
                       ))}

@@ -10,6 +10,7 @@ import {
 import { formatCurrency } from '../lib/format';
 import { HastarSokHistorik } from '../components/hastar/HastarSokHistorik';
 import { HastarRankingLista } from '../components/hastar/HastarRankingLista';
+import { apiFetch } from '../lib/api';
 
 interface HastarScreenProps {
   onSelectHorse: (horseId: string) => void;
@@ -77,8 +78,7 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
     const fetchRankings = async () => {
       setRankingLoading(true);
       try {
-        const res = await fetch(`/api/hastar/ranking?kategori=${rankingCategory}`);
-        const json: ApiResponse<HorseRankingsResponse> = await res.json();
+        const json: ApiResponse<HorseRankingsResponse> = await apiFetch<HorseRankingsResponse>(`/api/hastar/ranking?kategori=${rankingCategory}`);
         if (!isCancelled && json?.data?.items) {
           setRankingItems(json.data.items);
         }
@@ -107,8 +107,7 @@ export const HastarScreen: React.FC<HastarScreenProps> = ({ onSelectHorse }) => 
     const timer = setTimeout(async () => {
       setSearchLoading(true);
       try {
-        const res = await fetch(`/api/hastar/sok?q=${encodeURIComponent(trimmed)}`);
-        const json: ApiResponse<HorseDetail[]> = await res.json();
+        const json: ApiResponse<HorseDetail[]> = await apiFetch<HorseDetail[]>(`/api/hastar/sok?q=${encodeURIComponent(trimmed)}`);
         setResults(json?.data || []);
       } catch {
         setResults([]);

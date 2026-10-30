@@ -5,11 +5,11 @@ import {
   BongRaceLeg,
   HorseRank,
   analyzeHorseProbabilities,
-  ApiResponse,
   HorseProfileResponse,
 } from '@stallbacken/shared';
 import { BongHorseAnalysisSection } from './BongHorseAnalysisSection';
 import { BongHorsePastStarts } from './BongHorsePastStarts';
+import { apiFetch } from '../../lib/api';
 
 interface BongHorseInfoModalProps {
   horse: BongHorseInput | null;
@@ -73,28 +73,19 @@ export const BongHorseInfoModal: React.FC<BongHorseInfoModalProps> = ({
     let isCancelled = false;
     const fetchInfo = async () => {
       try {
-        const res = await fetch(`/api/hastar/${horse.id}`);
-        if (res.ok) {
-          const json: ApiResponse<HorseProfileResponse> = await res.json();
-          if (!isCancelled && json?.data?.horse) {
-            setProfile(json.data);
-            return;
-          }
+        const json = await apiFetch<HorseProfileResponse>(`/api/hastar/${horse.id}`);
+        if (!isCancelled && json?.data?.horse) {
+          setProfile(json.data);
+          return;
         }
 
         if (horse.name) {
-          const searchRes = await fetch(`/api/hastar/sok?q=${encodeURIComponent(horse.name)}`);
-          if (searchRes.ok) {
-            const searchJson = await searchRes.json();
-            const matched = searchJson?.data?.[0];
-            if (!isCancelled && matched) {
-              const fullRes = await fetch(`/api/hastar/${matched.id}`);
-              if (fullRes.ok) {
-                const fullJson = await fullRes.json();
-                if (!isCancelled && fullJson?.data) {
-                  setProfile(fullJson.data);
-                }
-              }
+          const searchJson = await apiFetch<Array<{ id: string; name: string }>>(`/api/hastar/sok?q=${encodeURIComponent(horse.name)}`);
+          const matched = searchJson?.data?.[0];
+          if (!isCancelled && matched) {
+            const fullJson = await apiFetch<HorseProfileResponse>(`/api/hastar/${matched.id}`);
+            if (!isCancelled && fullJson?.data) {
+              setProfile(fullJson.data);
             }
           }
         }

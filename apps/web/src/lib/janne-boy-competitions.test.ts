@@ -1,48 +1,54 @@
 import { describe, it, expect } from 'vitest';
-import { getUpcomingBongCompetitions } from '../components/bong/competitions';
-import { buildRaceDayFromCompetition } from '../components/bong/defaultRaceDay';
+import { formatCompetitionFromApi, buildFallbackBongRaceDay } from '../components/bong/competitions';
 import { JanneBoyEngine, JanneBoyConfig } from '@stallbacken/shared';
 
-describe('Janne Boy med tävlingsväljare', () => {
-  it('genererar kommande tävlingar 14 dagar framåt med datum, bana och spelform', () => {
-    const competitions = getUpcomingBongCompetitions();
-    expect(competitions.length).toBe(14);
+describe('Janne Boy och omgångar', () => {
+  it('formaterar tävling från API-struktur med datum och bana', () => {
+    const raw = {
+      id: 'V75_2026-10-31_solvalla',
+      gameType: 'V75' as const,
+      gameName: 'V75 Solvalla',
+      date: '2026-10-31',
+      trackName: 'Solvalla',
+      startTime: '16:20',
+      turnover: 45000000,
+      jackpotPool: 15000000,
+    };
 
-    const first = competitions[0];
-    expect(first.isToday).toBe(true);
-    expect(first.trackName).toBeTruthy();
-    expect(['V75', 'V86']).toContain(first.gameType);
+    const formatted = formatCompetitionFromApi(raw);
+    expect(formatted.id).toBe(raw.id);
+    expect(formatted.gameType).toBe('V75');
+    expect(formatted.trackName).toBe('Solvalla');
+    expect(formatted.turnover).toBe(45000000);
+    expect(formatted.jackpotPool).toBe(15000000);
+    expect(formatted.dateFormatted).toBeTruthy();
   });
 
-  it('bygger komplett omgångsunderlag från vald tävling för Janne Boy', () => {
-    const competitions = getUpcomingBongCompetitions();
-    const lördagComp = competitions.find((c) => c.weekday === 'Lör') || competitions[0];
-    const raceDay = buildRaceDayFromCompetition(lördagComp);
+  it('bygger omgångsstruktur med rätt antal avdelningar för V75 och V86', () => {
+    const v75Day = buildFallbackBongRaceDay('V75');
+    expect(v75Day.gameType).toBe('V75');
+    expect(v75Day.races.length).toBe(7);
+    expect(v75Day.races[0].horses.length).toBe(12);
 
-    expect(raceDay.gameType).toBe(lördagComp.gameType);
-    expect(raceDay.trackName).toBe(lördagComp.trackName);
-    expect(raceDay.races.length).toBe(lördagComp.gameType === 'V75' ? 7 : 8);
-    expect(raceDay.races[0].horses.length).toBeGreaterThan(0);
+    const v86Day = buildFallbackBongRaceDay('V86');
+    expect(v86Day.gameType).toBe('V86');
+    expect(v86Day.races.length).toBe(8);
   });
 
-  it('skapar fungerande Janne Boy-systemförslag för vald tävling', () => {
-    const competitions = getUpcomingBongCompetitions();
+  it('skapar fungerande Janne Boy-systemförslag för omgång', () => {
     const engine = new JanneBoyEngine();
+    const raceDay = buildFallbackBongRaceDay('V75');
+    const config: JanneBoyConfig = {
+      gameType: 'V75',
+      strategy: 'balanserad',
+      budget: 100,
+    };
 
-    for (const comp of competitions.slice(0, 3)) {
-      const raceDay = buildRaceDayFromCompetition(comp);
-      const config: JanneBoyConfig = {
-        gameType: comp.gameType,
-        strategy: 'balanserad',
-        budget: 100,
-      };
-
-      const result = engine.generate(raceDay, config);
-      expect(result.gameType).toBe(comp.gameType);
-      expect(result.legs.length).toBe(comp.gameType === 'V75' ? 7 : 8);
-      expect(result.costSek).toBeGreaterThan(0);
-      expect(result.costSek).toBeLessThanOrEqual(150);
-      expect(result.totalRows).toBeGreaterThan(0);
-    }
+    const result = engine.generate(raceDay, config);
+    expect(result.gameType).toBe('V75');
+    expect(result.legs.length).toBe(7);
+    expect(result.costSek).toBeGreaterThan(0);
+    expect(result.costSek).toBeLessThanOrEqual(150);
+    expect(result.totalRows).toBeGreaterThan(0);
   });
 });

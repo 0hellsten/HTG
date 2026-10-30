@@ -9,6 +9,7 @@ import { AnalysArtikelKort } from '../components/tips/AnalysArtikelKort';
 import { TipskallorValjare } from '../components/tips/TipskallorValjare';
 import { getReadTipIds, saveReadTipId } from '../lib/read-tips';
 import { getDisabledTipProviders, saveDisabledTipProviders } from '../lib/tip-providers';
+import { apiFetch } from '../lib/api';
 
 interface TipsScreenProps {
   onOpenRace?: (raceId: string) => void;
@@ -46,8 +47,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
   const fetchTips = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/tips');
-      const json: ApiResponse<TipsOverviewData> = await res.json();
+      const json: ApiResponse<TipsOverviewData> = await apiFetch<TipsOverviewData>('/api/tips');
       if (json && json.data) {
         setData(json.data);
         setStatus(json.status);
