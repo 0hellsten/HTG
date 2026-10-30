@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Search, Award, Star, Menu, Calculator } from 'lucide-react';
-import { JanneBoyIcon } from './components/janne-boy/JanneBoyIcon';
 import { Race, BongGameType } from '@stallbacken/shared';
 import { IdagScreen } from './screens/IdagScreen';
 import { LoppScreen } from './screens/LoppScreen';
@@ -18,8 +16,12 @@ import { OmAppenScreen } from './screens/OmAppenScreen';
 import { MerScreen } from './screens/MerScreen';
 import { OfflineRemsa } from './components/OfflineRemsa';
 import { ScrollToTopKnapp } from './components/ScrollToTopKnapp';
+import { Tab } from './components/navigation/navItems';
+import { DesktopSidebar } from './components/navigation/DesktopSidebar';
+import { MobileDrawer } from './components/navigation/MobileDrawer';
+import { MobileHeader } from './components/navigation/MobileHeader';
+import { MobileBottomNav } from './components/navigation/MobileBottomNav';
 
-type Tab = 'idag' | 'janneboy' | 'bong' | 'hastar' | 'tips' | 'stall' | 'mer';
 type MerSubscreen = 'none' | 'om' | 'status' | 'hjalp' | 'textstorlek';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -34,6 +36,7 @@ export const App: React.FC = () => {
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
   const [raceOriginTab, setRaceOriginTab] = useState<'tips' | null>(null);
   const [merSubscreen, setMerSubscreen] = useState<MerSubscreen>('none');
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [siblingRaces, setSiblingRaces] = useState<Race[]>([]);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [bongInitialGameType, setBongInitialGameType] = useState<BongGameType>('V75');
@@ -85,8 +88,17 @@ export const App: React.FC = () => {
     setSelectedTrackId(null);
     setMerSubscreen('none');
     setRaceOriginTab(null);
+    setIsMobileDrawerOpen(false);
     if (tab === 'idag') setSelectedRaceId(null);
     if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  const handleOpenOm = () => {
+    setActiveTab('mer');
+    setMerSubscreen('om');
+    setSelectedHorseId(null);
+    setSelectedTrackId(null);
+    setIsMobileDrawerOpen(false);
   };
 
   const handleOpenJanneBoyInBong = (type: BongGameType, horses: Record<number, string[]>) => {
@@ -95,108 +107,29 @@ export const App: React.FC = () => {
     setActiveTab('bong');
   };
 
-  const navItems = [
-    { id: 'idag' as Tab, label: 'Idag', mobileLabel: 'Idag', icon: Calendar },
-    { id: 'janneboy' as Tab, label: 'Janne Boy', mobileLabel: 'Janne', icon: JanneBoyIcon },
-    { id: 'bong' as Tab, label: 'Bong-maskinen', mobileLabel: 'Bongen', icon: Calculator },
-    { id: 'hastar' as Tab, label: 'Hästar', mobileLabel: 'Hästar', icon: Search },
-    { id: 'tips' as Tab, label: 'Tips', mobileLabel: 'Tips', icon: Award },
-    { id: 'stall' as Tab, label: 'Mitt stall', mobileLabel: 'Mitt stall', icon: Star },
-    { id: 'mer' as Tab, label: 'Mer', mobileLabel: 'Mer', icon: Menu },
-  ];
-
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col lg:flex-row font-sans">
-      {/* Datorsidofält (desktop) */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-slate-900 text-slate-100 p-6 border-r border-slate-800 shrink-0">
-        <div className="mb-8 flex items-center justify-start gap-3">
-          <img
-            src="./logo.png"
-            alt="Stallbacken"
-            className="h-14 w-auto max-w-[140px] object-contain rounded-lg drop-shadow-sm"
-          />
-          <span className="text-sm font-extrabold tracking-wide text-amber-400 select-none whitespace-nowrap">
-            Harry Janne
-          </span>
-        </div>
+      <DesktopSidebar
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        onOpenOm={handleOpenOm}
+      />
 
-        <nav className="space-y-1.5 flex-1" aria-label="Huvudmeny">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            const isJanne = item.id === 'janneboy';
+      <MobileDrawer
+        isOpen={isMobileDrawerOpen}
+        activeTab={activeTab}
+        onClose={() => setIsMobileDrawerOpen(false)}
+        onTabChange={handleTabChange}
+        onOpenOm={handleOpenOm}
+      />
 
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleTabChange(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-base font-medium transition-colors cursor-pointer ${
-                  isActive
-                    ? 'bg-amber-500 text-slate-950 font-semibold shadow-sm'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                }`}
-              >
-                {isJanne ? (
-                  <JanneBoyIcon className="w-5 h-5 object-contain shrink-0" />
-                ) : (
-                  <Icon className="w-5 h-5 shrink-0" />
-                )}
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-
-        <button
-          type="button"
-          onClick={() => {
-            setActiveTab('mer');
-            setMerSubscreen('om');
-            setSelectedHorseId(null);
-            setSelectedTrackId(null);
-          }}
-          className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded-lg text-sm font-semibold transition-colors cursor-pointer"
-        >
-          <span>Om appen</span>
-        </button>
-
-        <div className="pt-6 mt-auto border-t border-slate-800/80 text-center">
-          <span className="text-[10px] font-mono tracking-widest text-slate-500/70 select-none block">
-            HTG™ Hellstens Trav &amp; Galopp
-          </span>
-        </div>
-      </aside>
-
-      {}
       <div className="flex-1 flex flex-col min-w-0">
         <OfflineRemsa />
 
-        {/* Mobil toppremsa */}
-        <header className="lg:hidden bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between border-b border-slate-800 sticky top-0 z-10 shadow-sm">
-          <div className="flex flex-col items-start leading-tight">
-            <img
-              src="./logo.png"
-              alt="Stallbacken"
-              className="h-8 w-auto max-w-[150px] object-contain rounded drop-shadow-xs"
-            />
-            <span className="text-[10px] font-bold text-amber-400 tracking-wider uppercase mt-0.5 leading-none select-none">
-              Harry<br />Janne
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('mer');
-              setMerSubscreen('om');
-              setSelectedHorseId(null);
-              setSelectedTrackId(null);
-            }}
-            className="flex items-center gap-1 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-sm font-bold shadow-sm transition-colors cursor-pointer"
-          >
-            <span>Om</span>
-          </button>
-        </header>
+        <MobileHeader
+          onOpenDrawer={() => setIsMobileDrawerOpen(true)}
+          onOpenOm={handleOpenOm}
+        />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24 lg:pb-8">
           {selectedHorseId ? (
@@ -292,38 +225,10 @@ export const App: React.FC = () => {
 
         <ScrollToTopKnapp />
 
-        {}
-        <nav
-          className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex items-center justify-around z-30 px-1 py-1 shadow-lg"
-          aria-label="Mobil bottenmeny"
-        >
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            const isJanne = item.id === 'janneboy';
-
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleTabChange(item.id)}
-                className={`flex flex-col items-center justify-center flex-1 py-1 px-0.5 rounded-md transition-colors min-h-[44px] cursor-pointer ${
-                  isActive ? 'text-amber-600 font-semibold' : 'text-slate-500'
-                }`}
-              >
-                {isJanne ? (
-                  <JanneBoyIcon className="w-5 h-5 mb-0.5 object-contain shrink-0" />
-                ) : (
-                  <Icon
-                    className={`w-5 h-5 mb-0.5 shrink-0 ${isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'}`}
-                  />
-                )}
-                <span className="text-[10px] font-medium leading-none truncate max-w-full">
-                  {item.mobileLabel || item.label}
-                </span>
-              </button>
-            );
-          })}
-        </nav>
+        <MobileBottomNav
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+        />
       </div>
     </div>
   );
