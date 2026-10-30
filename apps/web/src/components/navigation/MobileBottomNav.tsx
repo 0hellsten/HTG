@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tab, NAV_ITEMS } from './navItems';
+import { Tab, MOBILE_NAV_ITEMS } from './navItems';
 import { JanneBoyIcon } from '../janne-boy/JanneBoyIcon';
 
 interface MobileBottomNavProps {
@@ -16,7 +16,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex items-center justify-around z-30 px-1 py-1 shadow-lg"
       aria-label="Mobil bottenmeny"
     >
-      {NAV_ITEMS.map((item) => {
+      {MOBILE_NAV_ITEMS.map((item) => {
         const Icon = item.icon;
         const isActive = activeTab === item.id;
         const isJanne = item.id === 'janneboy';
@@ -38,7 +38,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 }`}
               />
             )}
-            <span className="text-[10px] font-medium leading-none truncate max-w-full">
+            <span className="text-[11px] font-medium leading-none truncate max-w-full">
               {item.mobileLabel || item.label}
             </span>
           </button>

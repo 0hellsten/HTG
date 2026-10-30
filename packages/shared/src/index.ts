@@ -8,5 +8,7 @@ export * from './types/track.js';
 export * from './types/stall.js';
 export * from './types/bong.js';
 export * from './types/janne-boy.js';
+export * from './types/dagens-basta.js';
 export * from './bong/index.js';
 export * from './janne-boy/index.js';
+export * from './dagens-basta/index.js';

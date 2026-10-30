@@ -1,18 +1,25 @@
 import React from 'react';
-import { Compass, Activity, HelpCircle, Type, ChevronRight, ShieldCheck, BookOpen } from 'lucide-react';
+import { Compass, Activity, HelpCircle, Type, ChevronRight, ShieldCheck, BookOpen, Trophy } from 'lucide-react';
 
 interface MerScreenProps {
-  onSelectOption: (option: 'om' | 'banvisaren' | 'status' | 'hjalp' | 'textstorlek') => void;
+  onSelectOption: (option: 'om' | 'banvisaren' | 'status' | 'hjalp' | 'textstorlek' | 'dagensbasta') => void;
 }
 
 export const MerScreen: React.FC<MerScreenProps> = ({ onSelectOption }) => {
   const menuOptions = [
     {
+      id: 'dagensbasta' as const,
+      title: 'Dagens bästa',
+      description: 'De bästa hästarna och motiveringarna för varje lopp enligt alla parametrar.',
+      icon: Trophy,
+      highlight: true,
+    },
+    {
       id: 'om' as const,
       title: 'Om appen',
       description: 'Kort och enkelt om vad alla sidor gör och hur du installerar appen.',
       icon: BookOpen,
-      highlight: true,
+      highlight: false,
     },
     {
       id: 'banvisaren' as const,

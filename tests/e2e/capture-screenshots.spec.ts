@@ -2,63 +2,28 @@ import { test, expect } from '@playwright/test';
 import path from 'path';
 
 const ARTIFACTS_DIR =
-  'C:/Users/hells/.gemini/antigravity/brain/f232951c-e31e-490a-92b8-0527c7f439ba';
+  'C:/Users/hells/.gemini/antigravity/brain/2cc29c58-6aea-4590-a26f-8057872053f1';
 
-test.describe('Verifierande skärmdumpar', () => {
+test.describe('Verifierande skärmdumpar för Dagens bästa', () => {
   test('Laptop (1440x900)', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    // 1. Janne Boy på laptop
-    const janneTab = page.locator('aside button:has-text("Janne Boy")').first();
-    await expect(janneTab).toBeVisible();
-    await janneTab.click();
-    await expect(page.locator('h1:has-text("Janne Boy")')).toBeVisible();
-    await page.waitForTimeout(400);
+    // 1. Startsidan med Dagens bästa-banner
+    await expect(page.locator('button:has-text("Öppna Dagens bästa")')).toBeVisible();
     await page.screenshot({
-      path: path.join(ARTIFACTS_DIR, 'janne-boy-laptop.png'),
+      path: path.join(ARTIFACTS_DIR, 'idag-banner-laptop.png'),
     });
 
-    // 2. Bong-maskinen på laptop
-    const bongTab = page.locator('aside button:has-text("Bong-maskinen")').first();
-    await expect(bongTab).toBeVisible();
-    await bongTab.click();
-    await expect(page.locator('h1:has-text("Bong-maskinen")')).toBeVisible();
-    await page.waitForTimeout(400);
+    // 2. Klicka på Dagens bästa i menyn
+    const bastaTab = page.locator('aside button:has-text("Dagens bästa")').first();
+    await expect(bastaTab).toBeVisible();
+    await bastaTab.click();
+    await expect(page.locator('h1:has-text("Dagens bästa")')).toBeVisible();
+    await page.waitForTimeout(500);
     await page.screenshot({
-      path: path.join(ARTIFACTS_DIR, 'bong-maskinen-laptop.png'),
-    });
-
-    // 2b. Hästinfo & Analys i Bong-maskinen på laptop
-    const infoBtnLaptop = page.locator('button[title*="Information och analys"]').first();
-    await infoBtnLaptop.click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await page.waitForTimeout(300);
-    await page.screenshot({
-      path: path.join(ARTIFACTS_DIR, 'bong-hastinfo-laptop.png'),
-    });
-    await page.locator('button[aria-label="Stäng informationsruta"]').click();
-    await page.waitForTimeout(200);
-
-    // 3. Hästar med ranking på laptop
-    const hastarTab = page.locator('aside button:has-text("Hästar")').first();
-    await expect(hastarTab).toBeVisible();
-    await hastarTab.click();
-    await expect(page.locator('h1:has-text("Hästar")')).toBeVisible();
-    await page.waitForTimeout(400);
-    await page.screenshot({
-      path: path.join(ARTIFACTS_DIR, 'hastar-ranking-laptop.png'),
-    });
-
-    // 4. Tips med Aftonbladet på laptop
-    const tipsTab = page.locator('aside button:has-text("Tips")').first();
-    await expect(tipsTab).toBeVisible();
-    await tipsTab.click();
-    await expect(page.locator('h1:has-text("Vad tycker stallbacken?")')).toBeVisible();
-    await page.waitForTimeout(400);
-    await page.screenshot({
-      path: path.join(ARTIFACTS_DIR, 'tips-aftonbladet-laptop.png'),
+      path: path.join(ARTIFACTS_DIR, 'dagens-basta-laptop.png'),
     });
   });
 
@@ -67,51 +32,16 @@ test.describe('Verifierande skärmdumpar', () => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    // 1. Janne Boy på mobil
-    const janneTab = page
-      .locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Janne")')
+    // 1. Gå till Dagens bästa via bottenmenyn
+    const bastaTab = page
+      .locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Bästa")')
       .first();
-    await expect(janneTab).toBeVisible();
-    await janneTab.click();
-    await expect(page.locator('h1:has-text("Janne Boy")')).toBeVisible();
-    await page.waitForTimeout(400);
+    await expect(bastaTab).toBeVisible();
+    await bastaTab.click();
+    await expect(page.locator('h1:has-text("Dagens bästa")')).toBeVisible();
+    await page.waitForTimeout(500);
     await page.screenshot({
-      path: path.join(ARTIFACTS_DIR, 'janne-boy-mobil.png'),
-    });
-
-    // 2. Bong-maskinen på mobil
-    const bongTab = page
-      .locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Bongen")')
-      .first();
-    await expect(bongTab).toBeVisible();
-    await bongTab.click();
-    await expect(page.locator('h1:has-text("Bong-maskinen")')).toBeVisible();
-    await page.waitForTimeout(400);
-    await page.screenshot({
-      path: path.join(ARTIFACTS_DIR, 'bong-maskinen-mobil.png'),
-    });
-
-    // 2b. Hästinfo & Analys i Bong-maskinen på mobil
-    const infoBtnMobil = page.locator('button[title*="Information och analys"]').first();
-    await infoBtnMobil.click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await page.waitForTimeout(300);
-    await page.screenshot({
-      path: path.join(ARTIFACTS_DIR, 'bong-hastinfo-mobil.png'),
-    });
-    await page.locator('button[aria-label="Stäng informationsruta"]').click();
-    await page.waitForTimeout(200);
-
-    // 3. Hästar på mobil
-    const hastarTab = page
-      .locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Hästar")')
-      .first();
-    await expect(hastarTab).toBeVisible();
-    await hastarTab.click();
-    await expect(page.locator('h1:has-text("Hästar")')).toBeVisible();
-    await page.waitForTimeout(400);
-    await page.screenshot({
-      path: path.join(ARTIFACTS_DIR, 'hastar-ranking-mobil.png'),
+      path: path.join(ARTIFACTS_DIR, 'dagens-basta-mobil.png'),
     });
   });
 });

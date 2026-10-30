@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, BookOpen, Calendar, Calculator, Search, Award, Star, Compass, Activity, Download } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Calculator, Search, Award, Star, Compass, Activity, Download, Trophy } from 'lucide-react';
 import { JanneBoyIcon } from '../components/janne-boy/JanneBoyIcon';
 
 interface OmAppenScreenProps {
@@ -20,6 +20,13 @@ export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({
       icon: Calendar,
       description:
         'Här ser du alla travbanor som kör idag och deras lopp med starttider. Klicka på ett lopp för att se startlistan, vinnarodds, kusk, distans och hästarnas skor.',
+    },
+    {
+      title: 'Dagens bästa',
+      label: 'Bästa hästarna lopp för lopp',
+      icon: Trophy,
+      description:
+        'Matchdagsguiden! Här går vi igenom varje lopp och lyfter fram de bästa hästarna (bästa chansen, motbud och skräll) tillsammans med konkreta travmotiveringar om spår, skor, form och spelvärde.',
     },
     {
       title: 'Janne Boy',

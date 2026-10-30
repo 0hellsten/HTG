@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronRight, CloudSun, Compass } from 'lucide-react';
+import { ChevronRight, CloudSun, Compass, Trophy } from 'lucide-react';
 import { RaceDay, Race, SourceStatus, ApiResponse } from '@stallbacken/shared';
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
@@ -18,9 +18,14 @@ import { apiFetch } from '../lib/api';
 interface IdagScreenProps {
   onOpenRace: (raceId: string, siblingRaces: Race[]) => void;
   onOpenTrack?: (trackId: string) => void;
+  onOpenDagensBasta?: () => void;
 }
 
-export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace, onOpenTrack }) => {
+export const IdagScreen: React.FC<IdagScreenProps> = ({
+  onOpenRace,
+  onOpenTrack,
+  onOpenDagensBasta,
+}) => {
   const [selectedOffset, setSelectedOffset] = useState<number>(0);
   const [raceDays, setRaceDays] = useState<RaceDay[]>([]);
   const [favoriteTrackIds, setFavoriteTrackIds] = useState<string[]>([]);
@@ -107,6 +112,32 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({ onOpenRace, onOpenTrack 
           </button>
         ))}
       </div>
+
+      {/* Genväg till Dagens bästa */}
+      {onOpenDagensBasta && (
+        <div className="bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 rounded-2xl p-5 text-slate-950 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-slate-950 text-amber-400 flex items-center justify-center font-black shrink-0">
+              <Trophy className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-lg sm:text-xl font-black text-slate-950">
+                Dagens bästa — Lopp för lopp
+              </h2>
+              <p className="text-sm sm:text-base text-amber-950 font-medium">
+                Se bästa hästarna och motiveringarna för spikar, motbud och skrällar.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenDagensBasta}
+            className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-950 text-amber-400 hover:bg-slate-900 text-sm sm:text-base font-bold min-h-[44px] cursor-pointer transition-colors shadow-sm text-center shrink-0"
+          >
+            Öppna Dagens bästa →
+          </button>
+        </div>
+      )}
 
       {loading ? (
         <IdagSkelett />
