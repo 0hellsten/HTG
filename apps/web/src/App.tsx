@@ -120,6 +120,30 @@ export const App: React.FC = () => {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
+            const isJanne = item.id === 'janneboy';
+
+            if (isJanne) {
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleTabChange(item.id)}
+                  aria-label="Janne Boy"
+                  className={`w-full flex items-center justify-center py-2 px-1 transition-all cursor-pointer bg-transparent border-0 shadow-none group ${
+                    isActive ? 'scale-105' : 'hover:scale-105 opacity-85 hover:opacity-100'
+                  }`}
+                >
+                  <JanneBoyIcon
+                    className={`h-16 w-auto max-w-[80px] object-contain transition-all ${
+                      isActive
+                        ? 'drop-shadow-[0_0_12px_rgba(245,158,11,0.9)]'
+                        : 'drop-shadow-sm group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                    }`}
+                  />
+                  <span className="sr-only">Janne Boy</span>
+                </button>
+              );
+            }
+
             return (
               <button
                 key={item.id}
@@ -275,6 +299,28 @@ export const App: React.FC = () => {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
+            const isJanne = item.id === 'janneboy';
+
+            if (isJanne) {
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleTabChange(item.id)}
+                  aria-label="Janne Boy"
+                  className={`flex flex-col items-center justify-center flex-1 py-0.5 px-0 min-h-[44px] cursor-pointer bg-transparent border-0 shadow-none transition-transform ${
+                    isActive ? 'scale-110' : 'hover:scale-105 opacity-90'
+                  }`}
+                >
+                  <JanneBoyIcon
+                    className={`h-10 w-auto object-contain transition-all ${
+                      isActive ? 'drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]' : 'drop-shadow-xs'
+                    }`}
+                  />
+                  <span className="sr-only">Janne</span>
+                </button>
+              );
+            }
+
             return (
               <button
                 key={item.id}

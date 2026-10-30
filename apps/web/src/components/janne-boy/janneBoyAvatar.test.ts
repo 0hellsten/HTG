@@ -24,4 +24,9 @@ describe('janneBoyAvatar', () => {
     const url = getJanneBoyAvatarUrl('janneboy1.png');
     expect(url).toContain('janneboy1.png');
   });
+
+  it('använder janneboy4 som standardavatar', () => {
+    expect(selectJanneBoyAvatar()).toBe('janneboy4.png');
+    expect(getJanneBoyAvatarUrl()).toContain('janneboy4.png');
+  });
 });

@@ -14,7 +14,7 @@ export const JanneBoyIcon: React.FC<JanneBoyIconProps> = ({
     <img
       src={getJanneBoyAvatarUrl()}
       alt={alt}
-      className={`${className} rounded-full object-cover shrink-0 select-none`}
+      className={`${className} object-contain shrink-0 select-none`}
       loading="eager"
     />
   );

@@ -199,9 +199,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="p-1 rounded-xl bg-amber-500 text-slate-950 shadow-xs flex items-center justify-center">
-              <JanneBoyIcon className="w-8 h-8" />
-            </span>
+            <JanneBoyIcon className="h-10 w-auto object-contain drop-shadow-sm" />
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight flex items-center gap-2">
               <span>Janne Boy</span>
               <Sparkles className="w-5 h-5 text-amber-500" />
