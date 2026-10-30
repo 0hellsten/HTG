@@ -99,24 +99,49 @@ export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({
         </p>
       </div>
 
+      {/* Nedladdning av Android-app */}
+      <div className="bg-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-800 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-bold text-amber-400 flex items-center gap-2">
+              <Download className="w-5 h-5 text-amber-400" />
+              <span>Ladda ned Android-app (.apk)</span>
+            </h2>
+            <p className="text-sm text-slate-300 mt-1">
+              Färdig installationsfil för Android-telefoner. Kan skickas eller laddas ned direkt till telefonen.
+            </p>
+          </div>
+          <a
+            href="./Stallbacken.apk"
+            download="Stallbacken.apk"
+            className="min-h-[46px] px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm sm:text-base inline-flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shrink-0 no-underline"
+          >
+            <Download className="w-4 h-4" />
+            <span>Ladda ned app (.apk)</span>
+          </a>
+        </div>
+        <p className="text-xs text-slate-400 border-t border-slate-800 pt-3">
+          Öppna filen på Android-telefonen och tryck på "Installera" för att få Stallbacken direkt bland dina appar.
+        </p>
+      </div>
+
       {canInstall && onInstall && (
         <div className="bg-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-bold text-amber-400 flex items-center gap-2">
               <Download className="w-5 h-5" />
-              <span>Installera appen på mobilen</span>
+              <span>Lägg till på hemskärmen</span>
             </h2>
             <p className="text-sm text-slate-300 mt-1">
-              Lägg appen som en ikon på hemskärmen så öppnas den snabbt precis som en vanlig app.
+              Gör om webbsidan till en app på hemskärmen utan att ladda ned någon fil.
             </p>
           </div>
           <button
             type="button"
             onClick={onInstall}
-            className="min-h-[46px] px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shrink-0"
+            className="min-h-[46px] px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shrink-0"
           >
-            <Download className="w-4 h-4" />
-            <span>Installera nu</span>
+            <span>Lägg till</span>
           </button>
         </div>
       )}

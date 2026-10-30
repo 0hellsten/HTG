@@ -107,14 +107,17 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col lg:flex-row font-sans">
-      {}
+      {/* Datorsidofält (desktop) */}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-slate-900 text-slate-100 p-6 border-r border-slate-800 shrink-0">
-        <div className="mb-8 flex items-center justify-start">
+        <div className="mb-8 flex items-center justify-start gap-3">
           <img
             src="./logo.png"
             alt="Stallbacken"
-            className="h-14 w-auto max-w-full object-contain rounded-lg drop-shadow-sm"
+            className="h-14 w-auto max-w-[140px] object-contain rounded-lg drop-shadow-sm"
           />
+          <span className="text-sm font-extrabold tracking-wide text-amber-400 select-none whitespace-nowrap">
+            Harry Janne
+          </span>
         </div>
 
         <nav className="space-y-1.5 flex-1" aria-label="Huvudmeny">
@@ -186,14 +189,17 @@ export const App: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0">
         <OfflineRemsa />
 
-        {}
-        <header className="lg:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-0 z-10 shadow-sm">
-          <div className="flex items-center">
+        {/* Mobil toppremsa */}
+        <header className="lg:hidden bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between border-b border-slate-800 sticky top-0 z-10 shadow-sm">
+          <div className="flex flex-col items-start leading-tight">
             <img
               src="./logo.png"
               alt="Stallbacken"
-              className="h-10 w-auto max-w-[180px] object-contain rounded drop-shadow-xs"
+              className="h-8 w-auto max-w-[150px] object-contain rounded drop-shadow-xs"
             />
+            <span className="text-[10px] font-bold text-amber-400 tracking-wider uppercase mt-0.5 leading-none select-none">
+              Harry<br />Janne
+            </span>
           </div>
 
           <button
