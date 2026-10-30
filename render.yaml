@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: htg-server
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: pnpm install && pnpm --filter @stallbacken/shared build && pnpm --filter @stallbacken/server build
+    startCommand: node apps/server/dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000

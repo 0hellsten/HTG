@@ -7,6 +7,7 @@ import {
   getMockStallAnmalda,
 } from './mock-data/horses';
 import { getMockAllTips, getMockRaceTips, getMockKallorStatus } from './mock-data/tips';
+import { getApiBaseUrl } from './api-config';
 
 function createJsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -203,8 +204,11 @@ export function initMockApiFallback(): void {
       return originalFetch(input, init);
     }
 
+    const baseUrl = getApiBaseUrl();
+    const targetUrl = baseUrl && urlStr.startsWith('/api/') ? `${baseUrl}${urlStr}` : urlStr;
+
     try {
-      const res = await originalFetch(input, init);
+      const res = await originalFetch(targetUrl, init);
       const ct = res.headers.get('content-type') || '';
       if (res.ok && ct.includes('application/json')) {
         return res;
