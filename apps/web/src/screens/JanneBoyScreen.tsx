@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Wand2, Sparkles, RefreshCw, Radio, MapPin, Calendar, TrendingUp } from 'lucide-react';
+import { Wand2, Sparkles, RefreshCw, Radio } from 'lucide-react';
 import {
   BongGameType,
   BongRaceDayData,
@@ -10,8 +10,10 @@ import {
 } from '@stallbacken/shared';
 import { JanneBoyControls } from '../components/janne-boy/JanneBoyControls';
 import { JanneBoySystemView } from '../components/janne-boy/JanneBoySystemView';
+import { JanneBoyOmgangBanner } from '../components/janne-boy/JanneBoyOmgangBanner';
 import { BongCompetition, getUpcomingBongCompetitions } from '../components/bong/competitions';
 import { BongDateSelector } from '../components/bong/BongDateSelector';
+import { BongKupongModal } from '../components/bong/BongKupongModal';
 import { buildDefaultRaceDay, buildRaceDayFromCompetition } from '../components/bong/defaultRaceDay';
 
 interface JanneBoyScreenProps {
@@ -31,6 +33,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
   const [isLive, setIsLive] = useState<boolean>(false);
   const [loadingLive, setLoadingLive] = useState<boolean>(false);
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
+  const [isKupongModalOpen, setIsKupongModalOpen] = useState<boolean>(false);
 
   const engine = useMemo(() => new JanneBoyEngine(), []);
   const [raceDay, setRaceDay] = useState<BongRaceDayData>(() =>
@@ -137,6 +140,16 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
     onOpenInBong(sys.gameType, selectionMap);
   };
 
+  const couponSelectedHorses = useMemo(() => {
+    const map: Record<number, string[]> = {};
+    if (systemResult) {
+      for (const leg of systemResult.legs) {
+        map[leg.legIndex] = leg.selectedHorses.map((h) => h.id);
+      }
+    }
+    return map;
+  }, [systemResult]);
+
   return (
     <div className="space-y-6 pb-20 max-w-4xl mx-auto">
       {/* Sidhuvud med live API-status */}
@@ -209,38 +222,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
       </div>
 
       {/* Omgångsinformation för vald tävling */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900 text-white rounded-xl px-4 py-3 shadow-xs">
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm font-medium">
-          <span className="flex items-center gap-1.5 font-bold text-amber-400">
-            <MapPin className="w-4 h-4 text-amber-400" />
-            <span>{raceDay.trackName || 'Bana ej vald'}</span>
-          </span>
-
-          <span className="flex items-center gap-1.5 text-slate-200">
-            <Calendar className="w-4 h-4 text-slate-400" />
-            <span>
-              {raceDay.date ? `${raceDay.date} · ` : ''}
-              {raceDay.startTime ? `Start kl. ${raceDay.startTime}` : ''}
-            </span>
-          </span>
-
-          <span className="text-xs text-slate-400">({raceDay.races.length} avdelningar)</span>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
-          <span className="inline-flex items-center gap-1 text-slate-300">
-            <TrendingUp className="w-3.5 h-3.5 text-slate-400" />
-            <span>Omsättning: {raceDay.turnover.toLocaleString('sv-SE')} kr</span>
-          </span>
-
-          {Boolean(raceDay.jackpotPool && raceDay.jackpotPool > 0) && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-bold text-xs">
-              <Sparkles className="w-3 h-3 text-slate-950" />
-              <span>Jackpot +{(raceDay.jackpotPool || 0).toLocaleString('sv-SE')} kr</span>
-            </span>
-          )}
-        </div>
-      </div>
+      <JanneBoyOmgangBanner raceDay={raceDay} />
 
       {/* Kontroller för spel, profil & budget */}
       <JanneBoyControls
@@ -265,6 +247,31 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
           onOpenInBong={handleOpenInBong}
         />
       )}
+
+      {/* Flytande Bong-knapp för att se ifylld kupong */}
+      <button
+        type="button"
+        onClick={() => setIsKupongModalOpen((prev) => !prev)}
+        data-testid="janne-boy-kupong-flytande-knapp"
+        aria-label={isKupongModalOpen ? 'Stäng kupong' : 'Visa ifylld bong'}
+        title={isKupongModalOpen ? 'Stäng kupong' : 'Visa ifylld bong'}
+        className="fixed bottom-20 right-4 lg:bottom-8 lg:right-8 z-30 w-14 h-14 rounded-full p-1 bg-white hover:bg-slate-50 shadow-2xl border-2 border-amber-400 active:scale-95 transition-all cursor-pointer flex items-center justify-center group"
+      >
+        <img
+          src="./bong.png"
+          alt="Bong"
+          className="w-full h-full object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+        />
+      </button>
+
+      <BongKupongModal
+        isOpen={isKupongModalOpen}
+        onClose={() => setIsKupongModalOpen(false)}
+        gameType={gameType}
+        raceDay={raceDay}
+        selectedHorses={couponSelectedHorses}
+        costSek={systemResult?.costSek || 0}
+      />
     </div>
   );
 };
