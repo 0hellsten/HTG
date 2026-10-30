@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Sulkysport</title>
+    <description>Sveriges främsta oberoende facktidning för travsport</description>
+    <link>https://sulkysport.se</link>
+    <item>
+      <title>Sulkysports V75-analys: Genomgång av alla sju avdelningar</title>
+      <link>https://sulkysport.se/v75-analys-helgens-drag</link>
+      <guid>ss_trav_001</guid>
+      <description>Sulkysports redaktion ger sin syn på omgången. Toppchans i avdelning 1 och varning för formstarka hästar i stayersoppet.</description>
+      <pubDate>Thu, 29 Oct 2026 13:00:00 GMT</pubDate>
+      <author>Claes Freidenvall</author>
+    </item>
+    <item>
+      <title>Solvalla V75: San Moteur laddas för guldstrid</title>
+      <link>https://sulkysport.se/san-moteur-solvalla</link>
+      <guid>ss_trav_002</guid>
+      <description>Tränaren meddelar barfota runt om och amerikansk sulky. Perfekt läge på Solvalla och förväntas sitta i tät tidigt.</description>
+      <pubDate>Thu, 29 Oct 2026 12:15:00 GMT</pubDate>
+      <author>Ola Lernå</author>
+    </item>
+  </channel>
+</rss>

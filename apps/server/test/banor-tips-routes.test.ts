@@ -80,10 +80,11 @@ describe('Banor och Tips API-rutter (Fas 8)', () => {
     const body = JSON.parse(res.payload);
     expect(body.data).toBeDefined();
     expect(Array.isArray(body.data.providers)).toBe(true);
-    expect(body.data.providers.length).toBe(3);
+    expect(body.data.providers.length).toBe(4);
     expect(body.data.providers.some((p: { id: string }) => p.id === 'tips-expressen')).toBe(true);
     expect(body.data.providers.some((p: { id: string }) => p.id === 'tips-travronden')).toBe(true);
     expect(body.data.providers.some((p: { id: string }) => p.id === 'tips-aftonbladet')).toBe(true);
+    expect(body.data.providers.some((p: { id: string }) => p.id === 'tips-sulkysport')).toBe(true);
   });
 
   it('GET /api/lopp/:raceId/tips returnerar loppspecifika tips med avsändare', async () => {

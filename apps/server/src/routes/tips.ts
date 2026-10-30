@@ -8,6 +8,7 @@ import { getLatestTipArticles, getTipsForRace, getAllRaceTips } from '../db/quer
 import { tipsExpressenAdapter } from '../adapters/tips-expressen.js';
 import { tipsTravrondenAdapter } from '../adapters/tips-travronden.js';
 import { tipsAftonbladetAdapter } from '../adapters/tips-aftonbladet.js';
+import { tipsSulkysportAdapter } from '../adapters/tips-sulkysport.js';
 import { logger } from '../lib/logger.js';
 
 export const tipsRoutes: FastifyPluginAsync = async (app) => {
@@ -15,7 +16,7 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
 
   /**
    * Hämtar samlad tipssida ("Vad tycker stallbacken?") med artiklar och lopprankingar.
-   * Stödjer simulateDown=tips-expressen eller simulateDown=tips-travronden för att testa degradering.
+   * Stödjer simulateDown=tips-expressen, tips-travronden, tips-aftonbladet eller tips-sulkysport för att testa degradering.
    */
   app.get<{
     Querystring: { refresh?: string; simulateDown?: string };
@@ -27,12 +28,14 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
       tipsExpressenAdapter.setSimulatedFailure(simulateDown === 'tips-expressen');
       tipsTravrondenAdapter.setSimulatedFailure(simulateDown === 'tips-travronden');
       tipsAftonbladetAdapter.setSimulatedFailure(simulateDown === 'tips-aftonbladet');
+      tipsSulkysportAdapter.setSimulatedFailure(simulateDown === 'tips-sulkysport');
 
       // Hämta färsk data från källorna
-      const [resExpressen, resTravronden, resAftonbladet] = await Promise.all([
+      const [resExpressen, resTravronden, resAftonbladet, resSulkysport] = await Promise.all([
         tipsExpressenAdapter.fetch({ forceRefresh }),
         tipsTravrondenAdapter.fetch({ forceRefresh }),
         tipsAftonbladetAdapter.fetch({ forceRefresh }),
+        tipsSulkysportAdapter.fetch({ forceRefresh }),
       ]);
 
       const articles = getLatestTipArticles(db, 25);
@@ -60,6 +63,13 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
           message: resAftonbladet.message,
           fetchedAt: resAftonbladet.fetchedAt,
         },
+        {
+          id: tipsSulkysportAdapter.id,
+          name: tipsSulkysportAdapter.label,
+          status: resSulkysport.status,
+          message: resSulkysport.message,
+          fetchedAt: resSulkysport.fetchedAt,
+        },
       ];
 
       const overviewData: TipsOverviewData = {
@@ -68,7 +78,12 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
         providers,
       };
 
-      const statuses = [resExpressen.status, resTravronden.status, resAftonbladet.status];
+      const statuses = [
+        resExpressen.status,
+        resTravronden.status,
+        resAftonbladet.status,
+        resSulkysport.status,
+      ];
       const allOk = statuses.every((s) => s === 'ok');
       const allFailed = statuses.every((s) => s === 'failed');
       const overallStatus = allOk ? 'ok' : allFailed ? 'failed' : 'degraded';
@@ -98,6 +113,7 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
       tipsExpressenAdapter.setSimulatedFailure(false);
       tipsTravrondenAdapter.setSimulatedFailure(false);
       tipsAftonbladetAdapter.setSimulatedFailure(false);
+      tipsSulkysportAdapter.setSimulatedFailure(false);
     }
   });
 
@@ -113,9 +129,11 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
 
     try {
       // Säkerställ att tipsen är hämtade
-      const [resExpressen, resTravronden] = await Promise.all([
+      const [resExpressen, resTravronden, resAftonbladet, resSulkysport] = await Promise.all([
         tipsExpressenAdapter.fetch({ forceRefresh }),
         tipsTravrondenAdapter.fetch({ forceRefresh }),
+        tipsAftonbladetAdapter.fetch({ forceRefresh }),
+        tipsSulkysportAdapter.fetch({ forceRefresh }),
       ]);
 
       const tips = getTipsForRace(db, raceId);
@@ -134,6 +152,20 @@ export const tipsRoutes: FastifyPluginAsync = async (app) => {
           status: resTravronden.status,
           message: resTravronden.message,
           fetchedAt: resTravronden.fetchedAt,
+        },
+        {
+          id: tipsAftonbladetAdapter.id,
+          name: tipsAftonbladetAdapter.label,
+          status: resAftonbladet.status,
+          message: resAftonbladet.message,
+          fetchedAt: resAftonbladet.fetchedAt,
+        },
+        {
+          id: tipsSulkysportAdapter.id,
+          name: tipsSulkysportAdapter.label,
+          status: resSulkysport.status,
+          message: resSulkysport.message,
+          fetchedAt: resSulkysport.fetchedAt,
         },
       ];
 

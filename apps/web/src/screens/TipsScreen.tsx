@@ -6,7 +6,9 @@ import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
 import { IdagSkelett } from '../components/SkelettKort';
 import { LoppRankingKort } from '../components/tips/LoppRankingKort';
 import { AnalysArtikelKort } from '../components/tips/AnalysArtikelKort';
+import { TipskallorValjare } from '../components/tips/TipskallorValjare';
 import { getReadTipIds, saveReadTipId } from '../lib/read-tips';
+import { getDisabledTipProviders, saveDisabledTipProviders } from '../lib/tip-providers';
 
 interface TipsScreenProps {
   onOpenRace?: (raceId: string) => void;
@@ -19,10 +21,26 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
   const [statusMessage, setStatusMessage] = useState<string>('Alla tips är färska.');
   const [filter, setFilter] = useState<'alla' | 'ranking' | 'artiklar'>('alla');
   const [readTipIds, setReadTipIds] = useState<Set<string>>(() => getReadTipIds());
+  const [disabledProviders, setDisabledProviders] = useState<Set<string>>(() =>
+    getDisabledTipProviders()
+  );
 
   const handleMarkRead = (id: string) => {
     saveReadTipId(id);
     setReadTipIds((prev) => new Set(prev).add(id));
+  };
+
+  const handleToggleProvider = (providerId: string) => {
+    setDisabledProviders((prev) => {
+      const next = new Set(prev);
+      if (next.has(providerId)) {
+        next.delete(providerId);
+      } else {
+        next.add(providerId);
+      }
+      saveDisabledTipProviders(next);
+      return next;
+    });
   };
 
   const fetchTips = async () => {
@@ -54,6 +72,24 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
   const raceTips = data?.raceTips || [];
   const providers = data?.providers || [];
 
+  // Filtrera lopprankingar baserat på aktiva tipskällor
+  const visibleRaceTips = raceTips.filter((tip) => {
+    if (tip.sourceId) {
+      return !disabledProviders.has(tip.sourceId);
+    }
+    return true;
+  });
+
+  // Filtrera redaktionella artiklar baserat på aktiva tipskällor
+  const visibleArticles = articles.filter((art) => {
+    if (art.sourceId) {
+      return !disabledProviders.has(art.sourceId);
+    }
+    return true;
+  });
+
+  const activeProvidersCount = providers.filter((p) => !disabledProviders.has(p.id)).length;
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-16">
       {/* Rubrikrad med färskhetsprick */}
@@ -72,34 +108,13 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
         </div>
       </div>
 
-      {/* Status per källleverantör */}
-      {providers.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-2.5">
-            Tipskällor
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {providers.map((p) => (
-              <div
-                key={p.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100"
-              >
-                <div className="min-w-0 pr-2">
-                  <span className="font-semibold text-slate-900 block text-base truncate">
-                    {p.name}
-                  </span>
-                  <span className="text-xs text-slate-500 block truncate">
-                    {p.status === 'ok' ? 'Senast uppdaterat' : p.message}
-                  </span>
-                </div>
-                <div className="shrink-0">
-                  <FarskhetsPrick status={p.status} explanation={p.message} onRetry={fetchTips} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Status och val per tipskälla — minimerad från start */}
+      <TipskallorValjare
+        providers={providers}
+        disabledProviders={disabledProviders}
+        onToggleProvider={handleToggleProvider}
+        onRetry={fetchTips}
+      />
 
       {/* Filterknappar */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
@@ -112,7 +127,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
               : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          Alla tips ({articles.length + raceTips.length})
+          Alla tips ({visibleArticles.length + visibleRaceTips.length})
         </button>
         <button
           type="button"
@@ -123,7 +138,7 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
               : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          Lopprankingar ({raceTips.length})
+          Lopprankingar ({visibleRaceTips.length})
         </button>
         <button
           type="button"
@@ -134,21 +149,22 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
               : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          Analys & nyheter ({articles.length})
+          Analys & nyheter ({visibleArticles.length})
         </button>
       </div>
 
       {loading && <IdagSkelett />}
 
-      {!loading && articles.length === 0 && raceTips.length === 0 && (
+      {!loading && visibleArticles.length === 0 && visibleRaceTips.length === 0 && (
         <div className="bg-white rounded-xl border border-slate-200 p-8 sm:p-12 text-center space-y-3">
           <Award className="w-12 h-12 text-slate-400 mx-auto" />
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
-            Inga tips har kommit in än
+            Inga tips matchar ditt val
           </h2>
           <p className="text-slate-600 text-base sm:text-lg max-w-md mx-auto leading-relaxed">
-            Tipsen brukar komma in under förmiddagen på tävlingsdagen. Tryck på knappen nedan för
-            att kontrollera på nytt.
+            {activeProvidersCount === 0
+              ? 'Du har stängt av alla tipskällor. Öppna rutan för Tipskällor ovan och aktivera minst en källa för att se tips.'
+              : 'Tipsen brukar komma in under förmiddagen på tävlingsdagen. Tryck på knappen nedan för att kontrollera på nytt.'}
           </p>
           <div className="pt-2">
             <button
@@ -164,18 +180,20 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
       )}
 
       {/* 1. Lopprankingar */}
-      {!loading && (filter === 'alla' || filter === 'ranking') && raceTips.length > 0 && (
+      {!loading && (filter === 'alla' || filter === 'ranking') && visibleRaceTips.length > 0 && (
         <BlockErrorBoundary fallbackTitle="Lopprankingarna saknas just nu">
           <section className="space-y-4" aria-labelledby="ranking-rubrik">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <h2 id="ranking-rubrik" className="text-xl font-bold text-slate-950">
                 Lopprankingar & drag
               </h2>
-              <span className="text-sm font-medium text-slate-500">{raceTips.length} tips</span>
+              <span className="text-sm font-medium text-slate-500">
+                {visibleRaceTips.length} tips
+              </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {raceTips.map((tip) => (
+              {visibleRaceTips.map((tip) => (
                 <LoppRankingKort
                   key={tip.id}
                   tip={tip}
@@ -190,18 +208,20 @@ export const TipsScreen: React.FC<TipsScreenProps> = ({ onOpenRace }) => {
       )}
 
       {/* 2. Redaktionella tips & artiklar */}
-      {!loading && (filter === 'alla' || filter === 'artiklar') && articles.length > 0 && (
+      {!loading && (filter === 'alla' || filter === 'artiklar') && visibleArticles.length > 0 && (
         <BlockErrorBoundary fallbackTitle="Tipsartiklarna saknas just nu">
           <section className="space-y-4" aria-labelledby="artiklar-rubrik">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <h2 id="artiklar-rubrik" className="text-xl font-bold text-slate-950">
                 Experternas analyser och rapporter
               </h2>
-              <span className="text-sm font-medium text-slate-500">{articles.length} artiklar</span>
+              <span className="text-sm font-medium text-slate-500">
+                {visibleArticles.length} artiklar
+              </span>
             </div>
 
             <div className="space-y-3">
-              {articles.map((art) => (
+              {visibleArticles.map((art) => (
                 <AnalysArtikelKort
                   key={art.id}
                   article={art}

@@ -6,6 +6,7 @@ import { smhiWeatherAdapter } from './smhi-weather.js';
 import { tipsExpressenAdapter } from './tips-expressen.js';
 import { tipsTravrondenAdapter } from './tips-travronden.js';
 import { tipsAftonbladetAdapter } from './tips-aftonbladet.js';
+import { tipsSulkysportAdapter } from './tips-sulkysport.js';
 
 export * from './fake-source.js';
 export * from './atg-racinginfo.js';
@@ -14,6 +15,7 @@ export * from './smhi-weather.js';
 export * from './tips-expressen.js';
 export * from './tips-travronden.js';
 export * from './tips-aftonbladet.js';
+export * from './tips-sulkysport.js';
 
 /**
  * Register över samtliga aktiva källadaptrar i Stallbacken.
@@ -27,6 +29,7 @@ export const registeredAdapters: SourceAdapter<unknown>[] = [
   tipsExpressenAdapter,
   tipsTravrondenAdapter,
   tipsAftonbladetAdapter,
+  tipsSulkysportAdapter,
 ];
 
 /**
