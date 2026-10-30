@@ -1,36 +1,46 @@
 import React from 'react';
-import { Compass, Activity, HelpCircle, Type, ChevronRight, ShieldCheck } from 'lucide-react';
+import { Compass, Activity, HelpCircle, Type, ChevronRight, ShieldCheck, BookOpen } from 'lucide-react';
 
 interface MerScreenProps {
-  onSelectOption: (option: 'banvisaren' | 'status' | 'hjalp' | 'textstorlek') => void;
+  onSelectOption: (option: 'om' | 'banvisaren' | 'status' | 'hjalp' | 'textstorlek') => void;
 }
 
 export const MerScreen: React.FC<MerScreenProps> = ({ onSelectOption }) => {
   const menuOptions = [
     {
+      id: 'om' as const,
+      title: 'Om appen',
+      description: 'Kort och enkelt om vad alla sidor gör och hur du installerar appen.',
+      icon: BookOpen,
+      highlight: true,
+    },
+    {
       id: 'banvisaren' as const,
       title: 'Banvisaren',
       description: 'Banfakta, vinstprocent per startspår och väder vid banan.',
       icon: Compass,
-      highlight: true,
+      highlight: false,
     },
     {
       id: 'status' as const,
       title: 'Hur färskt är det här?',
       description: 'Status och senaste hämtning för alla datakällor i appen.',
       icon: Activity,
+      highlight: false,
     },
     {
       id: 'hjalp' as const,
       title: 'Hjälp och vanliga frågor',
       description: 'Hur prickarna fungerar och vad du gör om något ser gammalt ut.',
       icon: HelpCircle,
+      highlight: false,
     },
     {
       id: 'textstorlek' as const,
       title: 'Textstorlek',
       description: 'Anpassa textens storlek efter vad som är bekvämt att läsa.',
       icon: Type,
+      highlight: false,
     },
   ];
 

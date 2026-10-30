@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Search, Award, Star, Menu, Download, Calculator } from 'lucide-react';
+import { Calendar, Search, Award, Star, Menu, Calculator } from 'lucide-react';
 import { JanneBoyIcon } from './components/janne-boy/JanneBoyIcon';
 import { Race, BongGameType } from '@stallbacken/shared';
 import { IdagScreen } from './screens/IdagScreen';
@@ -14,12 +14,13 @@ import { StallScreen } from './screens/StallScreen';
 import { StatusScreen } from './screens/StatusScreen';
 import { TextstorlekScreen, TextSize } from './screens/TextstorlekScreen';
 import { HjalpScreen } from './screens/HjalpScreen';
+import { OmAppenScreen } from './screens/OmAppenScreen';
 import { MerScreen } from './screens/MerScreen';
 import { OfflineRemsa } from './components/OfflineRemsa';
 import { ScrollToTopKnapp } from './components/ScrollToTopKnapp';
 
 type Tab = 'idag' | 'janneboy' | 'bong' | 'hastar' | 'tips' | 'stall' | 'mer';
-type MerSubscreen = 'none' | 'status' | 'hjalp' | 'textstorlek';
+type MerSubscreen = 'none' | 'om' | 'status' | 'hjalp' | 'textstorlek';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -161,15 +162,18 @@ export const App: React.FC = () => {
           })}
         </nav>
 
-        {installPrompt && (
-          <button
-            onClick={handleInstallClick}
-            className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded-lg text-sm font-medium transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            <span>Installera app</span>
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab('mer');
+            setMerSubscreen('om');
+            setSelectedHorseId(null);
+            setSelectedTrackId(null);
+          }}
+          className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 rounded-lg text-sm font-semibold transition-colors cursor-pointer"
+        >
+          <span>Om appen</span>
+        </button>
 
         <div className="pt-6 mt-auto border-t border-slate-800/80 text-center">
           <span className="text-[10px] font-mono tracking-widest text-slate-500/70 select-none block">
@@ -192,15 +196,18 @@ export const App: React.FC = () => {
             />
           </div>
 
-          {installPrompt && (
-            <button
-              onClick={handleInstallClick}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 text-slate-950 rounded-md text-sm font-semibold shadow-sm"
-            >
-              <Download className="w-4 h-4" />
-              <span>Installera</span>
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('mer');
+              setMerSubscreen('om');
+              setSelectedHorseId(null);
+              setSelectedTrackId(null);
+            }}
+            className="flex items-center gap-1 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-sm font-bold shadow-sm transition-colors cursor-pointer"
+          >
+            <span>Om</span>
+          </button>
         </header>
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24 lg:pb-8">
@@ -210,6 +217,12 @@ export const App: React.FC = () => {
             <BanvisarenScreen
               initialTrackId={selectedTrackId}
               onBack={() => setSelectedTrackId(null)}
+            />
+          ) : merSubscreen === 'om' ? (
+            <OmAppenScreen
+              onBack={() => setMerSubscreen('none')}
+              onInstall={handleInstallClick}
+              canInstall={!!installPrompt}
             />
           ) : merSubscreen === 'status' ? (
             <StatusScreen onBack={() => setMerSubscreen('none')} />
