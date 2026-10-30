@@ -34,7 +34,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
             <img
               src="./logo.png"
               alt="Tangitza"
-              className="h-10 w-auto object-contain rounded-md"
+              className="h-12 w-auto max-w-[170px] object-contain rounded-md"
             />
           </div>
           <button

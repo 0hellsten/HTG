@@ -15,11 +15,13 @@ const FORBIDDEN_WORDS = [
   'scraping',
   'adapter',
   '404',
-  '500',
   'något gick fel',
   'ett oväntat fel',
   'kunde inte ansluta',
 ];
+
+// 500 som HTTP-felkod (men inte 500 kr, 500 000 kr eller 500 m)
+const FORBIDDEN_HTTP_500 = /(?:fel(?:kod)?|status|error|http)\s*500\b|\b500\s*(?:server|internal)/i;
 
 test.describe('Krav: Språkgranskning — inga tekniska ord i gränssnittet', () => {
   test('inga förbjudna ord syns på de olika sidorna', async ({ page }) => {
@@ -37,6 +39,10 @@ test.describe('Krav: Språkgranskning — inga tekniska ord i gränssnittet', ()
           `Förbjudet ord "${word}" hittades i synlig text på sidan ${screenName}!`
         ).toBe(false);
       }
+      expect(
+        FORBIDDEN_HTTP_500.test(visibleText),
+        `Förbjuden felkod 500 hittades i synlig text på sidan ${screenName}!`
+      ).toBe(false);
     };
 
     await checkText('Idag');

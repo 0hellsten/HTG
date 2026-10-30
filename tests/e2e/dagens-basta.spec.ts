@@ -21,43 +21,41 @@ const FORBIDDEN_WORDS = [
   'kunde inte ansluta',
 ];
 
-test.describe('Dagens bästa — Matchdagsguiden lopp för lopp', () => {
-  test('öppnar sidan från Idag, granskar hästar och motiveringar, och kontrollerar språk', async ({
+test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () => {
+  test('visar omgångens spik och skräll direkt på startsidan och växlar smidigt mellan lägena', async ({
     page,
   }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    // 1. Verifiera att genvägen finns på Idag-sidan
-    const bannerBtn = page.locator('button:has-text("Öppna Dagens bästa")').first();
-    await expect(bannerBtn).toBeVisible();
-    await bannerBtn.click();
+    // 1. Verifiera rubrik på startskärmen
+    await expect(page.locator('h1')).toContainText(/omgång/i);
 
-    // 2. Verifiera rubrik och grundläggande element
-    await expect(page.locator('h1')).toContainText('Dagens bästa');
-    await expect(
-      page.locator('text=De bästa hästarna och motiveringarna för varje lopp')
-    ).toBeVisible();
-
-    // 3. Kontrollera att omgångens spik och omgångens skräll visas i topp-bannern
+    // 2. Kontrollera att omgångens spik och omgångens skräll visas direkt i toppen
     await expect(page.locator('text=Omgångens spik')).toBeVisible();
     await expect(page.locator('text=Omgångens skräll')).toBeVisible();
 
-    // 4. Kontrollera att minst ett loppkort visas med förutsättningar och hästar
+    // 3. Verifiera lägesväljaren
+    const bastaKnapp = page.locator('button:has-text("Bästa hästarna lopp för lopp")');
+    const allaKnapp = page.locator('button:has-text("Alla lopp & banor")');
+    await expect(bastaKnapp).toBeVisible();
+    await expect(allaKnapp).toBeVisible();
+
+    // 4. Verifiera standardläget: Bästa hästarna med loppkort och motiveringar
     const loppKort = page.locator('div[id^="lopp-"]').first();
     await expect(loppKort).toBeVisible();
-
-    // 5. Kontrollera rollbrickor och varför-motiveringar
     await expect(page.locator('text=Bästa chansen').first()).toBeVisible();
     await expect(page.locator('text=Varför vi tror på hästen:').first()).toBeVisible();
     await expect(page.locator('text=Läge & startspår:').first()).toBeVisible();
     await expect(page.locator('text=Balans & vagn:').first()).toBeVisible();
-    await expect(page.locator('text=Spelvärde & streck:').first()).toBeVisible();
 
-    // 6. Kontrollera loppfilter
-    const filterBtn = page.locator('button[role="tab"]:has-text("Lopp")').first();
-    await expect(filterBtn).toBeVisible();
-    await filterBtn.click();
+    // 5. Växla till "Alla lopp & banor" och verifiera att banöversikten visas
+    await allaKnapp.click();
+    await expect(page.locator('text=Första start kl.').first()).toBeVisible();
+
+    // 6. Växla tillbaka till "Bästa hästarna"
+    await bastaKnapp.click();
+    await expect(loppKort).toBeVisible();
 
     // 7. Språkgranskning: Inga tekniska eller förbjudna ord på sidan
     const visibleText = (await page.locator('main').innerText()).toLowerCase();
@@ -66,21 +64,17 @@ test.describe('Dagens bästa — Matchdagsguiden lopp för lopp', () => {
       const found = regex.test(visibleText);
       expect(
         found,
-        `Förbjudet ord "${word}" hittades i synlig text på Dagens bästa!`
+        `Förbjudet ord "${word}" hittades i synlig text på startfliken!`
       ).toBe(false);
     }
   });
 
-  test('fungerar via menyn i botten/sidebar', async ({ page }) => {
+  test('verifierar att loggan i sidhuvudet är synlig och har bra storlek', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    const bastaNav = page
-      .locator('button:has-text("Dagens bästa"), button:has-text("Bästa")')
-      .first();
-    await expect(bastaNav).toBeVisible();
-    await bastaNav.click();
-
-    await expect(page.locator('h1')).toContainText('Dagens bästa');
+    const logo = page.locator('header img[alt="Tangitza"]');
+    await expect(logo).toBeVisible();
   });
 });

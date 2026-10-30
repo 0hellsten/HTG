@@ -1,10 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { ChevronRight, CloudSun, Compass, Trophy } from 'lucide-react';
-import { RaceDay, Race, SourceStatus, ApiResponse } from '@stallbacken/shared';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import {
+  ChevronRight,
+  CloudSun,
+  Compass,
+  Trophy,
+  Layers,
+  Filter,
+} from 'lucide-react';
+import {
+  RaceDay,
+  Race,
+  SourceStatus,
+  ApiResponse,
+  BongGameType,
+  BongRaceDayData,
+  DagensBastaEngine,
+  DagensBastaOmgang,
+} from '@stallbacken/shared';
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
 import { IdagSkelett } from '../components/SkelettKort';
 import { HastsKoIkon } from '../components/HastsKoIkon';
+import { DagensBastaOmgangBanner } from '../components/dagens-basta/DagensBastaOmgangBanner';
+import { DagensBastaLoppKort } from '../components/dagens-basta/DagensBastaLoppKort';
+import {
+  formatCompetitionFromApi,
+  buildFallbackBongRaceDay,
+  getDefaultUpcomingCompetitions,
+} from '../components/bong/competitions';
 import {
   getFavoriteTrackIds,
   toggleFavoriteTrack,
@@ -18,24 +41,37 @@ import { apiFetch } from '../lib/api';
 interface IdagScreenProps {
   onOpenRace: (raceId: string, siblingRaces: Race[]) => void;
   onOpenTrack?: (trackId: string) => void;
-  onOpenDagensBasta?: () => void;
+  onSelectHorse?: (horseId: string) => void;
 }
 
 export const IdagScreen: React.FC<IdagScreenProps> = ({
   onOpenRace,
   onOpenTrack,
-  onOpenDagensBasta,
+  onSelectHorse,
 }) => {
   const [selectedOffset, setSelectedOffset] = useState<number>(0);
+  const [activeViewMode, setActiveViewMode] = useState<'basta' | 'alla'>('basta');
   const [raceDays, setRaceDays] = useState<RaceDay[]>([]);
   const [favoriteTrackIds, setFavoriteTrackIds] = useState<string[]>([]);
   const [status, setStatus] = useState<SourceStatus>('ok');
   const [statusMessage, setStatusMessage] = useState<string>('Allt är färskt och uppdaterat.');
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedRaceFilter, setSelectedRaceFilter] = useState<number | 'alla'>('alla');
+
+  // Omgångsdata för bästa hästarna
+  const [raceDayData, setRaceDayData] = useState<BongRaceDayData>(() =>
+    buildFallbackBongRaceDay('V75')
+  );
+
+  const engine = useMemo(() => new DagensBastaEngine(), []);
+  const dagensBastaOmgang: DagensBastaOmgang = useMemo(() => {
+    return engine.analyzeOmgang(raceDayData);
+  }, [engine, raceDayData]);
 
   const targetDate = new Date(Date.now() + selectedOffset * 86400000);
   const targetDateStr = targetDate.toISOString().slice(0, 10);
 
+  // Hämtning av banor och lopp
   const fetchDagar = async () => {
     setLoading(true);
     try {
@@ -59,14 +95,86 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
     }
   };
 
+  const loadLiveOmgang = useCallback(
+    async (gameId: string, gameType: BongGameType) => {
+      try {
+        const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
+        if (res && res.data) {
+          setRaceDayData(res.data);
+        } else {
+          setRaceDayData(buildFallbackBongRaceDay(gameType));
+        }
+      } catch {
+        setRaceDayData(buildFallbackBongRaceDay(gameType));
+      }
+    },
+    []
+  );
+
   useEffect(() => {
     setFavoriteTrackIds(getFavoriteTrackIds());
     fetchDagar();
   }, [selectedOffset]);
 
+  useEffect(() => {
+    let isSubscribed = true;
+
+    async function loadUpcomingOmgangar() {
+      try {
+        const res = await apiFetch<
+          Array<{
+            id: string;
+            gameType: BongGameType;
+            gameName: string;
+            date: string;
+            trackName: string;
+            startTime: string;
+            turnover: number;
+            jackpotPool: number;
+          }>
+        >('/api/omganger/kommande');
+
+        if (!isSubscribed) return;
+
+        const formatted =
+          res.data && res.data.length > 0
+            ? res.data.map(formatCompetitionFromApi)
+            : getDefaultUpcomingCompetitions();
+
+        const initial = formatted[0];
+        if (initial) {
+          loadLiveOmgang(initial.id, initial.gameType);
+        }
+      } catch {
+        if (!isSubscribed) return;
+        const defaults = getDefaultUpcomingCompetitions();
+        if (defaults[0]) {
+          loadLiveOmgang(defaults[0].id, defaults[0].gameType);
+        }
+      }
+    }
+
+    loadUpcomingOmgangar();
+    return () => {
+      isSubscribed = false;
+    };
+  }, [loadLiveOmgang]);
+
   const handleToggleFavorite = (trackId: string, trackName: string) => {
     toggleFavoriteTrack(trackId, trackName);
     setFavoriteTrackIds(getFavoriteTrackIds());
+  };
+
+  const handleOpenRaceFromBasta = (raceNumber: number) => {
+    for (const day of raceDays) {
+      const match = (day.races || []).find((r) => r.number === raceNumber);
+      if (match) {
+        onOpenRace(match.id, day.races || []);
+        return;
+      }
+    }
+    // Om specifikt lopp-ID inte hittades i raceDays, växla till alla lopp
+    setActiveViewMode('alla');
   };
 
   const sortedRaceDays = sortRaceDaysWithFavorites(raceDays, favoriteTrackIds);
@@ -80,8 +188,16 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
     { offset: 2, label: 'I övermorgon' },
   ];
 
+  const filteredBastaRaces = useMemo(() => {
+    if (selectedRaceFilter === 'alla') {
+      return dagensBastaOmgang.races;
+    }
+    return dagensBastaOmgang.races.filter((r) => r.raceNumber === selectedRaceFilter);
+  }, [dagensBastaOmgang, selectedRaceFilter]);
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-16">
+      {/* Sidhuvud & färskhetsprick */}
       <div className="flex items-start justify-between border-b border-slate-200 pb-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
@@ -94,6 +210,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
         </div>
       </div>
 
+      {/* Datumväljare */}
       <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Välj tävlingsdag">
         {dateOptions.map((opt) => (
           <button
@@ -113,53 +230,137 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
         ))}
       </div>
 
-      {/* Genväg till Dagens bästa */}
-      {onOpenDagensBasta && (
-        <div className="bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 rounded-2xl p-5 text-slate-950 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-slate-950 text-amber-400 flex items-center justify-center font-black shrink-0">
-              <Trophy className="w-6 h-6" />
+      {/* Omgångens drag: Dagens spik & skräll i toppen */}
+      {dagensBastaOmgang && (
+        <BlockErrorBoundary fallbackTitle="Omgångens spik och skräll">
+          <DagensBastaOmgangBanner
+            omgang={dagensBastaOmgang}
+            onScrollToRace={(raceNr) => {
+              setActiveViewMode('basta');
+              setSelectedRaceFilter(raceNr);
+            }}
+          />
+        </BlockErrorBoundary>
+      )}
+
+      {/* Smart och enkel vyväxlare */}
+      <div className="bg-slate-200/80 p-1.5 rounded-2xl flex gap-1.5 shadow-2xs">
+        <button
+          type="button"
+          onClick={() => setActiveViewMode('basta')}
+          className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer min-h-[46px] ${
+            activeViewMode === 'basta'
+              ? 'bg-white text-slate-950 shadow-sm font-extrabold'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Trophy className="w-5 h-5 text-amber-600" />
+          <span>Bästa hästarna lopp för lopp</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveViewMode('alla')}
+          className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer min-h-[46px] ${
+            activeViewMode === 'alla'
+              ? 'bg-white text-slate-950 shadow-sm font-extrabold'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Layers className="w-5 h-5 text-slate-600" />
+          <span>Alla lopp &amp; banor</span>
+        </button>
+      </div>
+
+      {/* Läge 1: Bästa hästarna lopp för lopp */}
+      {activeViewMode === 'basta' && (
+        <div className="space-y-4">
+          {/* Snabbväljare / Filter för lopp */}
+          {dagensBastaOmgang.races.length > 0 && (
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500">
+                <Filter className="w-4 h-4" />
+                <span>Välj lopp att titta på</span>
+              </div>
+
+              <div className="flex gap-2 overflow-x-auto pb-1" role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={selectedRaceFilter === 'alla'}
+                  onClick={() => setSelectedRaceFilter('alla')}
+                  className={`px-4 py-2 rounded-xl text-sm sm:text-base font-bold min-h-[44px] cursor-pointer transition-colors shrink-0 ${
+                    selectedRaceFilter === 'alla'
+                      ? 'bg-slate-950 text-white'
+                      : 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  Alla lopp ({dagensBastaOmgang.races.length})
+                </button>
+
+                {dagensBastaOmgang.races.map((r) => (
+                  <button
+                    key={r.raceNumber}
+                    type="button"
+                    role="tab"
+                    aria-selected={selectedRaceFilter === r.raceNumber}
+                    onClick={() => setSelectedRaceFilter(r.raceNumber)}
+                    className={`px-3.5 py-2 rounded-xl text-sm sm:text-base font-bold min-h-[44px] cursor-pointer transition-colors shrink-0 ${
+                      selectedRaceFilter === r.raceNumber
+                        ? 'bg-amber-600 text-white shadow-sm'
+                        : 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-700'
+                    }`}
+                  >
+                    Lopp {r.raceNumber}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg sm:text-xl font-black text-slate-950">
-                Dagens bästa — Lopp för lopp
-              </h2>
-              <p className="text-sm sm:text-base text-amber-950 font-medium">
-                Se bästa hästarna och motiveringarna för spikar, motbud och skrällar.
-              </p>
+          )}
+
+          {/* Loppkorten */}
+          <BlockErrorBoundary fallbackTitle="Bästa hästarna per lopp">
+            <div className="space-y-6 pt-1">
+              {filteredBastaRaces.map((race) => (
+                <div key={race.raceNumber} id={`lopp-${race.raceNumber}`}>
+                  <DagensBastaLoppKort
+                    race={race}
+                    onSelectHorse={onSelectHorse}
+                    onOpenRace={handleOpenRaceFromBasta}
+                  />
+                </div>
+              ))}
             </div>
-          </div>
-          <button
-            type="button"
-            onClick={onOpenDagensBasta}
-            className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-950 text-amber-400 hover:bg-slate-900 text-sm sm:text-base font-bold min-h-[44px] cursor-pointer transition-colors shadow-sm text-center shrink-0"
-          >
-            Öppna Dagens bästa →
-          </button>
+          </BlockErrorBoundary>
         </div>
       )}
 
-      {loading ? (
-        <IdagSkelett />
-      ) : sortedRaceDays.length > 0 ? (
+      {/* Läge 2: Alla lopp & banor */}
+      {activeViewMode === 'alla' && (
         <div className="space-y-6">
-          {sortedRaceDays.map((day) => (
-            <BlockErrorBoundary key={day.id} fallbackTitle={`Bana ${day.trackName}`}>
-              <BanaKort
-                day={day}
-                isFavorite={favoriteTrackIds.includes(day.trackId)}
-                onToggleFavorite={() => handleToggleFavorite(day.trackId, day.trackName)}
-                onOpenRace={onOpenRace}
-                onOpenTrack={onOpenTrack}
-              />
-            </BlockErrorBoundary>
-          ))}
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl border border-slate-200 p-8 text-center space-y-3">
-          <p className="text-lg font-medium text-slate-800">
-            Inga tävlingar hittades för det valda datumet.
-          </p>
+          {loading && raceDays.length === 0 ? (
+            <IdagSkelett />
+          ) : sortedRaceDays.length > 0 ? (
+            <div className="space-y-6">
+              {sortedRaceDays.map((day) => (
+                <BlockErrorBoundary key={day.id} fallbackTitle={`Bana ${day.trackName}`}>
+                  <BanaKort
+                    day={day}
+                    isFavorite={favoriteTrackIds.includes(day.trackId)}
+                    onToggleFavorite={() => handleToggleFavorite(day.trackId, day.trackName)}
+                    onOpenRace={onOpenRace}
+                    onOpenTrack={onOpenTrack}
+                  />
+                </BlockErrorBoundary>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-slate-200 p-8 text-center space-y-3">
+              <p className="text-lg font-medium text-slate-800">
+                Inga tävlingar hittades för det valda datumet.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

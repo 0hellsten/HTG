@@ -6,7 +6,6 @@ import { HastScreen } from './screens/HastScreen';
 import { HastarScreen } from './screens/HastarScreen';
 import { BongScreen } from './screens/BongScreen';
 import { JanneBoyScreen } from './screens/JanneBoyScreen';
-import { DagensBastaScreen } from './screens/DagensBastaScreen';
 import { TipsScreen } from './screens/TipsScreen';
 import { BanvisarenScreen } from './screens/BanvisarenScreen';
 import { StallScreen } from './screens/StallScreen';
@@ -184,15 +183,9 @@ export const App: React.FC = () => {
                   setSiblingRaces(siblings);
                 }}
                 onOpenTrack={(trackId) => setSelectedTrackId(trackId)}
-                onOpenDagensBasta={() => handleTabChange('dagensbasta')}
+                onSelectHorse={(id) => setSelectedHorseId(id)}
               />
             )
-          ) : activeTab === 'dagensbasta' ? (
-            <DagensBastaScreen
-              onSelectHorse={(id) => setSelectedHorseId(id)}
-              onOpenRace={() => setActiveTab('idag')}
-              onBackToIdag={() => setActiveTab('idag')}
-            />
           ) : activeTab === 'janneboy' ? (
             <JanneBoyScreen onOpenInBong={handleOpenJanneBoyInBong} />
           ) : activeTab === 'bong' ? (
@@ -225,7 +218,6 @@ export const App: React.FC = () => {
             <MerScreen
               onSelectOption={(opt) => {
                 if (opt === 'banvisaren') setSelectedTrackId('1');
-                else if (opt === 'dagensbasta') setActiveTab('dagensbasta');
                 else setMerSubscreen(opt);
               }}
             />
