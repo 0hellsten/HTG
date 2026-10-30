@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Check, Wand2 } from 'lucide-react';
+import { Sparkles, Check, Wand2, RefreshCw } from 'lucide-react';
 import { BongGameType, JanneBoyStrategy, JANNE_BOY_STRATEGIES } from '@stallbacken/shared';
 
 interface JanneBoyControlsProps {
@@ -8,6 +8,7 @@ interface JanneBoyControlsProps {
   trackName?: string;
   strategy: JanneBoyStrategy;
   budget: number;
+  isCalculating?: boolean;
   onSelectStrategy: (strat: JanneBoyStrategy) => void;
   onChangeBudget: (b: number) => void;
   onGenerate: () => void;
@@ -21,6 +22,7 @@ export const JanneBoyControls: React.FC<JanneBoyControlsProps> = ({
   trackName,
   strategy,
   budget,
+  isCalculating = false,
   onSelectStrategy,
   onChangeBudget,
   onGenerate,
@@ -119,11 +121,25 @@ export const JanneBoyControls: React.FC<JanneBoyControlsProps> = ({
         <button
           type="button"
           onClick={onGenerate}
-          className="w-full min-h-[52px] py-3.5 px-6 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-sm transition-all cursor-pointer active:scale-[0.99]"
+          disabled={isCalculating}
+          className={`w-full min-h-[52px] py-3.5 px-6 rounded-xl font-extrabold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-sm transition-all cursor-pointer active:scale-[0.99] ${
+            isCalculating
+              ? 'bg-amber-300 text-slate-800 cursor-wait opacity-90'
+              : 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+          }`}
         >
-          <Wand2 className="w-5 h-5" />
-          <span>Skapa systemförslag ({budget} kr)</span>
-          <Sparkles className="w-4 h-4 text-slate-950" />
+          {isCalculating ? (
+            <>
+              <RefreshCw className="w-5 h-5 animate-spin" />
+              <span>Janne analyserar lopp &amp; spår...</span>
+            </>
+          ) : (
+            <>
+              <Wand2 className="w-5 h-5" />
+              <span>Skapa systemförslag ({budget} kr)</span>
+              <Sparkles className="w-4 h-4 text-slate-950" />
+            </>
+          )}
         </button>
       </div>
     </div>

@@ -4,6 +4,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { registerSW } from 'virtual:pwa-register';
 import { App } from './App';
 import './index.css';
+import { initMockApiFallback } from './lib/mockApiFallback';
+
+// Aktivera automatisk data-fallback för GitHub Pages och offline
+initMockApiFallback();
 
 // Registrera PWA service worker automatiskt
 registerSW({ immediate: true });

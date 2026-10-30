@@ -30,6 +30,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
   const [lockedHorses, setLockedHorses] = useState<Record<number, string[]>>({});
   const [isLive, setIsLive] = useState<boolean>(false);
   const [loadingLive, setLoadingLive] = useState<boolean>(false);
+  const [isCalculating, setIsCalculating] = useState<boolean>(false);
 
   const engine = useMemo(() => new JanneBoyEngine(), []);
   const [raceDay, setRaceDay] = useState<BongRaceDayData>(() =>
@@ -96,31 +97,27 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
       const newRaceDay = buildRaceDayFromCompetition(comp);
       setRaceDay(newRaceDay);
       setIsLive(false);
-      const config: JanneBoyConfig = {
-        gameType: comp.gameType,
-        strategy,
-        budget,
-        lockedHorses: {},
-      };
-      setSystemResult(engine.generate(newRaceDay, config));
     }
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
+    if (isCalculating) return;
+    setIsCalculating(true);
+    // Fördröjning mellan 0,5 sek och 1,5 sek för naturlig betänketid
+    const delayMs = Math.floor(Math.random() * 600) + 600;
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+
     const config: JanneBoyConfig = { gameType, strategy, budget, lockedHorses };
     setSystemResult(engine.generate(raceDay, config));
+    setIsCalculating(false);
   };
 
   const handleSelectStrategy = (newStrat: JanneBoyStrategy) => {
     setStrategy(newStrat);
-    const config: JanneBoyConfig = { gameType, strategy: newStrat, budget, lockedHorses };
-    setSystemResult(engine.generate(raceDay, config));
   };
 
   const handleChangeBudget = (newBudget: number) => {
     setBudget(newBudget);
-    const config: JanneBoyConfig = { gameType, strategy, budget: newBudget, lockedHorses };
-    setSystemResult(engine.generate(raceDay, config));
   };
 
   const handleToggleLock = (legIndex: number, horseId: string) => {
@@ -128,11 +125,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
       const current = prev[legIndex] || [];
       const isCurrentlyLocked = current.includes(horseId);
       const updated = isCurrentlyLocked ? [] : [horseId];
-      const newLocked = { ...prev, [legIndex]: updated };
-
-      const config: JanneBoyConfig = { gameType, strategy, budget, lockedHorses: newLocked };
-      setSystemResult(engine.generate(raceDay, config));
-      return newLocked;
+      return { ...prev, [legIndex]: updated };
     });
   };
 
@@ -256,6 +249,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
         trackName={raceDay.trackName}
         strategy={strategy}
         budget={budget}
+        isCalculating={isCalculating}
         onSelectStrategy={handleSelectStrategy}
         onChangeBudget={handleChangeBudget}
         onGenerate={handleGenerate}
