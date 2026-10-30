@@ -19,6 +19,7 @@ import { formatDistance, formatStartMethod } from '../lib/format';
 interface LoppScreenProps {
   raceId: string;
   onBack: () => void;
+  onBackToTips?: () => void;
   onSelectRace?: (raceId: string) => void;
   onSelectHorse?: (horseId: string) => void;
   onOpenTrack?: (trackId: string) => void;
@@ -28,6 +29,7 @@ interface LoppScreenProps {
 export const LoppScreen: React.FC<LoppScreenProps> = ({
   raceId,
   onBack,
+  onBackToTips,
   onSelectRace,
   onSelectHorse,
   onOpenTrack,
@@ -187,16 +189,29 @@ export const LoppScreen: React.FC<LoppScreenProps> = ({
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-16">
-      {/* Tillbaka-knapp och loppväljare */}
+      {/* Tillbaka-knappar och loppväljare */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-950 font-medium text-base py-2.5 px-2 -mx-2 rounded-lg transition-colors min-h-[44px] cursor-pointer"
-        >
-          <ArrowLeft className="w-5 h-5 shrink-0" />
-          <span>Tillbaka till dagens omgång</span>
-        </button>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {onBackToTips && (
+            <button
+              type="button"
+              onClick={onBackToTips}
+              className="inline-flex items-center gap-2 text-amber-800 hover:text-amber-950 font-bold text-base py-2 px-3 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-lg transition-colors min-h-[44px] cursor-pointer shadow-2xs"
+            >
+              <ArrowLeft className="w-5 h-5 shrink-0" />
+              <span>Tillbaka till tips</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-950 font-medium text-base py-2 px-2.5 rounded-lg transition-colors min-h-[44px] cursor-pointer"
+          >
+            <ArrowLeft className="w-5 h-5 shrink-0" />
+            <span>Tillbaka till dagens omgång</span>
+          </button>
+        </div>
 
         {siblingRaces.length > 0 && (
           <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">

@@ -29,6 +29,7 @@ export const App: React.FC = () => {
   const [selectedRaceId, setSelectedRaceId] = useState<string | null>(null);
   const [selectedHorseId, setSelectedHorseId] = useState<string | null>(null);
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
+  const [raceOriginTab, setRaceOriginTab] = useState<'tips' | null>(null);
   const [merSubscreen, setMerSubscreen] = useState<MerSubscreen>('none');
   const [siblingRaces, setSiblingRaces] = useState<Race[]>([]);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -80,6 +81,7 @@ export const App: React.FC = () => {
     setSelectedHorseId(null);
     setSelectedTrackId(null);
     setMerSubscreen('none');
+    setRaceOriginTab(null);
     if (tab === 'idag') setSelectedRaceId(null);
   };
 
@@ -201,7 +203,19 @@ export const App: React.FC = () => {
               <LoppScreen
                 raceId={selectedRaceId}
                 siblingRaces={siblingRaces}
-                onBack={() => setSelectedRaceId(null)}
+                onBack={() => {
+                  setSelectedRaceId(null);
+                  setRaceOriginTab(null);
+                }}
+                onBackToTips={
+                  raceOriginTab === 'tips'
+                    ? () => {
+                        setSelectedRaceId(null);
+                        setRaceOriginTab(null);
+                        setActiveTab('tips');
+                      }
+                    : undefined
+                }
                 onSelectRace={(newRaceId) => setSelectedRaceId(newRaceId)}
                 onSelectHorse={(horseId) => setSelectedHorseId(horseId)}
               />
@@ -228,6 +242,7 @@ export const App: React.FC = () => {
             <TipsScreen
               onOpenRace={(raceId) => {
                 setSelectedRaceId(raceId);
+                setRaceOriginTab('tips');
                 setActiveTab('idag');
               }}
             />
