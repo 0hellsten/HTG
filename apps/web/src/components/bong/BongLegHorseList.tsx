@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Clock, MapPin, Flag, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, Clock, MapPin, Flag, HelpCircle, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { BongRaceLeg, HorseRank, BongHorseInput } from '@stallbacken/shared';
 
 interface BongLegHorseListProps {
@@ -24,12 +24,14 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
   onOpenHorseInfo,
 }) => {
   const [showRankHelp, setShowRankHelp] = useState(false);
+  const [activePickerHorseId, setActivePickerHorseId] = useState<string | null>(null);
+
   const startMethodText = leg.startMethod === 'auto' ? 'autostart' : 'voltstart';
   const distanceText = leg.distance ? `${leg.distance.toLocaleString('sv-SE')} m` : undefined;
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-4">
-      {}
+      {/* Avdelningshuvud */}
       <div className="border-b border-slate-200 pb-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
@@ -89,7 +91,7 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
             type="button"
             onClick={() => setShowRankHelp((prev) => !prev)}
             aria-expanded={showRankHelp}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-amber-800 hover:text-amber-950 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-amber-800 hover:text-amber-950 transition-colors cursor-pointer min-h-[44px] py-1"
           >
             <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
             <span>Vad betyder A, B, C, D vid varje häst?</span>
@@ -115,7 +117,7 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
         )}
       </div>
 
-      {}
+      {/* Hästlista */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
         {leg.horses.map((horse) => {
           const isSelected = selectedIds.includes(horse.id);
@@ -124,26 +126,45 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
           const isValue = horse.winOdds
             ? 0.85 / horse.winOdds > horse.betDistribution * 1.15
             : false;
+          const isPickerOpen = activePickerHorseId === horse.id;
 
           return (
             <div
               key={horse.id}
-              className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+              className={`flex items-center justify-between p-3 rounded-2xl border transition-all ${
                 isSelected
-                  ? 'bg-amber-50/70 border-amber-300 shadow-xs'
+                  ? 'bg-amber-50/80 border-amber-300 shadow-xs ring-1 ring-amber-300/40'
                   : 'bg-white border-slate-200 hover:border-slate-300'
               }`}
             >
-              <button
-                type="button"
-                onClick={() => onToggleHorse(horse.id)}
-                className="flex items-center gap-3 text-left flex-1 min-w-0 mr-2 cursor-pointer"
+              {/* Klickbar yta för hela hästkortet -> snabbmarkerar / avmarkerar som etta (A) */}
+              <div
+                onClick={() => {
+                  if (isPickerOpen) {
+                    setActivePickerHorseId(null);
+                    return;
+                  }
+                  onToggleHorse(horse.id);
+                }}
+                className="flex items-center gap-3 text-left flex-1 min-w-0 mr-2 sm:mr-3 cursor-pointer py-1 select-none min-h-[44px]"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onToggleHorse(horse.id);
+                  }
+                }}
+                aria-pressed={isSelected}
+                aria-label={`${horse.name || `Häst ${horse.startNumber}`}, tryck för att ${
+                  isSelected ? 'avmarkera' : 'markera som etta'
+                }`}
               >
                 <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 ${
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-black text-sm sm:text-base shrink-0 shadow-2xs ${
                     isSelected
-                      ? 'bg-amber-500 text-slate-950'
-                      : 'bg-slate-100 text-slate-700 border border-slate-200'
+                      ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-400'
+                      : 'bg-slate-100 text-slate-800 border border-slate-200'
                   }`}
                 >
                   {horse.startNumber}
@@ -159,82 +180,125 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-slate-500 truncate">
-                    {horse.driverName} · {streckPct} % ·{' '}
-                    {horse.winOdds ? `${horse.winOdds} odds` : ''}
+                  <div className="text-xs text-slate-500 truncate mt-0.5">
+                    {horse.driverName ? `${horse.driverName} · ` : ''}
+                    {streckPct} %
+                    {horse.winOdds ? ` · ${horse.winOdds} odds` : ''}
                   </div>
                 </div>
-              </button>
+              </div>
 
-              {isSelected ? (
-                <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 shrink-0">
-                  {RANK_OPTIONS.map((r) => {
-                    const isRankActive = rank === r;
-                    const colorClass =
-                      r === 'A'
-                        ? isRankActive
-                          ? 'bg-emerald-600 text-white font-bold'
-                          : 'text-emerald-700 hover:bg-emerald-50'
-                        : r === 'B'
-                          ? isRankActive
-                            ? 'bg-blue-600 text-white font-bold'
-                            : 'text-blue-700 hover:bg-blue-50'
-                          : r === 'C'
-                            ? isRankActive
-                              ? 'bg-amber-600 text-white font-bold'
-                              : 'text-amber-700 hover:bg-amber-50'
-                            : isRankActive
-                              ? 'bg-slate-600 text-white font-bold'
-                              : 'text-slate-600 hover:bg-slate-100';
+              {/* Högersektion: Vald bokstav / Välj-knapp + Informationsknapp (alltid fast längst till höger) */}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Bokstavsväljare eller Bokstavsvisning */}
+                <div className="relative">
+                  {isPickerOpen ? (
+                    <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-300 shadow-md">
+                      {RANK_OPTIONS.map((r) => {
+                        const isRankActive = isSelected && rank === r;
+                        let btnClass = 'text-slate-700 hover:bg-slate-100';
+                        if (r === 'A')
+                          btnClass = isRankActive
+                            ? 'bg-emerald-600 text-white font-black'
+                            : 'text-emerald-700 hover:bg-emerald-50';
+                        if (r === 'B')
+                          btnClass = isRankActive
+                            ? 'bg-blue-600 text-white font-black'
+                            : 'text-blue-700 hover:bg-blue-50';
+                        if (r === 'C')
+                          btnClass = isRankActive
+                            ? 'bg-amber-600 text-white font-black'
+                            : 'text-amber-700 hover:bg-amber-50';
+                        if (r === 'D')
+                          btnClass = isRankActive
+                            ? 'bg-slate-600 text-white font-black'
+                            : 'text-slate-600 hover:bg-slate-100';
 
-                    return (
-                      <button
-                        key={r}
-                        type="button"
-                        onClick={() => onSetRank(horse.id, r)}
-                        className={`w-7 h-7 rounded text-xs transition-colors cursor-pointer ${colorClass}`}
-                      >
-                        {r}
-                      </button>
-                    );
-                  })}
-
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenHorseInfo?.(horse);
-                    }}
-                    title={`Information och analys för ${horse.name || `häst ${horse.startNumber}`}`}
-                    aria-label={`Information och analys för ${horse.name || `häst ${horse.startNumber}`}`}
-                    className="w-7 h-7 rounded text-xs font-serif font-black italic transition-colors cursor-pointer flex items-center justify-center bg-sky-50 text-sky-700 hover:bg-sky-100 hover:text-sky-900 border border-sky-200/80"
-                  >
-                    i
-                  </button>
+                        return (
+                          <button
+                            key={r}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!isSelected) {
+                                onToggleHorse(horse.id);
+                              }
+                              onSetRank(horse.id, r);
+                              setActivePickerHorseId(null); // Stänger direkt efter val!
+                            }}
+                            className={`w-8 h-8 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center min-h-[32px] ${btnClass}`}
+                            title={`Välj ${r}-häst`}
+                          >
+                            {r}
+                          </button>
+                        );
+                      })}
+                      {isSelected && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleHorse(horse.id);
+                            setActivePickerHorseId(null);
+                          }}
+                          className="px-2 py-1 text-[11px] font-semibold text-red-600 hover:bg-red-50 rounded-md cursor-pointer ml-0.5 min-h-[32px]"
+                          title="Ta bort häst från kupongen"
+                        >
+                          Ta bort
+                        </button>
+                      )}
+                    </div>
+                  ) : isSelected ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActivePickerHorseId(horse.id);
+                      }}
+                      className={`min-h-[44px] px-3 py-1.5 rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 cursor-pointer shadow-2xs border transition-transform active:scale-95 ${
+                        rank === 'A'
+                          ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500'
+                          : rank === 'B'
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-500'
+                          : rank === 'C'
+                          ? 'bg-amber-600 hover:bg-amber-700 text-white border-amber-500'
+                          : 'bg-slate-700 hover:bg-slate-800 text-white border-slate-600'
+                      }`}
+                      title="Klicka för att ändra bokstav (A, B, C, D)"
+                      aria-label={`Bokstav ${rank}. Klicka för att ändra`}
+                    >
+                      <span>{rank}</span>
+                      <ChevronDown className="w-3.5 h-3.5 opacity-80" />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActivePickerHorseId(horse.id);
+                      }}
+                      className="min-h-[44px] px-3.5 py-1.5 text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl cursor-pointer transition-colors"
+                      title="Välj häst med specifik bokstav"
+                    >
+                      Välj
+                    </button>
+                  )}
                 </div>
-              ) : (
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenHorseInfo?.(horse);
-                    }}
-                    title={`Information och analys för ${horse.name || `häst ${horse.startNumber}`}`}
-                    aria-label={`Information och analys för ${horse.name || `häst ${horse.startNumber}`}`}
-                    className="w-7 h-7 rounded text-xs font-serif font-black italic transition-colors cursor-pointer flex items-center justify-center bg-slate-50 text-slate-600 hover:bg-sky-50 hover:text-sky-700 border border-slate-200 hover:border-sky-300"
-                  >
-                    i
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onToggleHorse(horse.id)}
-                    className="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer"
-                  >
-                    Välj
-                  </button>
-                </div>
-              )}
+
+                {/* FAST INFORMATIONS-KNAPP LÄNGST TILL HÖGER MED EGEN RUND DESIGN */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenHorseInfo?.(horse);
+                  }}
+                  title={`Information och analys för ${horse.name || `häst ${horse.startNumber}`}`}
+                  aria-label={`Information och analys för ${horse.name || `häst ${horse.startNumber}`}`}
+                  className="w-10 h-10 rounded-full flex items-center justify-center bg-sky-50 text-sky-700 hover:bg-sky-100 hover:text-sky-900 border border-sky-200/90 shadow-2xs transition-all cursor-pointer shrink-0 min-h-[44px] min-w-[44px]"
+                >
+                  <Info className="w-5 h-5 stroke-[2.2]" />
+                </button>
+              </div>
             </div>
           );
         })}

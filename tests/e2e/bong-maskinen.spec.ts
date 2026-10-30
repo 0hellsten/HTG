@@ -104,4 +104,49 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
     await page.locator('button:has-text("Tillbaka")').first().click();
     await expect(page.locator('h1')).toContainText('Bong-maskinen');
   });
+
+  test('snabbtryck på hästkort markerar som etta utan meny, och val av bokstav stänger väljaren', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+
+    const bongTab = page
+      .locator('button:has-text("Bong-maskinen"), button:has-text("Bongen")')
+      .first();
+    await bongTab.click();
+    await expect(page.locator('h1')).toContainText('Bong-maskinen');
+
+    // Rensa avdelningen först för ett rent tillstånd
+    const rensaBtn = page.locator('button:has-text("Rensa avdelning")').first();
+    await rensaBtn.click();
+
+    // 1. Hitta det första hästkortet och dess snabbklicksyta
+    const firstHorseCard = page.locator('div[role="button"][aria-label*="tryck för att"]').first();
+    await expect(firstHorseCard).toBeVisible();
+
+    // 2. Snabbtryck på hästkortet -> ska direkt markeras som A (etta)
+    await firstHorseCard.click();
+
+    // Kontrollera att A-brickan visas och att ingen bokstavsväljare (A, B, C, D) är öppen
+    const rankABadge = page.locator('button[aria-label="Bokstav A. Klicka för att ändra"]').first();
+    await expect(rankABadge).toBeVisible();
+    await expect(page.locator('button[title="Välj B-häst"]')).not.toBeVisible();
+
+    // 3. Klicka på A-brickan för att öppna bokstavsväljaren
+    await rankABadge.click();
+    const chooseBBtn = page.locator('button[title="Välj B-häst"]').first();
+    await expect(chooseBBtn).toBeVisible();
+
+    // 4. Klicka på B -> ska direkt stänga väljaren och visa B-brickan
+    await chooseBBtn.click();
+    await expect(chooseBBtn).not.toBeVisible(); // Menyn stängdes direkt!
+    const rankBBadge = page.locator('button[aria-label="Bokstav B. Klicka för att ändra"]').first();
+    await expect(rankBBadge).toBeVisible();
+
+    // 5. Verifiera att informationsknappen ("i") sitter synlig och har rund fast styling
+    const infoBtn = page.locator('button[title*="Information och analys"]').first();
+    await expect(infoBtn).toBeVisible();
+    await expect(infoBtn).toHaveClass(/rounded-full/);
+  });
 });
