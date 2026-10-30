@@ -1,6 +1,3 @@
-// Zod-scheman för validering av ATG:s externa JSON-svar
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { z } from 'zod';
 
 export const AtgTrackRaceSummarySchema = z.object({
@@ -26,11 +23,19 @@ export const AtgTrackSchema = z.object({
 export const AtgGameSchema = z.object({
   id: z.string().optional(),
   startTime: z.string().optional(),
+  scheduledStartTime: z.string().optional(),
   trackId: z
     .union([z.number(), z.string()])
     .optional()
     .transform((v) => (v ? String(v) : undefined)),
+  tracks: z
+    .array(z.union([z.number(), z.string()]))
+    .optional()
+    .default([])
+    .transform((arr) => arr.map(String)),
   races: z.array(z.string()).optional().default([]),
+  jackpotAmount: z.number().optional(),
+  estimatedJackpot: z.number().optional(),
 });
 
 export const AtgCalendarRaceSchema = z.object({
@@ -75,6 +80,22 @@ export const AtgPersonRefSchema = z.object({
   silks: z.string().optional(),
 });
 
+export const AtgPedigreeParentSchema = z.object({
+  id: z
+    .union([z.number(), z.string()])
+    .optional()
+    .transform((v) => (v ? String(v) : undefined)),
+  name: z.string().optional(),
+  nationality: z.string().optional(),
+});
+
+export const AtgKmTimeSchema = z.object({
+  minutes: z.number().optional(),
+  seconds: z.number().optional(),
+  tenths: z.number().optional(),
+  code: z.string().optional(),
+});
+
 export const AtgStartSchema = z.object({
   number: z.number(),
   postPosition: z.number().optional(),
@@ -85,18 +106,98 @@ export const AtgStartSchema = z.object({
     age: z.number().optional(),
     sex: z.string().optional(),
     color: z.string().optional(),
+    homeTrack: z
+      .union([
+        z.string(),
+        z.object({
+          id: z.union([z.number(), z.string()]).optional(),
+          name: z.string().optional(),
+        }),
+      ])
+      .optional()
+      .transform((v) => (typeof v === 'string' ? v : v?.name)),
     owner: z
       .union([z.string(), z.object({ name: z.string().optional() })])
       .optional()
       .transform((v) => (typeof v === 'string' ? { name: v } : v)),
+    breeder: z
+      .union([z.string(), z.object({ name: z.string().optional() })])
+      .optional()
+      .transform((v) => (typeof v === 'string' ? { name: v } : v)),
     trainer: AtgPersonRefSchema.optional(),
+    pedigree: z
+      .object({
+        father: AtgPedigreeParentSchema.optional(),
+        mother: AtgPedigreeParentSchema.optional(),
+        grandfather: AtgPedigreeParentSchema.optional(),
+      })
+      .optional(),
+    statistics: z
+      .object({
+        life: z
+          .object({
+            starts: z.number().optional().default(0),
+            earnings: z.number().optional().default(0),
+            placement: z.record(z.number()).optional().default({}),
+            winPercentage: z.number().optional().default(0),
+            placePercentage: z.number().optional().default(0),
+            earningsPerStart: z.number().optional().default(0),
+            records: z
+              .array(
+                z.object({
+                  code: z.string().optional(),
+                  startMethod: z.string().optional(),
+                  distance: z.string().optional(),
+                  time: AtgKmTimeSchema.optional(),
+                })
+              )
+              .optional()
+              .default([]),
+          })
+          .optional(),
+      })
+      .optional(),
     records: z
       .object({
         auto: z.string().optional(),
         volt: z.string().optional(),
       })
       .optional(),
-    record: z.unknown().optional(),
+    record: z
+      .object({
+        code: z.string().optional(),
+        startMethod: z.string().optional(),
+        time: AtgKmTimeSchema.optional(),
+      })
+      .optional(),
+    shoes: z
+      .object({
+        reported: z.boolean().optional(),
+        front: AtgShoeInfoSchema.optional(),
+        back: AtgShoeInfoSchema.optional(),
+      })
+      .optional(),
+    sulky: z
+      .object({
+        reported: z.boolean().optional(),
+        type: z
+          .object({
+            code: z.string().optional(),
+            text: z.string().optional(),
+          })
+          .optional(),
+        colour: z
+          .object({
+            code: z.string().optional(),
+            text: z.string().optional(),
+          })
+          .optional(),
+        color: z
+          .union([z.string(), z.object({ text: z.string().optional() })])
+          .optional()
+          .transform((v) => (typeof v === 'object' && v ? v.text : v)),
+      })
+      .optional(),
     money: z.number().optional(),
   }),
   driver: AtgPersonRefSchema.optional(),
@@ -126,6 +227,7 @@ export const AtgRaceDetailSchema = z.object({
   distance: z.number().optional().default(2140),
   startMethod: z.string().optional().default('auto'),
   startTime: z.string(),
+  scheduledStartTime: z.string().optional(),
   status: z.string().optional().default('upcoming'),
   purse: z.string().optional(),
   prize: z.string().optional(),
@@ -138,23 +240,6 @@ export const AtgRaceDetailSchema = z.object({
 });
 
 export type AtgRaceDetail = z.infer<typeof AtgRaceDetailSchema>;
-
-// Scheman för Hästprofil (horses/{id})
-export const AtgPedigreeParentSchema = z.object({
-  id: z
-    .union([z.number(), z.string()])
-    .optional()
-    .transform((v) => (v ? String(v) : undefined)),
-  name: z.string().optional(),
-  nationality: z.string().optional(),
-});
-
-export const AtgKmTimeSchema = z.object({
-  minutes: z.number().optional(),
-  seconds: z.number().optional(),
-  tenths: z.number().optional(),
-  code: z.string().optional(),
-});
 
 export const AtgHorseProfileSchema = z.object({
   id: z.union([z.number(), z.string()]).transform(String),
@@ -231,13 +316,16 @@ export const AtgHorseProfileSchema = z.object({
 
 export type AtgHorseProfile = z.infer<typeof AtgHorseProfileSchema>;
 
-// Scheman för Hästresultat (horses/{id}/results)
 export const AtgHorseResultRecordSchema = z.object({
   date: z.string(),
   place: z
     .union([z.string(), z.number()])
     .optional()
     .transform((v) => (v !== undefined ? String(v) : undefined)),
+  scratched: z.boolean().optional(),
+  galloped: z.boolean().optional(),
+  disqualified: z.boolean().optional(),
+  oddsCode: z.string().optional(),
   odds: z.number().nullable().optional(),
   kmTime: AtgKmTimeSchema.nullable().optional(),
   race: z

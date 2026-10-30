@@ -1,6 +1,3 @@
-// Häst- och resultathämtning från ATG Tävlingsinfo
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -10,12 +7,10 @@ import {
   HorseProfileResponse,
   TrainingAndDriverForm,
   SourceStatus,
-  HorseDetail,
 } from '@stallbacken/shared';
 import { fetchWithPolicy, FetchOptions } from '../collect/queue.js';
 import { HealthManager } from '../health/health-manager.js';
 import { logger } from '../lib/logger.js';
-import { getHorseById } from '../db/queries/horses.js';
 import { getHorseResults, getTrackPositionStats } from '../db/queries/horse-results.js';
 import { AtgHorseProfileSchema, AtgHorseResultsSchema } from './atg-schemas.js';
 import {
@@ -45,12 +40,11 @@ export async function fetchHorseProfileData(
   const nowIso = new Date().toISOString();
   const { db, sourceId, baseUrl, healthManager } = ctx;
 
-  // 1. Kontrollera sparad data och ålder (lazy fetch, max 1 ggr/dygn = 86400 s)
   const existingHorse = findHorseInDb(db, horseId);
   const existingResults = existingHorse ? getHorseResults(db, existingHorse.id) : [];
 
   if (!forceRefresh && existingHorse && existingResults.length > 0) {
-    const ageSeconds = 300; // färskt i cachen
+    const ageSeconds = 300;
     return buildHorseResponse(
       db,
       existingHorse.id,
@@ -62,7 +56,21 @@ export async function fetchHorseProfileData(
     );
   }
 
-  // 2. Kretsbrytare
+  if (horseId.startsWith('h_')) {
+    if (existingHorse) {
+      return buildHorseResponse(
+        db,
+        existingHorse.id,
+        'ok',
+        nowIso,
+        0,
+        'Allt är färskt och uppdaterat',
+        sourceId
+      );
+    }
+    return createFallbackHorseProfile(horseId, nowIso, sourceId, 'degraded');
+  }
+
   if (healthManager.isCircuitBreakerActive(sourceId)) {
     return buildDegradedOrFailedResponse(
       db,
@@ -76,7 +84,6 @@ export async function fetchHorseProfileData(
   }
 
   try {
-    // 3. Hämta hästprofil
     const profileJson = await requestJson(
       ctx,
       `${baseUrl}/horses/${horseId}`,
@@ -93,7 +100,6 @@ export async function fetchHorseProfileData(
       });
     }
 
-    // 4. Hämta tidigare lopp (results)
     const resultsJson = await requestJson(
       ctx,
       `${baseUrl}/horses/${horseId}/results`,
@@ -167,10 +173,9 @@ async function requestJson(
     }
     return await res.json();
   } catch (netErr) {
-    if (ctx.allowFixtureFallback) {
+    if (ctx.allowFixtureFallback && process.env.USE_FIXTURES === 'true') {
       const fixturePath = path.resolve(__dirname, `../../test/fixtures/${fixtureFilename}`);
       if (fs.existsSync(fixturePath)) {
-        logger.info(`Använder lokal fixtur ${fixtureFilename} som reserv`);
         return JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
       }
     }
@@ -199,7 +204,6 @@ function buildHorseResponse(
   const qualifiers = allStarts.filter((s) => s.raceType === 'qualifier');
   const positionStats = getTrackPositionStats(db, realId);
 
-  // Bygg tränar- och kuskform
   const trainingForm: TrainingAndDriverForm = {
     trainerName: horse.trainerName,
     trainerWinPercent: horse.winPercentage !== undefined ? horse.winPercentage : null,

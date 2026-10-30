@@ -1,6 +1,3 @@
-// API-rutter för Mitt stall (anmälda hästar, kuskar, tränare och banor)
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { FastifyPluginAsync } from 'fastify';
 import { ApiResponse, StallTodayResponse, TodaysEntry } from '@stallbacken/shared';
 import { getDb } from '../db/connection.js';
@@ -22,30 +19,33 @@ interface EntryRow {
 export const stallRoutes: FastifyPluginAsync = async (app) => {
   const db = getDb();
 
-  /**
-   * Hämtar alla anmälda ekipage i dagens lopp för snabb matchning mot sparade favoriter.
-   */
   app.get<{
-    Querystring: { refresh?: string };
+    Querystring: { refresh?: string; datum?: string };
   }>('/api/stall/anmalda-idag', async (request, reply) => {
     try {
       const forceRefresh = request.query.refresh === 'true';
+      const todayDateStr =
+        request.query.datum ||
+        new Intl.DateTimeFormat('sv-SE', {
+          timeZone: 'Europe/Stockholm',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).format(new Date());
 
-      // Säkerställ att vi har dagens kalender i databasen
-      const calendarResult = await atgRacingInfoAdapter.fetchCalendar(undefined, forceRefresh);
+      const calendarResult = await atgRacingInfoAdapter.fetchCalendar(todayDateStr, forceRefresh);
 
-      // Hämta aktiva banor för dagen
       const trackRows = db
         .prepare(
           `SELECT DISTINCT rd.track_id 
            FROM race_days rd 
-           JOIN races r ON r.race_day_id = rd.id`
+           JOIN races r ON r.race_day_id = rd.id
+           WHERE rd.date = ?`
         )
-        .all() as { track_id: string }[];
+        .all(todayDateStr) as { track_id: string }[];
 
       const trackIdsWithRaces = trackRows.map((r) => r.track_id);
 
-      // Hämta alla aktiva starter för dagens lopp
       const stmt = db.prepare(`
         SELECT 
           s.horse_id,
@@ -64,11 +64,11 @@ export const stallRoutes: FastifyPluginAsync = async (app) => {
         JOIN horses h ON h.id = s.horse_id
         LEFT JOIN people pd ON pd.id = s.driver_id
         LEFT JOIN people pt ON pt.id = s.trainer_id
-        WHERE s.scratched = 0
+        WHERE rd.date = ? AND s.scratched = 0
         ORDER BY r.scheduled_start ASC, r.number ASC
       `);
 
-      const rows = stmt.all() as EntryRow[];
+      const rows = stmt.all(todayDateStr) as EntryRow[];
 
       const entries: TodaysEntry[] = rows.map((row) => {
         let formattedTime: string | undefined;

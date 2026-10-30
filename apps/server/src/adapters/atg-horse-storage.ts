@@ -1,6 +1,3 @@
-// Databaslagring för ATG:s hästprofil och historik
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import Database from 'better-sqlite3';
 import {
   HorsePastStart,
@@ -12,6 +9,7 @@ import {
 import { AtgHorseProfile, AtgHorseResults, AtgKmTimeSchema } from './atg-schemas.js';
 import { upsertHorse, upsertPerson, getHorseById } from '../db/queries/horses.js';
 import { saveHorseResults } from '../db/queries/horse-results.js';
+import { mapSwedishSex, mapSwedishSulky } from './atg-storage.js';
 import { z } from 'zod';
 
 type AtgKmTime = z.infer<typeof AtgKmTimeSchema>;
@@ -40,7 +38,6 @@ export function saveHorseProfileToDb(
   const seconds = placements['2'] ?? 0;
   const thirds = placements['3'] ?? 0;
 
-  // Hitta bästa tider från life.records
   let recordAuto: string | undefined;
   let recordVolt: string | undefined;
   if (life?.records) {
@@ -57,7 +54,6 @@ export function saveHorseProfileToDb(
     }
   }
 
-  // Tränare
   if (profile.trainer?.id) {
     const trainerName =
       profile.trainer.name ||
@@ -90,7 +86,7 @@ export function saveHorseProfileToDb(
     id: profile.id,
     name: profile.name,
     birthYear,
-    sex: profile.sex,
+    sex: mapSwedishSex(profile.sex),
     color: profile.color,
     breed: profile.breed,
     trainerId: profile.trainer?.id,
@@ -131,13 +127,11 @@ export function saveHorseResultsToDb(
     const raceNumber = rec.race?.number ?? 1;
     const id = `${horseId}_${rec.date}_${raceNumber}`;
 
-    // Odds: om odds är t.ex. 746 innebär det 7.46
     let odds: number | undefined;
     if (rec.odds !== null && rec.odds !== undefined) {
       odds = rec.odds > 99 ? Math.round((rec.odds / 100) * 10) / 10 : rec.odds;
     }
 
-    // Skor
     let shoesFront: boolean | undefined;
     let shoesBack: boolean | undefined;
     if (rec.start?.horse?.shoes) {
@@ -147,19 +141,23 @@ export function saveHorseResultsToDb(
       shoesBack = typeof sb === 'boolean' ? sb : sb?.hasShoe;
     }
 
-    // Förstapris: i öre hos ATG (3 500 000 öre = 35 000 kr)
     let firstPrize = rec.race?.firstPrize || 0;
     if (firstPrize > 100000) {
       firstPrize = Math.round(firstPrize / 100);
     }
 
-    // Kusk
     const driver = rec.start?.driver;
     const driverName = driver
       ? [driver.firstName, driver.lastName].filter(Boolean).join(' ') || driver.shortName
       : undefined;
 
     const kmTime = formatAtgKmTime(rec.kmTime, startMethod);
+
+    let place = rec.place;
+    if (rec.scratched) place = 'str';
+    else if (rec.disqualified) place = 'd';
+    else if (rec.galloped) place = place ? `${place}g` : 'g';
+    else if (rec.oddsCode === 'gdk') place = 'gdk';
 
     converted.push({
       id,
@@ -172,12 +170,12 @@ export function saveHorseResultsToDb(
       distanceM: rec.start?.distance || 2140,
       postPosition: rec.start?.postPosition,
       driverName,
-      place: rec.place,
+      place,
       kmTime,
       odds,
       shoesFront,
       shoesBack,
-      sulkyType: rec.start?.horse?.sulky?.type?.text,
+      sulkyType: mapSwedishSulky(rec.start?.horse?.sulky?.type?.text),
       firstPrize,
     });
   }
@@ -190,7 +188,6 @@ export function findHorseInDb(db: Database.Database, horseId: string): HorseDeta
   const byId = getHorseById(db, horseId);
   if (byId) return byId;
 
-  // Försök matcha namn ur ID (t.ex. h_brother_bill -> Brother Bill)
   const clean = horseId.replace(/^h_/, '').replace(/_/g, ' ').trim();
   if (clean.length >= 2) {
     const found = db

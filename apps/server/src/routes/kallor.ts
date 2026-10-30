@@ -5,8 +5,12 @@ import {
   registeredAdapters,
   fakeSource,
   atgRacingInfoAdapter,
+  atgOddsAdapter,
+  smhiWeatherAdapter,
   tipsExpressenAdapter,
   tipsTravrondenAdapter,
+  tipsAftonbladetAdapter,
+  tipsSulkysportAdapter,
 } from '../adapters/index.js';
 import { logger } from '../lib/logger.js';
 
@@ -20,10 +24,6 @@ interface FakeSourceBody {
 export const kallorRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   const healthManager = new HealthManager();
 
-  /**
-   * GET /api/kallor
-   * Listar alla registrerade datakällors aktuella hälsa och färskhet på svenska.
-   */
   app.get<{ Reply: ApiResponse<SourceHealthRecord[]> }>('/api/kallor', async (_req, reply) => {
     try {
       const records = healthManager.getAllSourcesHealth(registeredAdapters);
@@ -45,10 +45,6 @@ export const kallorRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
     }
   });
 
-  /**
-   * POST /api/kallor/uppdatera-allt
-   * Forcerar en ny hämtning för alla aktiva datakällor och returnerar uppdaterad status.
-   */
   app.post<{ Reply: ApiResponse<SourceHealthRecord[]> }>(
     '/api/kallor/uppdatera-allt',
     async (_req, reply) => {
@@ -57,8 +53,12 @@ export const kallorRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
 
         await Promise.allSettled([
           atgRacingInfoAdapter.fetchCalendar(undefined, true),
+          atgOddsAdapter.fetch({ forceRefresh: true }),
+          smhiWeatherAdapter.fetch({ forceRefresh: true } as any),
           tipsExpressenAdapter.fetch({ forceRefresh: true }),
           tipsTravrondenAdapter.fetch({ forceRefresh: true }),
+          tipsAftonbladetAdapter.fetch({ forceRefresh: true }),
+          tipsSulkysportAdapter.fetch({ forceRefresh: true }),
         ]);
 
         const records = healthManager.getAllSourcesHealth(registeredAdapters);
@@ -82,10 +82,6 @@ export const kallorRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
     }
   );
 
-  /**
-   * POST /api/test/fake-source
-   * Styr tillståndet för den permanenta testkällan (för verifiering och tester).
-   */
   app.post<{ Body: FakeSourceBody }>('/api/test/fake-source', async (req, reply) => {
     const { status, message, failures, reset } = req.body || {};
 

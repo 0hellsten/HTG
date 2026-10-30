@@ -1,6 +1,3 @@
-// Databasfrågor för hästranking och topplistor
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import Database from 'better-sqlite3';
 import { HorseRankingCategory, HorseRankingItem } from '@stallbacken/shared';
 import { ensureEliteHorsesSeeded } from './seed-elite-horses.js';
@@ -114,9 +111,19 @@ function mapRowToRankingItem(row: DbRankingRow, rankPosition: number): HorseRank
 export function getHorseRankings(
   db: Database.Database,
   category: HorseRankingCategory = 'vinstrikast',
-  limit = 20
+  limit = 20,
+  todayDateStr?: string
 ): HorseRankingItem[] {
   ensureEliteHorsesSeeded(db);
+
+  const dateToUse =
+    todayDateStr ||
+    new Intl.DateTimeFormat('sv-SE', {
+      timeZone: 'Europe/Stockholm',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
 
   if (category === 'idag') {
     const rows = db
@@ -131,15 +138,16 @@ export function getHorseRankings(
         r.scheduled_start AS today_start_time
       FROM starts s
       JOIN horses h ON h.id = s.horse_id
-      LEFT JOIN races r ON r.id = s.race_id
-      LEFT JOIN race_days rd ON rd.id = r.race_day_id
+      JOIN races r ON r.id = s.race_id
+      JOIN race_days rd ON rd.id = r.race_day_id
       LEFT JOIN tracks t ON t.id = rd.track_id
       LEFT JOIN people p ON p.id = h.trainer_id
+      WHERE rd.date = ?
       ORDER BY r.scheduled_start ASC, r.number ASC, s.start_number ASC
       LIMIT ?
     `
       )
-      .all(limit) as DbRankingRow[];
+      .all(dateToUse, limit) as DbRankingRow[];
 
     return rows.map((row, idx) => mapRowToRankingItem(row, idx + 1));
   }

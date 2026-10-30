@@ -1,33 +1,51 @@
 {
+  "@type": ".VinnareGame",
   "id": "vinnare_2026-10-29_1_4",
-  "raceId": "2026-10-29_1_4",
-  "gameType": "Vinnare",
-  "status": "open",
-  "recordedAt": "2026-10-29T18:42:00",
+  "status": "bettable",
   "pools": {
-    "vinnare": {
-      "odds": [
-        { "startNumber": 1, "odds": 3.45 },
-        { "startNumber": 2, "odds": 6.8 },
-        { "startNumber": 3, "odds": 2.15 },
-        { "startNumber": 4, "odds": null }
-      ]
-    },
-    "plats": {
-      "odds": [
-        { "startNumber": 1, "minOdds": 1.45, "maxOdds": 1.95 },
-        { "startNumber": 2, "minOdds": 2.1, "maxOdds": 2.9 },
-        { "startNumber": 3, "minOdds": 1.15, "maxOdds": 1.4 },
-        { "startNumber": 4, "minOdds": null, "maxOdds": null }
-      ]
-    },
-    "streck": {
-      "distribution": [
-        { "startNumber": 1, "percent": 24 },
-        { "startNumber": 2, "percent": 14 },
-        { "startNumber": 3, "percent": 48 },
-        { "startNumber": 4, "percent": 0 }
+    "vinnare": { "@type": ".VinnarePool", "turnover": 4500000 }
+  },
+  "races": [
+    {
+      "id": "2026-10-29_1_4",
+      "number": 4,
+      "distance": 2140,
+      "startMethod": "auto",
+      "startTime": "2026-10-29T18:42:00",
+      "starts": [
+        {
+          "number": 1,
+          "pools": {
+            "vinnare": { "odds": 345 },
+            "plats": { "minOdds": 145, "maxOdds": 195 },
+            "streck": { "betDistribution": 2400 }
+          }
+        },
+        {
+          "number": 2,
+          "pools": {
+            "vinnare": { "odds": 680 },
+            "plats": { "minOdds": 210, "maxOdds": 290 },
+            "streck": { "betDistribution": 1400 }
+          }
+        },
+        {
+          "number": 3,
+          "pools": {
+            "vinnare": { "odds": 215 },
+            "plats": { "minOdds": 115, "maxOdds": 140 },
+            "streck": { "betDistribution": 4800 }
+          }
+        },
+        {
+          "number": 4,
+          "pools": {
+            "vinnare": { "odds": null },
+            "plats": { "minOdds": null, "maxOdds": null },
+            "streck": { "betDistribution": 0 }
+          }
+        }
       ]
     }
-  }
+  ]
 }

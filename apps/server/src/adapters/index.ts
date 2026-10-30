@@ -17,12 +17,7 @@ export * from './tips-travronden.js';
 export * from './tips-aftonbladet.js';
 export * from './tips-sulkysport.js';
 
-/**
- * Register över samtliga aktiva källadaptrar i Stallbacken.
- * Nya källor registreras i denna lista.
- */
-export const registeredAdapters: SourceAdapter<unknown>[] = [
-  fakeSource,
+const realAdapters: SourceAdapter<unknown>[] = [
   atgRacingInfoAdapter,
   atgOddsAdapter,
   smhiWeatherAdapter,
@@ -32,9 +27,7 @@ export const registeredAdapters: SourceAdapter<unknown>[] = [
   tipsSulkysportAdapter,
 ];
 
-/**
- * Hämtar en specifik adapter baserat på dess ID.
- */
-export function getAdapter(id: string): SourceAdapter<unknown> | undefined {
-  return registeredAdapters.find((adapter) => adapter.id === id);
-}
+export const registeredAdapters: SourceAdapter<unknown>[] =
+  process.env.USE_FIXTURES === 'true' || process.env.NODE_ENV === 'test'
+    ? [fakeSource, ...realAdapters]
+    : realAdapters;

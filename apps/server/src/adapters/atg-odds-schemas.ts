@@ -1,49 +1,46 @@
-// Zod-scheman för validering av ATG:s odds- och speldata
-// Privat, icke-kommersiell användning. Ingen vidarespridning av data.
-
 import { z } from 'zod';
 
-export const AtgWinnerOddsItemSchema = z.object({
-  startNumber: z.number(),
-  odds: z.number().nullable().optional(),
-});
-
-export const AtgPlaceOddsItemSchema = z.object({
-  startNumber: z.number(),
-  minOdds: z.number().nullable().optional(),
-  maxOdds: z.number().nullable().optional(),
-});
-
-export const AtgStakeDistributionItemSchema = z.object({
-  startNumber: z.number(),
-  percent: z.number().nullable().optional(),
-});
-
-export const AtgOddsPoolsSchema = z.object({
-  vinnare: z
-    .object({
-      odds: z.array(AtgWinnerOddsItemSchema).optional().default([]),
-    })
-    .optional(),
-  plats: z
-    .object({
-      odds: z.array(AtgPlaceOddsItemSchema).optional().default([]),
-    })
-    .optional(),
-  streck: z
-    .object({
-      distribution: z.array(AtgStakeDistributionItemSchema).optional().default([]),
-    })
-    .optional(),
-});
-
-export const AtgOddsResponseSchema = z.object({
+export const AtgGamePoolStartSchema = z.object({
   id: z.string().optional(),
-  raceId: z.string(),
-  gameType: z.string().optional().default('Vinnare'),
-  status: z.string().optional(),
-  recordedAt: z.string().optional(),
-  pools: AtgOddsPoolsSchema.optional(),
+  number: z.number(),
+  postPosition: z.number().optional(),
+  distance: z.number().optional(),
+  pools: z
+    .record(
+      z.object({
+        odds: z.number().nullable().optional(),
+        minOdds: z.number().nullable().optional(),
+        maxOdds: z.number().nullable().optional(),
+        betDistribution: z.number().nullable().optional(),
+      })
+    )
+    .optional(),
 });
 
-export type AtgOddsResponse = z.infer<typeof AtgOddsResponseSchema>;
+export const AtgGameRaceSchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  date: z.string().optional(),
+  number: z.number(),
+  distance: z.number().optional().default(2140),
+  startMethod: z.string().optional().default('auto'),
+  startTime: z.string().optional(),
+  scheduledStartTime: z.string().optional(),
+  track: z
+    .object({
+      id: z.union([z.number(), z.string()]).optional(),
+      name: z.string().optional(),
+    })
+    .optional(),
+  starts: z.array(AtgGamePoolStartSchema).optional().default([]),
+});
+
+export const AtgGameResponseSchema = z.object({
+  id: z.string(),
+  status: z.string().optional(),
+  type: z.string().optional(),
+  pools: z.record(z.unknown()).optional(),
+  races: z.array(AtgGameRaceSchema).optional().default([]),
+});
+
+export type AtgGameResponse = z.infer<typeof AtgGameResponseSchema>;

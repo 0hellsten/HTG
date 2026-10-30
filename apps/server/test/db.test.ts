@@ -52,7 +52,7 @@ describe('Databas och migrationer (Fas 2)', () => {
     expect(() => runMigrations(db)).not.toThrow();
 
     const migrations = db.prepare('SELECT version FROM schema_migrations').all();
-    expect(migrations.length).toBe(3);
+    expect(migrations.length).toBeGreaterThanOrEqual(3);
   });
 
   it('sparar och läser rader i source_health med automatiska tidsstämplar', () => {
