@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tab, MOBILE_NAV_ITEMS } from './navItems';
 import { JanneBoyIcon } from '../janne-boy/JanneBoyIcon';
+import { BongIcon } from '../bong/BongIcon';
 
 interface MobileBottomNavProps {
   activeTab: Tab;
@@ -20,6 +21,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         const Icon = item.icon;
         const isActive = activeTab === item.id;
         const isJanne = item.id === 'janneboy';
+        const isBong = item.id === 'bong';
 
         return (
           <button
@@ -31,6 +33,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           >
             {isJanne ? (
               <JanneBoyIcon className="w-5 h-5 mb-0.5 object-contain shrink-0" />
+            ) : isBong ? (
+              <BongIcon className="w-5 h-5 mb-0.5 object-contain shrink-0" />
             ) : (
               <Icon
                 className={`w-5 h-5 mb-0.5 shrink-0 ${
@@ -38,7 +42,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 }`}
               />
             )}
-            <span className="text-[11px] font-medium leading-none truncate max-w-full">
+            <span className="text-[10px] font-medium leading-none truncate max-w-full">
               {item.mobileLabel || item.label}
             </span>
           </button>

@@ -2,6 +2,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { Tab, NAV_ITEMS } from './navItems';
 import { JanneBoyIcon } from '../janne-boy/JanneBoyIcon';
+import { BongIcon } from '../bong/BongIcon';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -32,7 +33,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
         <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
           <div className="flex items-center">
             <img
-              src="./logo.png"
+              src={`${import.meta.env.BASE_URL ?? './'}logo.png`}
               alt="Tangitza"
               className="h-12 w-auto max-w-[170px] object-contain rounded-md"
             />
@@ -52,6 +53,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             const isJanne = item.id === 'janneboy';
+            const isBong = item.id === 'bong';
 
             return (
               <button
@@ -65,6 +67,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               >
                 {isJanne ? (
                   <JanneBoyIcon className="w-5 h-5 object-contain shrink-0" />
+                ) : isBong ? (
+                  <BongIcon className="w-5 h-5 object-contain shrink-0" />
                 ) : (
                   <Icon className="w-5 h-5 shrink-0" />
                 )}

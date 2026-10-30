@@ -24,6 +24,7 @@ import { HastsKoIkon } from '../components/HastsKoIkon';
 import { DagensBastaOmgangBanner } from '../components/dagens-basta/DagensBastaOmgangBanner';
 import { DagensBastaLoppKort } from '../components/dagens-basta/DagensBastaLoppKort';
 import {
+  BongCompetition,
   formatCompetitionFromApi,
   buildFallbackBongRaceDay,
   getDefaultUpcomingCompetitions,
@@ -57,10 +58,17 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
   const [statusMessage, setStatusMessage] = useState<string>('Allt är färskt och uppdaterat.');
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedRaceFilter, setSelectedRaceFilter] = useState<number | 'alla'>('alla');
+  const [competitions, setCompetitions] = useState<BongCompetition[]>(() =>
+    getDefaultUpcomingCompetitions()
+  );
+
+  // Beräkna måldatum
+  const targetDate = useMemo(() => new Date(Date.now() + selectedOffset * 86400000), [selectedOffset]);
+  const targetDateStr = useMemo(() => targetDate.toISOString().slice(0, 10), [targetDate]);
 
   // Omgångsdata för bästa hästarna
   const [raceDayData, setRaceDayData] = useState<BongRaceDayData>(() =>
-    buildFallbackBongRaceDay('V75')
+    buildFallbackBongRaceDay('V75', new Date().toISOString().slice(0, 10), 'Solvalla')
   );
 
   const engine = useMemo(() => new DagensBastaEngine(), []);
@@ -68,11 +76,8 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
     return engine.analyzeOmgang(raceDayData);
   }, [engine, raceDayData]);
 
-  const targetDate = new Date(Date.now() + selectedOffset * 86400000);
-  const targetDateStr = targetDate.toISOString().slice(0, 10);
-
   // Hämtning av banor och lopp
-  const fetchDagar = async () => {
+  const fetchDagar = useCallback(async () => {
     setLoading(true);
     try {
       const endpoint =
@@ -93,29 +98,25 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedOffset, targetDateStr]);
 
   const loadLiveOmgang = useCallback(
-    async (gameId: string, gameType: BongGameType) => {
+    async (gameId: string, gameType: BongGameType, dateStr?: string, trackName?: string) => {
       try {
         const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
         if (res && res.data) {
           setRaceDayData(res.data);
         } else {
-          setRaceDayData(buildFallbackBongRaceDay(gameType));
+          setRaceDayData(buildFallbackBongRaceDay(gameType, dateStr, trackName));
         }
       } catch {
-        setRaceDayData(buildFallbackBongRaceDay(gameType));
+        setRaceDayData(buildFallbackBongRaceDay(gameType, dateStr, trackName));
       }
     },
     []
   );
 
-  useEffect(() => {
-    setFavoriteTrackIds(getFavoriteTrackIds());
-    fetchDagar();
-  }, [selectedOffset]);
-
+  // Ladda kommande omgångar en gång vid start
   useEffect(() => {
     let isSubscribed = true;
 
@@ -136,21 +137,11 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
 
         if (!isSubscribed) return;
 
-        const formatted =
-          res.data && res.data.length > 0
-            ? res.data.map(formatCompetitionFromApi)
-            : getDefaultUpcomingCompetitions();
-
-        const initial = formatted[0];
-        if (initial) {
-          loadLiveOmgang(initial.id, initial.gameType);
+        if (res && res.data && res.data.length > 0) {
+          setCompetitions(res.data.map(formatCompetitionFromApi));
         }
       } catch {
-        if (!isSubscribed) return;
-        const defaults = getDefaultUpcomingCompetitions();
-        if (defaults[0]) {
-          loadLiveOmgang(defaults[0].id, defaults[0].gameType);
-        }
+        // Fallback competitions redan satta
       }
     }
 
@@ -158,15 +149,63 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
     return () => {
       isSubscribed = false;
     };
-  }, [loadLiveOmgang]);
+  }, []);
+
+  // Uppdatera omgång och lopp när valt datum (offset) eller competitions ändras
+  useEffect(() => {
+    setFavoriteTrackIds(getFavoriteTrackIds());
+    setSelectedRaceFilter('alla');
+    fetchDagar();
+
+    // Hitta omgång för det valda datumet
+    const matched =
+      competitions.find((c) => c.dateIso === targetDateStr) ||
+      competitions[selectedOffset] ||
+      competitions[0];
+
+    if (matched) {
+      loadLiveOmgang(matched.id, matched.gameType, matched.dateIso, matched.trackName);
+    }
+  }, [selectedOffset, competitions, targetDateStr, fetchDagar, loadLiveOmgang]);
 
   const handleToggleFavorite = (trackId: string, trackName: string) => {
     toggleFavoriteTrack(trackId, trackName);
     setFavoriteTrackIds(getFavoriteTrackIds());
   };
 
+  // Om raceDays är tom (t.ex. på GitHub Pages utan aktiv backend), använd omgångens loppdata så att sidan alltid fungerar!
+  const effectiveRaceDays: RaceDay[] = useMemo(() => {
+    if (raceDays.length > 0) return raceDays;
+    if (raceDayData && raceDayData.races && raceDayData.races.length > 0) {
+      return [
+        {
+          id: `raceday_${raceDayData.date || targetDateStr}_${raceDayData.trackName || 'solvalla'}`,
+          date: raceDayData.date || targetDateStr,
+          trackId: '1',
+          trackName: raceDayData.trackName || 'Solvalla',
+          biggestGame: raceDayData.gameType,
+          firstStart: raceDayData.startTime || '16:20',
+          racesCount: raceDayData.races.length,
+          races: raceDayData.races.map((r, idx) => ({
+            id: `race_${raceDayData.date || targetDateStr}_${r.raceNumber || idx + 1}`,
+            raceDayId: `raceday_${raceDayData.date || targetDateStr}_${raceDayData.trackName || 'solvalla'}`,
+            number: r.raceNumber || idx + 1,
+            name: r.raceName ? `Avdelning ${idx + 1} (${r.raceName})` : `Lopp ${r.raceNumber || idx + 1}`,
+            distanceM: r.distance || 2140,
+            startMethod: (r.startMethod?.toLowerCase().includes('volt') ? 'volt' : 'auto') as 'auto' | 'volt',
+            scheduledStart: r.startTime || '16:20',
+            trackCondition: 'Lätt bana',
+            trackName: raceDayData.trackName || 'Solvalla',
+            status: 'kommande' as const,
+          })),
+        },
+      ];
+    }
+    return [];
+  }, [raceDays, raceDayData, targetDateStr]);
+
   const handleOpenRaceFromBasta = (raceNumber: number) => {
-    for (const day of raceDays) {
+    for (const day of effectiveRaceDays) {
       const match = (day.races || []).find((r) => r.number === raceNumber);
       if (match) {
         onOpenRace(match.id, day.races || []);
@@ -177,9 +216,13 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
     setActiveViewMode('alla');
   };
 
-  const sortedRaceDays = sortRaceDaysWithFavorites(raceDays, favoriteTrackIds);
+  const sortedRaceDays = sortRaceDaysWithFavorites(effectiveRaceDays, favoriteTrackIds);
   const heading =
-    selectedOffset === 0 ? (isEvening() ? 'Kvällens omgång' : 'Dagens omgång') : 'Kommande omgång';
+    selectedOffset === 0
+      ? (isEvening() ? 'Kvällens omgång' : 'Dagens omgång')
+      : selectedOffset === 1
+      ? 'Morgondagens omgång'
+      : 'Kommande omgång';
   const displayDateFormatted = formatSwedishDate(targetDate);
 
   const dateOptions = [
@@ -338,7 +381,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
       {/* Läge 2: Alla lopp & banor */}
       {activeViewMode === 'alla' && (
         <div className="space-y-6">
-          {loading && raceDays.length === 0 ? (
+          {loading && raceDays.length === 0 && effectiveRaceDays.length === 0 ? (
             <IdagSkelett />
           ) : sortedRaceDays.length > 0 ? (
             <div className="space-y-6">

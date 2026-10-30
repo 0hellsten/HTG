@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calculator, Calendar, MapPin, Sparkles, TrendingUp } from 'lucide-react';
+import { Calendar, MapPin, Sparkles, TrendingUp } from 'lucide-react';
 import { BongRaceDayData } from '@stallbacken/shared';
 import { BongCompetition } from './competitions';
 import { BongDateSelector } from './BongDateSelector';
@@ -22,10 +22,12 @@ export const BongOmgangHeader: React.FC<BongOmgangHeaderProps> = ({
       {}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-lg bg-amber-500 text-slate-950">
-              <Calculator className="w-6 h-6 stroke-[2.2]" />
-            </span>
+          <div className="flex items-center gap-3">
+            <img
+              src={`${import.meta.env.BASE_URL ?? './'}bong.png`}
+              alt="Bong-maskinen"
+              className="h-11 w-11 sm:h-12 sm:w-12 object-contain drop-shadow-md select-none shrink-0"
+            />
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
               Bong-maskinen
             </h1>

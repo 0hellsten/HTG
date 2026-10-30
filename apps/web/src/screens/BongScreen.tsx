@@ -161,7 +161,7 @@ export const BongScreen: React.FC<BongScreenProps> = ({
         className="fixed bottom-20 right-4 lg:bottom-8 lg:right-8 z-30 w-14 h-14 rounded-full p-1 bg-white hover:bg-slate-50 shadow-2xl border-2 border-amber-400 active:scale-95 transition-all cursor-pointer flex items-center justify-center group"
       >
         <img
-          src="./bong.png"
+          src={`${import.meta.env.BASE_URL ?? './'}bong.png`}
           alt="Bong"
           className="w-full h-full object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
         />

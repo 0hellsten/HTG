@@ -1,5 +1,6 @@
-import { LucideIcon, Calendar, Search, Award, Star, Menu, Calculator } from 'lucide-react';
+import { LucideIcon, Calendar, Search, Award, Star, Menu } from 'lucide-react';
 import { JanneBoyIcon } from '../janne-boy/JanneBoyIcon';
+import { BongIcon } from '../bong/BongIcon';
 
 export type Tab =
   | 'idag'
@@ -19,8 +20,8 @@ export interface NavItemConfig {
 
 export const NAV_ITEMS: NavItemConfig[] = [
   { id: 'idag', label: 'Idag', mobileLabel: 'Idag', icon: Calendar },
+  { id: 'bong', label: 'Bong-maskinen', mobileLabel: 'Bongen', icon: BongIcon },
   { id: 'janneboy', label: 'Janne Boy', mobileLabel: 'Janne', icon: JanneBoyIcon },
-  { id: 'bong', label: 'Bong-maskinen', mobileLabel: 'Bongen', icon: Calculator },
   { id: 'hastar', label: 'Hästar', mobileLabel: 'Hästar', icon: Search },
   { id: 'tips', label: 'Tips', mobileLabel: 'Tips', icon: Award },
   { id: 'stall', label: 'Mitt stall', mobileLabel: 'Mitt stall', icon: Star },
@@ -29,6 +30,7 @@ export const NAV_ITEMS: NavItemConfig[] = [
 
 export const MOBILE_NAV_ITEMS: NavItemConfig[] = [
   { id: 'idag', label: 'Idag', mobileLabel: 'Idag', icon: Calendar },
+  { id: 'bong', label: 'Bong-maskinen', mobileLabel: 'Bongen', icon: BongIcon },
   { id: 'janneboy', label: 'Janne Boy', mobileLabel: 'Janne', icon: JanneBoyIcon },
   { id: 'hastar', label: 'Hästar', mobileLabel: 'Hästar', icon: Search },
   { id: 'tips', label: 'Tips', mobileLabel: 'Tips', icon: Award },

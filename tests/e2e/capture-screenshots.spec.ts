@@ -38,5 +38,21 @@ test.describe('Verifierande skärmdumpar för ny startflik och logga', () => {
     await page.screenshot({
       path: path.join(ARTIFACTS_DIR, 'idag-alla-lopp-mobil.png'),
     });
+
+    // 3. Testa "Imorgon"
+    const imorgonKnapp = page.locator('button[role="tab"]:has-text("Imorgon")');
+    await imorgonKnapp.click();
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: path.join(ARTIFACTS_DIR, 'idag-imorgon-mobil.png'),
+    });
+
+    // 4. Bong-maskinen med Bong-logga på mobil
+    const bongNavBtn = page.locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Bongen")');
+    await bongNavBtn.click();
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: path.join(ARTIFACTS_DIR, 'bong-logga-mobil.png'),
+    });
   });
 });

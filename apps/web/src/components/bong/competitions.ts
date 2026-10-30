@@ -95,12 +95,17 @@ export function getDefaultUpcomingCompetitions(): BongCompetition[] {
   return list;
 }
 
-export function buildFallbackBongRaceDay(gameType: BongGameType): BongRaceDayData {
+export function buildFallbackBongRaceDay(
+  gameType: BongGameType,
+  dateStr?: string,
+  trackName?: string
+): BongRaceDayData {
   const count = gameType === 'V86' ? 8 : 7;
+  const defaultTrack = trackName || (gameType === 'V86' ? 'Solvalla / Åby (Xpress)' : 'Solvalla');
   const races = Array.from({ length: count }, (_, idx) => ({
     legIndex: idx,
     raceNumber: idx + 1,
-    trackName: gameType === 'V86' ? (idx % 2 === 0 ? 'Solvalla' : 'Åby') : 'Solvalla',
+    trackName: gameType === 'V86' ? (idx % 2 === 0 ? 'Solvalla' : 'Åby') : defaultTrack,
     raceName: `Avdelning ${idx + 1}`,
     startTime: gameType === 'V86' ? '20:30' : '16:20',
     distance: 2140,
@@ -124,8 +129,8 @@ export function buildFallbackBongRaceDay(gameType: BongGameType): BongRaceDayDat
   return {
     gameType,
     turnover: 0,
-    trackName: 'Svensk travbana',
-    date: 'Idag',
+    trackName: defaultTrack,
+    date: dateStr || 'Idag',
     startTime: gameType === 'V86' ? '20:30' : '16:20',
     races,
   };

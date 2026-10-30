@@ -24,7 +24,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
 
       <div className="flex items-center justify-center select-none py-0.5">
         <img
-          src="./logo.png"
+          src={`${import.meta.env.BASE_URL ?? './'}logo.png`}
           alt="Tangitza"
           className="h-11 sm:h-12 w-auto max-w-[170px] object-contain rounded drop-shadow-xs"
         />

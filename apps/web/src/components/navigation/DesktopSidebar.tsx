@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tab, NAV_ITEMS } from './navItems';
 import { JanneBoyIcon } from '../janne-boy/JanneBoyIcon';
+import { BongIcon } from '../bong/BongIcon';
 
 interface DesktopSidebarProps {
   activeTab: Tab;
@@ -17,7 +18,7 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
     <aside className="hidden lg:flex lg:flex-col lg:w-64 bg-slate-900 text-slate-100 p-6 border-r border-slate-800 shrink-0 shadow-lg">
       <div className="mb-8 flex items-center justify-center px-1">
         <img
-          src="./logo.png"
+          src={`${import.meta.env.BASE_URL ?? './'}logo.png`}
           alt="Tangitza"
           className="h-12 w-auto max-w-[180px] object-contain rounded-lg drop-shadow-md"
         />
@@ -28,6 +29,7 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           const isJanne = item.id === 'janneboy';
+          const isBong = item.id === 'bong';
 
           return (
             <button
@@ -41,6 +43,8 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
             >
               {isJanne ? (
                 <JanneBoyIcon className="w-5 h-5 object-contain shrink-0" />
+              ) : isBong ? (
+                <BongIcon className="w-5 h-5 object-contain shrink-0" />
               ) : (
                 <Icon className="w-5 h-5 shrink-0" />
               )}

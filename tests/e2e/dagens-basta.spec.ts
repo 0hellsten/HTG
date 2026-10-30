@@ -77,4 +77,57 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
     const logo = page.locator('header img[alt="Tangitza"]');
     await expect(logo).toBeVisible();
   });
+
+  test('fungerar sömlöst även för Imorgon och I övermorgon med datumväxlare', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+
+    // 1. Klicka på "Imorgon"
+    const imorgonKnapp = page.locator('button[role="tab"]:has-text("Imorgon")');
+    await expect(imorgonKnapp).toBeVisible();
+    await imorgonKnapp.click();
+    await page.waitForTimeout(300);
+
+    // Verifiera att rubriken visar Morgondagens omgång
+    await expect(page.locator('h1')).toContainText(/morgondagens omgång/i);
+    // Verifiera att spik och skräll syns för morgondagen
+    await expect(page.locator('text=Omgångens spik')).toBeVisible();
+    await expect(page.locator('div[id^="lopp-"]').first()).toBeVisible();
+
+    // 2. Växla till "Alla lopp & banor" för imorgon
+    const allaKnapp = page.locator('button:has-text("Alla lopp & banor")');
+    await allaKnapp.click();
+    await page.waitForTimeout(300);
+    // Verifiera att banöversikten visas utan fel
+    await expect(page.locator('text=Första start kl.').first()).toBeVisible();
+
+    // 3. Klicka på "I övermorgon"
+    const overmorgonKnapp = page.locator('button[role="tab"]:has-text("I övermorgon")');
+    await overmorgonKnapp.click();
+    await page.waitForTimeout(300);
+    await expect(page.locator('h1')).toContainText(/kommande omgång/i);
+  });
+
+  test('verifierar att Bong-loggan syns i mobilmenyn och på Bong-sidan', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+
+    // 1. Bong-ikon i bottenmenyn
+    const bongNavBtn = page.locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Bongen")');
+    await expect(bongNavBtn).toBeVisible();
+    const bongNavImg = bongNavBtn.locator('img[alt="Bong-maskinen"]');
+    await expect(bongNavImg).toBeVisible();
+
+    // 2. Klicka på Bongen och verifiera Bong-loggan i sidhuvudet
+    await bongNavBtn.click();
+    await page.waitForTimeout(300);
+    const bongHeaderImg = page.locator('main img[alt="Bong-maskinen"]:visible').first();
+    await expect(bongHeaderImg).toBeVisible();
+
+    // 3. Verifiera den flytande kupongknappen med Bong-logga
+    const flytandeBongKnapp = page.locator('button[data-testid="bong-kupong-flytande-knapp"] img[alt="Bong"]:visible');
+    await expect(flytandeBongKnapp).toBeVisible();
+  });
 });
