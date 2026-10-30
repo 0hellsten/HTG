@@ -10,7 +10,8 @@
     "test:e2e": "playwright test",
     "backup": "node scripts/backup-db.js",
     "lint": "eslint . --ext .ts,.tsx",
-    "format": "prettier --write \"**/*.{ts,tsx,json,md,css,html}\""
+    "format": "prettier --write \"**/*.{ts,tsx,json,md,css,html}\"",
+    "deploy:gh-pages": "node scripts/deploy-gh-pages.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",

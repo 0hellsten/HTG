@@ -15,6 +15,7 @@ import { TextstorlekScreen, TextSize } from './screens/TextstorlekScreen';
 import { HjalpScreen } from './screens/HjalpScreen';
 import { MerScreen } from './screens/MerScreen';
 import { OfflineRemsa } from './components/OfflineRemsa';
+import { ScrollToTopKnapp } from './components/ScrollToTopKnapp';
 
 type Tab = 'idag' | 'janneboy' | 'bong' | 'hastar' | 'tips' | 'stall' | 'mer';
 type MerSubscreen = 'none' | 'status' | 'hjalp' | 'textstorlek';
@@ -83,6 +84,7 @@ export const App: React.FC = () => {
     setMerSubscreen('none');
     setRaceOriginTab(null);
     if (tab === 'idag') setSelectedRaceId(null);
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const handleOpenJanneBoyInBong = (type: BongGameType, horses: Record<number, string[]>) => {
@@ -261,6 +263,8 @@ export const App: React.FC = () => {
             />
           ) : null}
         </main>
+
+        <ScrollToTopKnapp />
 
         {/* Mobil: Bottennavigering */}
         <nav
