@@ -35,23 +35,23 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
   const model = buildBongCouponViewModel(raceDay, selectedHorses, gameType, costSek);
 
   // Exakta procentkoordinater baserat på uppmätta kuponger
-  // Justerat uppåt ett snäpp eller två för perfekt passning
+  // Justerad placering: sidhuvud sänkt något, hästnummer bibehållna i optimal höjd
   const config = isV86
     ? {
         aspectRatio: '1434 / 1830',
-        bana: { left: '16.0%', top: '12.7%' },
-        datum: { left: '18.5%', top: '16.2%' },
-        start: { left: '16.0%', top: '20.0%' },
-        kostnad: { left: '83.5%', top: '12.7%' },
+        bana: { left: '16.0%', top: '13.5%' },
+        datum: { left: '18.5%', top: '17.0%' },
+        start: { left: '16.0%', top: '20.8%' },
+        kostnad: { left: '83.5%', top: '13.5%' },
         horsesLeft: '20.0%',
         rowTops: ['43.0%', '50.3%', '57.6%', '64.9%', '72.6%', '80.3%', '87.8%', '95.2%'],
       }
     : {
         aspectRatio: '1399 / 1812',
-        bana: { left: '14.5%', top: '12.2%' },
-        datum: { left: '17.0%', top: '15.7%' },
-        start: { left: '14.5%', top: '19.4%' },
-        kostnad: { left: '84.0%', top: '12.2%' },
+        bana: { left: '14.5%', top: '13.0%' },
+        datum: { left: '17.0%', top: '16.5%' },
+        start: { left: '14.5%', top: '20.2%' },
+        kostnad: { left: '84.0%', top: '13.0%' },
         horsesLeft: '19.0%',
         rowTops: ['42.5%', '49.8%', '57.2%', '64.5%', '72.3%', '80.0%', '87.5%'],
       };
@@ -128,7 +128,7 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
             return (
               <div
                 key={row.legIndex}
-                className="absolute font-mono font-bold text-slate-950 text-xs sm:text-sm tracking-[0.14em] leading-none whitespace-nowrap"
+                className="absolute font-mono font-bold text-slate-950 text-xs sm:text-sm tracking-[0.04em] leading-none whitespace-nowrap"
                 style={{ left: config.horsesLeft, top }}
               >
                 {row.text}
