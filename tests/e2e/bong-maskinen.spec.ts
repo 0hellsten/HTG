@@ -21,7 +21,12 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
     await expect(page.locator('button:has-text("Lagom (~100 kr)")')).toBeVisible();
     await expect(page.locator('button:has-text("Större (~200 kr)")')).toBeVisible();
     await expect(page.locator('button:has-text("Favoritrad (1 häst/lopp)")')).toBeVisible();
-    await expect(page.locator('button:has-text("Visa kupong")')).toBeVisible();
+
+    // Testa hjälp-ruta
+    const helpBtn = page.locator('button:has-text("Hur gör jag?")');
+    await expect(helpBtn).toBeVisible();
+    await helpBtn.click();
+    await expect(page.locator('text=Så här fungerar Bong-maskinen:')).toBeVisible();
 
     // Testa snabbkupongsval
     await page.locator('button:has-text("Favoritrad (1 häst/lopp)")').click();
@@ -98,9 +103,5 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
     // Klicka på Tillbaka för att återgå till Bong-maskinen
     await page.locator('button:has-text("Tillbaka")').first().click();
     await expect(page.locator('h1')).toContainText('Bong-maskinen');
-
-    // 8. Kontrollera att export-knapparna finns
-    await expect(page.getByRole('button', { name: 'Kopiera', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Fil', exact: true })).toBeVisible();
   });
 });

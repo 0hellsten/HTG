@@ -49,8 +49,6 @@ export const BongScreen: React.FC<BongScreenProps> = ({
     setMaxStrecksumma,
     minPayout,
     setMinPayout,
-    copied,
-    saveMessage,
     calculationResult,
     handleSelectCompetition,
     handleToggleHorse,
@@ -58,9 +56,6 @@ export const BongScreen: React.FC<BongScreenProps> = ({
     handleClearLeg,
     handleResetCoupon,
     handleApplyPreset,
-    handleCopyRows,
-    handleDownloadFile,
-    handleSaveBong,
     setOnlyTopPool,
     setFlerbongMultiplier,
     setSharesCount,
@@ -91,14 +86,8 @@ export const BongScreen: React.FC<BongScreenProps> = ({
 
       <BongSummaryCard
         calculationResult={calculationResult}
-        copied={copied}
-        saveMessage={saveMessage}
-        onCopyRows={handleCopyRows}
-        onDownloadFile={handleDownloadFile}
-        onSaveBong={handleSaveBong}
         onApplyPreset={handleApplyPreset}
         onResetCoupon={handleResetCoupon}
-        onOpenKupongModal={() => setIsKupongModalOpen(true)}
       />
 
       <BongLegTabs

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Sparkles, Clock, MapPin, Flag } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sparkles, Clock, MapPin, Flag, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { BongRaceLeg, HorseRank, BongHorseInput } from '@stallbacken/shared';
 
 interface BongLegHorseListProps {
@@ -23,6 +23,7 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
   onClearLeg,
   onOpenHorseInfo,
 }) => {
+  const [showRankHelp, setShowRankHelp] = useState(false);
   const startMethodText = leg.startMethod === 'auto' ? 'autostart' : 'voltstart';
   const distanceText = leg.distance ? `${leg.distance.toLocaleString('sv-SE')} m` : undefined;
 
@@ -82,6 +83,36 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
             </button>
           </div>
         </div>
+
+        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setShowRankHelp((prev) => !prev)}
+            aria-expanded={showRankHelp}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-amber-800 hover:text-amber-950 transition-colors cursor-pointer"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
+            <span>Vad betyder A, B, C, D vid varje häst?</span>
+            {showRankHelp ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
+        </div>
+
+        {showRankHelp && (
+          <div className="mt-2 p-3 rounded-xl bg-amber-50/70 border border-amber-200 text-xs sm:text-sm text-slate-800 space-y-1.5">
+            <p>
+              <strong>A, B, C och D</strong> är din egen betygssättning av hästarna om du vill använda reduceringsmotorn:
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1 text-xs">
+              <div><strong className="text-emerald-800">A-hästar:</strong> Dina favoriter/bästa spikar som du tror mest på.</div>
+              <div><strong className="text-blue-800">B-hästar:</strong> Bra reserver och garderingar.</div>
+              <div><strong className="text-amber-800">C-hästar:</strong> Skrällar och outsider-bud.</div>
+              <div><strong className="text-slate-600">D-hästar:</strong> Långskott som du sällan vill betala för på alla rader.</div>
+            </div>
+            <p className="text-[11px] text-slate-500 pt-1">
+              Om du inte använder reduceringsmotorn spelas alla dina markerade hästar precis som på en vanlig bong!
+            </p>
+          </div>
+        )}
       </div>
 
       {}
