@@ -16,13 +16,14 @@ import { OmAppenScreen } from './screens/OmAppenScreen';
 import { MerScreen } from './screens/MerScreen';
 import { OfflineRemsa } from './components/OfflineRemsa';
 import { ScrollToTopKnapp } from './components/ScrollToTopKnapp';
+import { InfoModal } from './components/InfoModal';
 import { Tab } from './components/navigation/navItems';
 import { DesktopSidebar } from './components/navigation/DesktopSidebar';
 import { MobileDrawer } from './components/navigation/MobileDrawer';
 import { MobileHeader } from './components/navigation/MobileHeader';
 import { MobileBottomNav } from './components/navigation/MobileBottomNav';
 
-type MerSubscreen = 'none' | 'om' | 'status' | 'hjalp' | 'textstorlek';
+type MerSubscreen = 'none' | 'om' | 'status' | 'hjalp' | 'textstorlek' | 'banvisaren';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -94,10 +95,7 @@ export const App: React.FC = () => {
   };
 
   const handleOpenOm = () => {
-    setActiveTab('mer');
     setMerSubscreen('om');
-    setSelectedHorseId(null);
-    setSelectedTrackId(null);
     setIsMobileDrawerOpen(false);
   };
 
@@ -108,7 +106,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col lg:flex-row font-sans">
+    <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col lg:flex-row font-sans">
       <DesktopSidebar
         activeTab={activeTab}
         onTabChange={handleTabChange}
@@ -132,30 +130,7 @@ export const App: React.FC = () => {
         />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24 lg:pb-8">
-          {selectedHorseId ? (
-            <HastScreen horseId={selectedHorseId} onBack={() => setSelectedHorseId(null)} />
-          ) : selectedTrackId ? (
-            <BanvisarenScreen
-              initialTrackId={selectedTrackId}
-              onBack={() => setSelectedTrackId(null)}
-            />
-          ) : merSubscreen === 'om' ? (
-            <OmAppenScreen
-              onBack={() => setMerSubscreen('none')}
-              onInstall={handleInstallClick}
-              canInstall={!!installPrompt}
-            />
-          ) : merSubscreen === 'status' ? (
-            <StatusScreen onBack={() => setMerSubscreen('none')} />
-          ) : merSubscreen === 'hjalp' ? (
-            <HjalpScreen onBack={() => setMerSubscreen('none')} />
-          ) : merSubscreen === 'textstorlek' ? (
-            <TextstorlekScreen
-              currentSize={textSize}
-              onSelectSize={(size) => setTextSize(size)}
-              onBack={() => setMerSubscreen('none')}
-            />
-          ) : activeTab === 'idag' ? (
+          {activeTab === 'idag' ? (
             selectedRaceId ? (
               <LoppScreen
                 raceId={selectedRaceId}
@@ -217,8 +192,7 @@ export const App: React.FC = () => {
           ) : activeTab === 'mer' ? (
             <MerScreen
               onSelectOption={(opt) => {
-                if (opt === 'banvisaren') setSelectedTrackId('1');
-                else setMerSubscreen(opt);
+                setMerSubscreen(opt);
               }}
             />
           ) : null}
@@ -230,6 +204,77 @@ export const App: React.FC = () => {
           activeTab={activeTab}
           onTabChange={handleTabChange}
         />
+
+        {/* Pop-out modaler för infosidor */}
+        <InfoModal
+          isOpen={merSubscreen === 'om'}
+          onClose={() => setMerSubscreen('none')}
+          title="Om appen & vad allt gör"
+        >
+          <OmAppenScreen
+            onBack={() => setMerSubscreen('none')}
+            onInstall={handleInstallClick}
+            canInstall={!!installPrompt}
+          />
+        </InfoModal>
+
+        <InfoModal
+          isOpen={merSubscreen === 'status'}
+          onClose={() => setMerSubscreen('none')}
+          title="Hur färskt är det här?"
+        >
+          <StatusScreen onBack={() => setMerSubscreen('none')} />
+        </InfoModal>
+
+        <InfoModal
+          isOpen={merSubscreen === 'hjalp'}
+          onClose={() => setMerSubscreen('none')}
+          title="Hjälp och vanliga frågor"
+        >
+          <HjalpScreen onBack={() => setMerSubscreen('none')} />
+        </InfoModal>
+
+        <InfoModal
+          isOpen={merSubscreen === 'textstorlek'}
+          onClose={() => setMerSubscreen('none')}
+          title="Textstorlek"
+        >
+          <TextstorlekScreen
+            currentSize={textSize}
+            onSelectSize={(size) => setTextSize(size)}
+            onBack={() => setMerSubscreen('none')}
+          />
+        </InfoModal>
+
+        <InfoModal
+          isOpen={merSubscreen === 'banvisaren' || !!selectedTrackId}
+          onClose={() => {
+            setMerSubscreen('none');
+            setSelectedTrackId(null);
+          }}
+          title="Banvisaren"
+        >
+          <BanvisarenScreen
+            initialTrackId={selectedTrackId || '1'}
+            onBack={() => {
+              setMerSubscreen('none');
+              setSelectedTrackId(null);
+            }}
+          />
+        </InfoModal>
+
+        <InfoModal
+          isOpen={!!selectedHorseId}
+          onClose={() => setSelectedHorseId(null)}
+          title="Hästens form & tidigare lopp"
+        >
+          {selectedHorseId && (
+            <HastScreen
+              horseId={selectedHorseId}
+              onBack={() => setSelectedHorseId(null)}
+            />
+          )}
+        </InfoModal>
       </div>
     </div>
   );

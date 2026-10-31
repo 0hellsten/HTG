@@ -130,4 +130,32 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
     const flytandeBongKnapp = page.locator('button[data-testid="bong-kupong-flytande-knapp"] img[alt="Bong"]:visible');
     await expect(flytandeBongKnapp).toBeVisible();
   });
+
+  test('verifierar att infosidor (t.ex. Om appen och Källor) öppnas som stängbara popouter', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+
+    // Klicka på Mer i mobilens bottenmeny
+    const merBtn = page.locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Mer")');
+    await merBtn.click();
+    await page.waitForTimeout(300);
+
+    // Klicka på "Om appen"-kortet
+    const omKort = page.getByRole('button', { name: /Om appen/i });
+    await expect(omKort).toBeVisible();
+    await omKort.click();
+
+    // Verifiera att dialogen/popout öppnas med modal-roll och stängknapp
+    const modal = page.locator('div[role="dialog"][aria-modal="true"]');
+    await expect(modal).toBeVisible();
+    await expect(modal.locator('text=Tangitza').first()).toBeVisible();
+
+    // Klicka på Stäng-knappen
+    const closeBtn = modal.locator('button:has-text("Stäng")').first();
+    await closeBtn.click();
+
+    // Verifiera att modalen stängs och vi är kvar i appen
+    await expect(modal).not.toBeVisible();
+  });
 });

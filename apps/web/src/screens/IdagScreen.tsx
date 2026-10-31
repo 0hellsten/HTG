@@ -439,8 +439,8 @@ const BanaKort: React.FC<BanaKortProps> = ({
   }, [day.trackId]);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
-      <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
+    <div className="bg-white rounded-2xl border-2 border-slate-300 p-5 sm:p-6 shadow-sm space-y-4">
+      <div className="flex items-start justify-between gap-3 border-b border-slate-200 pb-3">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-950">{day.trackName}</h2>
@@ -493,7 +493,7 @@ const BanaKort: React.FC<BanaKortProps> = ({
           className={`p-2.5 rounded-lg border transition-colors cursor-pointer shrink-0 flex items-center justify-center min-w-[44px] min-h-[44px] ${
             isFavorite
               ? 'bg-amber-50 border-amber-300 text-amber-600 hover:bg-amber-100'
-              : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+              : 'bg-slate-50 border-slate-300 text-slate-400 hover:text-slate-700 hover:bg-slate-100'
           }`}
           aria-label={
             isFavorite
@@ -511,13 +511,13 @@ const BanaKort: React.FC<BanaKortProps> = ({
             <button
               key={race.id}
               onClick={() => onOpenRace(race.id, races)}
-              className="flex items-center justify-between p-3.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100/90 text-left transition-colors cursor-pointer group min-h-[44px]"
+              className="flex items-center justify-between p-3.5 rounded-xl border border-slate-300 bg-slate-50/80 hover:bg-slate-100 hover:border-slate-400 text-left transition-all cursor-pointer group min-h-[44px] shadow-xs"
             >
               <div>
                 <div className="font-bold text-base text-slate-900 group-hover:text-amber-800 transition-colors">
                   Lopp {race.number}
                   {race.scheduledStart && (
-                    <span className="font-normal text-slate-500 text-sm ml-2">
+                    <span className="font-normal text-slate-600 text-sm ml-2">
                       kl. {race.scheduledStart.slice(11, 16)}
                     </span>
                   )}

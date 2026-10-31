@@ -24,7 +24,14 @@ interface FakeSourceBody {
 export const kallorRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   const healthManager = new HealthManager();
 
-  app.get<{ Reply: ApiResponse<SourceHealthRecord[]> }>('/api/kallor', async (_req, reply) => {
+  const handleGetKallor = async (
+    _req: unknown,
+    reply: {
+      status: (code: number) => {
+        send: (payload: ApiResponse<SourceHealthRecord[]>) => unknown;
+      };
+    }
+  ) => {
     try {
       const records = healthManager.getAllSourcesHealth(registeredAdapters);
 
@@ -43,7 +50,10 @@ export const kallorRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
         message: 'Kunde inte läsa källornas hälsa just nu',
       });
     }
-  });
+  };
+
+  app.get<{ Reply: ApiResponse<SourceHealthRecord[]> }>('/api/kallor', handleGetKallor);
+  app.get<{ Reply: ApiResponse<SourceHealthRecord[]> }>('/api/kallor/status', handleGetKallor);
 
   app.post<{ Reply: ApiResponse<SourceHealthRecord[]> }>(
     '/api/kallor/uppdatera-allt',

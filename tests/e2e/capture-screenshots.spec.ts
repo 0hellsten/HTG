@@ -54,5 +54,16 @@ test.describe('Verifierande skärmdumpar för ny startflik och logga', () => {
     await page.screenshot({
       path: path.join(ARTIFACTS_DIR, 'bong-logga-mobil.png'),
     });
+
+    // 5. Popout-modal för infosida (Om appen)
+    const merBtn = page.locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Mer")');
+    await merBtn.click();
+    await page.waitForTimeout(300);
+    const omKort = page.getByRole('button', { name: /Om appen/i });
+    await omKort.click();
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: path.join(ARTIFACTS_DIR, 'popout-modal-mobil.png'),
+    });
   });
 });

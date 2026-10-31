@@ -119,12 +119,12 @@ export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({
             </p>
           </div>
           <a
-            href="./Stallbacken.apk"
-            download="Stallbacken.apk"
+            href={`${import.meta.env.BASE_URL ?? './'}Stallbacken.apk`}
+            download="Tangitza.apk"
             className="min-h-[46px] px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm sm:text-base inline-flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shrink-0 no-underline"
           >
             <Download className="w-4 h-4" />
-            <span>Ladda ned app (.apk)</span>
+            <span>Ladda ned Tangitza (.apk)</span>
           </a>
         </div>
         <p className="text-xs text-slate-400 border-t border-slate-800 pt-3">

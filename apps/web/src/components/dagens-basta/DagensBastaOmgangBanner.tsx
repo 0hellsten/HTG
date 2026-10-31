@@ -40,31 +40,31 @@ export const DagensBastaOmgangBanner: React.FC<DagensBastaOmgangBannerProps> = (
       <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3.5">
         {/* Dagens spik */}
         {topSpik && (
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-amber-200/80 shadow-sm flex flex-col justify-between">
+          <div className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-amber-300 shadow-md flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 text-xs sm:text-sm font-extrabold uppercase tracking-wide">
-                  <Sparkles className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-100 text-amber-950 text-xs sm:text-sm font-black uppercase tracking-wide border border-amber-300">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-700" />
                   Omgångens spik
                 </span>
-                <span className="text-xs font-bold text-slate-500">
+                <span className="text-xs font-black text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                   Lopp {topSpik.raceNumber}
                 </span>
               </div>
-              <h3 className="mt-2 text-lg sm:text-xl font-black text-slate-950">
+              <h3 className="mt-2.5 text-lg sm:text-xl font-black text-slate-950">
                 Nr {topSpik.startNumber} {topSpik.horseName}
               </h3>
-              <p className="mt-1 text-sm sm:text-base text-slate-700 leading-snug">
+              <p className="mt-1.5 text-sm sm:text-base text-slate-800 leading-snug font-medium">
                 {topSpik.reason}
               </p>
             </div>
 
             {onScrollToRace && (
-              <div className="mt-3 pt-2">
+              <div className="mt-3.5 pt-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => onScrollToRace(topSpik.raceNumber)}
-                  className="text-xs sm:text-sm font-bold text-amber-800 hover:text-amber-950 cursor-pointer min-h-[44px] flex items-center"
+                  className="text-xs sm:text-sm font-black text-amber-800 hover:text-amber-950 cursor-pointer min-h-[44px] flex items-center"
                 >
                   Gå till Lopp {topSpik.raceNumber} →
                 </button>
@@ -75,31 +75,31 @@ export const DagensBastaOmgangBanner: React.FC<DagensBastaOmgangBannerProps> = (
 
         {/* Dagens skräll */}
         {topSkrall && (
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-purple-200/80 shadow-sm flex flex-col justify-between">
+          <div className="bg-white rounded-2xl p-4 sm:p-5 border-2 border-purple-300 shadow-md flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-100 text-purple-900 text-xs sm:text-sm font-extrabold uppercase tracking-wide">
-                  <Zap className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-purple-100 text-purple-950 text-xs sm:text-sm font-black uppercase tracking-wide border border-purple-300">
+                  <Zap className="w-3.5 h-3.5 text-purple-700" />
                   Omgångens skräll
                 </span>
-                <span className="text-xs font-bold text-slate-500">
+                <span className="text-xs font-black text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                   Lopp {topSkrall.raceNumber}
                 </span>
               </div>
-              <h3 className="mt-2 text-lg sm:text-xl font-black text-slate-950">
+              <h3 className="mt-2.5 text-lg sm:text-xl font-black text-slate-950">
                 Nr {topSkrall.startNumber} {topSkrall.horseName}
               </h3>
-              <p className="mt-1 text-sm sm:text-base text-slate-700 leading-snug">
+              <p className="mt-1.5 text-sm sm:text-base text-slate-800 leading-snug font-medium">
                 {topSkrall.reason}
               </p>
             </div>
 
             {onScrollToRace && (
-              <div className="mt-3 pt-2">
+              <div className="mt-3.5 pt-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => onScrollToRace(topSkrall.raceNumber)}
-                  className="text-xs sm:text-sm font-bold text-purple-900 hover:text-purple-950 cursor-pointer min-h-[44px] flex items-center"
+                  className="text-xs sm:text-sm font-black text-purple-900 hover:text-purple-950 cursor-pointer min-h-[44px] flex items-center"
                 >
                   Gå till Lopp {topSkrall.raceNumber} →
                 </button>
