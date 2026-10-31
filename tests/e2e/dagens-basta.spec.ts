@@ -158,4 +158,66 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
     // Verifiera att modalen stängs och vi är kvar i appen
     await expect(modal).not.toBeVisible();
   });
+
+  test('verifierar Bong-knappen, ifylld kupong och hästpopout på Janne Boy', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+
+    // 1. Öppna Janne Boy via sidomenyn eller navigation
+    // På mobil: klicka på hamburgermenyn i sidhuvudet
+    const menuBtn = page.locator('header button[aria-label="Öppna sidomeny"]');
+    await menuBtn.click();
+    await page.waitForTimeout(300);
+
+    const janneBoyLink = page.locator('nav[aria-label="Mobil sidonavigering"] button:has-text("Janne Boy")');
+    await expect(janneBoyLink).toBeVisible();
+    await janneBoyLink.click();
+    await page.waitForTimeout(500);
+
+    // 2. Verifiera att den flytande Bong-knappen syns på Janne Boy
+    const flytandeBongKnapp = page.locator('button[data-testid="bong-kupong-flytande-knapp"]');
+    await expect(flytandeBongKnapp).toBeVisible();
+
+    // 3. Klicka på den flytande Bong-knappen och verifiera att ifylld kupong visas
+    await flytandeBongKnapp.click();
+    await page.waitForTimeout(300);
+    const kupongModal = page.locator('div[aria-label="Ifylld bong-kupong"]');
+    await expect(kupongModal).toBeVisible();
+
+    // Stäng kupong-modalen
+    const stangKupongBtn = kupongModal.locator('button[aria-label="Stäng kupong"]').first();
+    await stangKupongBtn.click();
+    await page.waitForTimeout(300);
+    await expect(kupongModal).not.toBeVisible();
+
+    // 4. Verifiera "Visa ifylld bong"-knappen i systemöversikten
+    const visaBongBtn = page.locator('button:has-text("Visa ifylld bong")');
+    await expect(visaBongBtn).toBeVisible();
+
+    // 5. Verifiera att hästar i Janne Boy är klickbara och öppnar hästpopout
+    const horseBtn = page.locator('div.min-w-0 button[type="button"]:has(span)').first();
+    await expect(horseBtn).toBeVisible();
+    await horseBtn.click();
+    await page.waitForTimeout(400);
+
+    // Verifiera att hästens infomodal öppnas
+    const horseModal = page.locator('div[role="dialog"][aria-modal="true"]');
+    await expect(horseModal).toBeVisible();
+
+    // Stäng hästmodalen
+    const closeHorseBtn = horseModal.locator('button:has-text("Stäng")').first();
+    await closeHorseBtn.click();
+    await page.waitForTimeout(300);
+    await expect(horseModal).not.toBeVisible();
+
+    // 6. Klicka på "Öppna i Bong-maskinen" och verifiera navigering
+    const openInBongBtn = page.locator('button:has-text("Öppna i Bong-maskinen")');
+    await expect(openInBongBtn).toBeVisible();
+    await openInBongBtn.click();
+    await page.waitForTimeout(500);
+
+    // Verifiera att vi hamnar i Bong-maskinen
+    await expect(page.locator('main img[alt="Bong-maskinen"]:visible').first()).toBeVisible();
+  });
 });

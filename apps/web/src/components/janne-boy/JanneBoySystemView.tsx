@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calculator, RotateCcw, Copy, Check, TrendingUp, Bookmark } from 'lucide-react';
+import { RotateCcw, Copy, Check, TrendingUp, Bookmark } from 'lucide-react';
 import { JanneBoySystemResult } from '@stallbacken/shared';
 import { JanneBoyLegCard } from './JanneBoyLegCard';
 
@@ -9,6 +9,8 @@ interface JanneBoySystemViewProps {
   onToggleLock: (legIndex: number, horseId: string) => void;
   onRegenerate: () => void;
   onOpenInBong: (system: JanneBoySystemResult) => void;
+  onOpenKupong?: () => void;
+  onSelectHorse?: (horseId: string) => void;
 }
 
 export const JanneBoySystemView: React.FC<JanneBoySystemViewProps> = ({
@@ -17,6 +19,8 @@ export const JanneBoySystemView: React.FC<JanneBoySystemViewProps> = ({
   onToggleLock,
   onRegenerate,
   onOpenInBong,
+  onOpenKupong,
+  onSelectHorse,
 }) => {
   const [copied, setCopied] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
@@ -96,12 +100,31 @@ export const JanneBoySystemView: React.FC<JanneBoySystemViewProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5">
+            {onOpenKupong && (
+              <button
+                type="button"
+                onClick={onOpenKupong}
+                className="min-h-[44px] px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer group"
+              >
+                <img
+                  src={`${import.meta.env.BASE_URL ?? './'}bong.png`}
+                  alt=""
+                  className="w-4 h-4 object-contain group-hover:scale-110 transition-transform"
+                />
+                <span>Visa ifylld bong</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => onOpenInBong(system)}
-              className="min-h-[44px] px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+              className="min-h-[44px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 border border-amber-500/30 transition-all cursor-pointer group"
             >
-              <Calculator className="w-4 h-4" />
+              <img
+                src={`${import.meta.env.BASE_URL ?? './'}bong.png`}
+                alt=""
+                className="w-4 h-4 object-contain group-hover:scale-110 transition-transform"
+              />
               <span>Öppna i Bong-maskinen</span>
             </button>
 
@@ -162,6 +185,7 @@ export const JanneBoySystemView: React.FC<JanneBoySystemViewProps> = ({
               leg={leg}
               isLocked={isLocked}
               onToggleLock={onToggleLock}
+              onSelectHorse={onSelectHorse}
             />
           );
         })}

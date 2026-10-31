@@ -65,5 +65,20 @@ test.describe('Verifierande skärmdumpar för ny startflik och logga', () => {
     await page.screenshot({
       path: path.join(ARTIFACTS_DIR, 'popout-modal-mobil.png'),
     });
+
+    // 6. Janne Boy med flytande Bong-knapp
+    const closeOmBtn = page.locator('div[role="dialog"] button:has-text("Stäng")').first();
+    await closeOmBtn.click();
+    await page.waitForTimeout(300);
+
+    const menuBtn = page.locator('header button[aria-label="Öppna sidomeny"]');
+    await menuBtn.click();
+    await page.waitForTimeout(300);
+    const janneBoyLink = page.locator('nav[aria-label="Mobil sidonavigering"] button:has-text("Janne Boy")');
+    await janneBoyLink.click();
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: path.join(ARTIFACTS_DIR, 'janne-boy-bong-knapp-mobil.png'),
+    });
   });
 });

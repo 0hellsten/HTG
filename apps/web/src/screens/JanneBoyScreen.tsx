@@ -24,9 +24,13 @@ import { apiFetch } from '../lib/api';
 
 interface JanneBoyScreenProps {
   onOpenInBong: (gameType: BongGameType, selectedHorses: Record<number, string[]>) => void;
+  onSelectHorse?: (horseId: string) => void;
 }
 
-export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) => {
+export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({
+  onOpenInBong,
+  onSelectHorse,
+}) => {
   const [competitions, setCompetitions] = useState<BongCompetition[]>(() =>
     getDefaultUpcomingCompetitions()
   );
@@ -273,7 +277,27 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong }) 
           onToggleLock={handleToggleLock}
           onRegenerate={handleGenerate}
           onOpenInBong={handleOpenInBong}
+          onOpenKupong={() => setIsKupongModalOpen(true)}
+          onSelectHorse={onSelectHorse}
         />
+      )}
+
+      {/* Flytande Bong-knapp (visar ifylld bong/kupong) */}
+      {systemResult && (
+        <button
+          type="button"
+          onClick={() => setIsKupongModalOpen((prev) => !prev)}
+          data-testid="bong-kupong-flytande-knapp"
+          aria-label={isKupongModalOpen ? 'Stäng kupong' : 'Visa ifylld bong'}
+          title={isKupongModalOpen ? 'Stäng kupong' : 'Visa ifylld bong'}
+          className="fixed bottom-20 right-4 lg:bottom-8 lg:right-8 z-30 w-14 h-14 rounded-full p-1 bg-white hover:bg-slate-50 shadow-2xl border-2 border-amber-400 active:scale-95 transition-all cursor-pointer flex items-center justify-center group"
+        >
+          <img
+            src={`${import.meta.env.BASE_URL ?? './'}bong.png`}
+            alt="Bong"
+            className="w-full h-full object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+          />
+        </button>
       )}
 
       {isKupongModalOpen && systemResult && (

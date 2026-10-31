@@ -92,6 +92,30 @@ export function useBongState(
     };
   }, [initialGameType]);
 
+  // Synka in externa val om de ändras (t.ex. när man trycker "Öppna i Bong-maskinen" från Janne Boy)
+  useEffect(() => {
+    if (initialSelectedHorses && Object.keys(initialSelectedHorses).length > 0) {
+      setSelectedHorses(initialSelectedHorses);
+      setRanks((prev) => {
+        const next = { ...prev };
+        for (const horseIds of Object.values(initialSelectedHorses)) {
+          horseIds.forEach((hId, i) => {
+            if (!next[hId]) {
+              next[hId] = i === 0 ? 'A' : 'B';
+            }
+          });
+        }
+        return next;
+      });
+    }
+  }, [initialSelectedHorses]);
+
+  useEffect(() => {
+    if (initialGameType) {
+      setGameType(initialGameType);
+    }
+  }, [initialGameType]);
+
   async function loadGame(gameId: string, gType: BongGameType) {
     const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
     if (res.data) {

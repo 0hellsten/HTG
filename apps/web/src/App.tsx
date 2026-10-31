@@ -162,7 +162,10 @@ export const App: React.FC = () => {
               />
             )
           ) : activeTab === 'janneboy' ? (
-            <JanneBoyScreen onOpenInBong={handleOpenJanneBoyInBong} />
+            <JanneBoyScreen
+              onOpenInBong={handleOpenJanneBoyInBong}
+              onSelectHorse={(id) => setSelectedHorseId(id)}
+            />
           ) : activeTab === 'bong' ? (
             <BongScreen
               initialGameType={bongInitialGameType}

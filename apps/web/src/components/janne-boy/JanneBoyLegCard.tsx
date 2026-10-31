@@ -1,17 +1,19 @@
 import React from 'react';
-import { Sparkles, Lock, Unlock, Clock, MapPin, Flag, Zap } from 'lucide-react';
+import { Sparkles, Lock, Unlock, Clock, MapPin, Flag, Zap, ChevronRight } from 'lucide-react';
 import { JanneBoyLegSuggestion } from '@stallbacken/shared';
 
 interface JanneBoyLegCardProps {
   leg: JanneBoyLegSuggestion;
   isLocked: boolean;
   onToggleLock: (legIndex: number, horseId: string) => void;
+  onSelectHorse?: (horseId: string) => void;
 }
 
 export const JanneBoyLegCard: React.FC<JanneBoyLegCardProps> = ({
   leg,
   isLocked,
   onToggleLock,
+  onSelectHorse,
 }) => {
   const startMethodText = leg.startMethod === 'auto' ? 'autostart' : 'voltstart';
   const distanceText = leg.distance ? `${leg.distance.toLocaleString('sv-SE')} m` : undefined;
@@ -103,21 +105,33 @@ export const JanneBoyLegCard: React.FC<JanneBoyLegCardProps> = ({
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div className="font-bold text-xs sm:text-sm text-slate-950 truncate flex items-center gap-1.5">
-                      <span>{horse.name}</span>
-                      {horse.isValueCandidate && (
-                        <span className="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[9px] font-bold">
-                          <Zap className="w-2.5 h-2.5 text-emerald-600" />
-                          <span>Spelvärde {horse.valueRatio ? `${horse.valueRatio}x` : ''}</span>
-                        </span>
-                      )}
-                      {horse.isSpikCandidate && (
-                        <span className="inline-flex items-center px-1 py-0.2 rounded bg-amber-200 text-slate-950 text-[9px] font-bold">
-                          Spik-kandidat
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-[11px] text-slate-500 truncate">
+                    <button
+                      type="button"
+                      onClick={() => onSelectHorse && onSelectHorse(horse.id)}
+                      disabled={!onSelectHorse}
+                      className={`text-left w-full group focus:outline-none ${
+                        onSelectHorse ? 'cursor-pointer' : 'cursor-default'
+                      }`}
+                    >
+                      <div className="font-extrabold text-xs sm:text-sm text-slate-950 group-hover:text-amber-800 transition-colors truncate flex items-center gap-1.5">
+                        <span>{horse.name}</span>
+                        {onSelectHorse && (
+                          <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 text-amber-600 transition-opacity shrink-0" />
+                        )}
+                        {horse.isValueCandidate && (
+                          <span className="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[9px] font-bold shrink-0">
+                            <Zap className="w-2.5 h-2.5 text-emerald-600" />
+                            <span>Spelvärde {horse.valueRatio ? `${horse.valueRatio}x` : ''}</span>
+                          </span>
+                        )}
+                        {horse.isSpikCandidate && (
+                          <span className="inline-flex items-center px-1 py-0.2 rounded bg-amber-200 text-slate-950 text-[9px] font-bold shrink-0">
+                            Spik-kandidat
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                    <div className="text-[11px] text-slate-500 truncate mt-0.5">
                       {horse.driverName} · Spår {horse.postPosition || horse.startNumber} ·{' '}
                       {streckPct} % · {horse.winOdds ? `${horse.winOdds} odds` : ''}
                     </div>
