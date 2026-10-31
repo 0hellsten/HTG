@@ -1,5 +1,13 @@
 import React from 'react';
-import { Compass, Activity, HelpCircle, Type, ChevronRight, ShieldCheck, BookOpen } from 'lucide-react';
+import {
+  Compass,
+  Activity,
+  HelpCircle,
+  Type,
+  ChevronRight,
+  ShieldCheck,
+  BookOpen,
+} from 'lucide-react';
 
 interface MerScreenProps {
   onSelectOption: (option: 'om' | 'banvisaren' | 'status' | 'hjalp' | 'textstorlek') => void;

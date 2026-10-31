@@ -84,7 +84,8 @@ export function generateHorseReasons(
   const isAmericanSulky = horse.sulkyType === 'american' && isAuto;
 
   if (horse.shoeChanged && isBarfotaRuntOm) {
-    equipText = 'Skoryck till barfota runt om! En klassisk ändring som ofta ger hästen en helt ny växel.';
+    equipText =
+      'Skoryck till barfota runt om! En klassisk ändring som ofta ger hästen en helt ny växel.';
     equipPositive = true;
   } else if (isBarfotaRuntOm) {
     equipText = 'Anmäld barfota runt om – maximal och lätt balans som ger bra spänst i steget.';
@@ -124,7 +125,8 @@ export function generateHorseReasons(
   } else if (earnings && earnings > 100000) {
     formText = `Möter lagom motstånd för sina meriter (${formatMoneySwedish(earnings)} intjänat).`;
   } else {
-    formText = 'Spännande travare som utvecklas för varje start och passar väl i loppets proposition.';
+    formText =
+      'Spännande travare som utvecklas för varje start och passar väl i loppets proposition.';
   }
 
   reasons.push({

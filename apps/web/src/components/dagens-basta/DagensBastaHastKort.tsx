@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Sparkles,
-  Zap,
-  Target,
-  Compass,
-  Award,
-  ChevronRight,
-  TrendingUp,
-} from 'lucide-react';
+import { Sparkles, Zap, Target, Compass, Award, ChevronRight, TrendingUp } from 'lucide-react';
 import { DagensBastaHorse, DagensBastaReasonItem } from '@stallbacken/shared';
 import { HastsKoIkon } from '../HastsKoIkon';
 
@@ -56,9 +48,7 @@ export const DagensBastaHastKort: React.FC<DagensBastaHastKortProps> = ({
   };
 
   return (
-    <div
-      className={`rounded-2xl p-4 sm:p-5 transition-all ${cardBorderClass}`}
-    >
+    <div className={`rounded-2xl p-4 sm:p-5 transition-all ${cardBorderClass}`}>
       {/* Överdel: Startnummer, namn, kusk och rollbricka */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 min-w-0">
@@ -68,8 +58,8 @@ export const DagensBastaHastKort: React.FC<DagensBastaHastKortProps> = ({
               isSpik
                 ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-400'
                 : isSkrall
-                ? 'bg-purple-700 text-white ring-2 ring-purple-300'
-                : 'bg-slate-900 text-white'
+                  ? 'bg-purple-700 text-white ring-2 ring-purple-300'
+                  : 'bg-slate-900 text-white'
             }`}
           >
             {horse.startNumber}
@@ -145,9 +135,7 @@ export const DagensBastaHastKort: React.FC<DagensBastaHastKortProps> = ({
             >
               {renderReasonIcon(reason.category)}
               <div>
-                <span className="font-extrabold text-slate-950 mr-1.5">
-                  {reason.title}:
-                </span>
+                <span className="font-extrabold text-slate-950 mr-1.5">{reason.title}:</span>
                 <span className="font-medium text-slate-800">{reason.text}</span>
               </div>
             </li>

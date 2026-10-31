@@ -9,13 +9,7 @@ interface InfoModalProps {
   children: React.ReactNode;
 }
 
-export const InfoModal: React.FC<InfoModalProps> = ({
-  isOpen,
-  onClose,
-  title,
-  icon,
-  children,
-}) => {
+export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, title, icon, children }) => {
   useEffect(() => {
     if (!isOpen) return;
 

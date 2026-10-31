@@ -120,7 +120,8 @@ export function resolveLegCandidates(
     legsMap.set(race.legIndex, race.horses);
   }
 
-  for (let legIdx = 0; legIdx < config.legsCount; legIdx++) {
+  const legsCount = raceDay.races.length > 0 ? raceDay.races.length : config.legsCount;
+  for (let legIdx = 0; legIdx < legsCount; legIdx++) {
     const legSel = selection.legs.find((l) => l.legIndex === legIdx);
     const allHorsesInLeg = legsMap.get(legIdx) || [];
     if (!legSel || legSel.selectedHorseIds.length === 0) {

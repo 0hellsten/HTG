@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginAsync } from 'fastify';
+import { FastifyInstance, FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify';
 import { ApiResponse, SourceHealthRecord, SourceStatus } from '@stallbacken/shared';
 import { HealthManager } from '../health/health-manager.js';
 import {
@@ -24,14 +24,7 @@ interface FakeSourceBody {
 export const kallorRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   const healthManager = new HealthManager();
 
-  const handleGetKallor = async (
-    _req: unknown,
-    reply: {
-      status: (code: number) => {
-        send: (payload: ApiResponse<SourceHealthRecord[]>) => unknown;
-      };
-    }
-  ) => {
+  const handleGetKallor = async (_req: FastifyRequest, reply: FastifyReply) => {
     try {
       const records = healthManager.getAllSourcesHealth(registeredAdapters);
 

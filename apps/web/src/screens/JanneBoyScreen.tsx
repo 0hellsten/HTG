@@ -27,10 +27,7 @@ interface JanneBoyScreenProps {
   onSelectHorse?: (horseId: string) => void;
 }
 
-export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({
-  onOpenInBong,
-  onSelectHorse,
-}) => {
+export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, onSelectHorse }) => {
   const [competitions, setCompetitions] = useState<BongCompetition[]>(() =>
     getDefaultUpcomingCompetitions()
   );
@@ -209,9 +206,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({
               <Sparkles className="w-5 h-5 text-amber-500" />
             </h1>
           </div>
-          <p className="text-slate-600 text-sm sm:text-base mt-1.5 leading-relaxed">
-            Superintelligent kupongmotor
-          </p>
+          <p className="text-slate-600 text-sm sm:text-base mt-1">Kupongförslag för vald omgång</p>
         </div>
 
         <div className="flex items-center gap-2.5 bg-white border border-slate-200 px-3 py-2 rounded-xl text-xs shrink-0 shadow-2xs">
@@ -221,7 +216,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({
           <div className="leading-tight">
             <span className="font-bold text-slate-800 block flex items-center gap-1">
               <Radio className="w-3 h-3 text-slate-500" />
-              <span>{isLive ? 'Färska live-odds från ATG' : 'Kvalitetssäkrat travunderlag'}</span>
+              <span>{isLive ? 'Live-odds från ATG' : 'Kvalitetssäkrat travunderlag'}</span>
             </span>
             <span className="text-[10px] text-slate-500">
               {raceDay.trackName} · {raceDay.date || 'Vald omgång'}
@@ -253,7 +248,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({
 
         <BongDateSelector
           competitions={competitions}
-          selectedDateIso={selectedCompId}
+          selectedCompetitionId={selectedCompId}
           onSelectCompetition={handleSelectCompetition}
         />
       </div>
@@ -262,6 +257,8 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({
 
       <JanneBoyControls
         gameType={gameType}
+        racesCount={raceDay.races.length}
+        trackName={raceDay.trackName}
         strategy={strategy}
         budget={budget}
         isCalculating={isCalculating}

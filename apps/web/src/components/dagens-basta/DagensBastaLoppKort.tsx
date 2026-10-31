@@ -65,7 +65,9 @@ export const DagensBastaLoppKort: React.FC<DagensBastaLoppKortProps> = ({
           </span>
           <span className="inline-flex items-center gap-1.5">
             <Flag className="w-4 h-4 text-amber-400" />
-            <span>{race.distance} m ({startMethodText})</span>
+            <span>
+              {race.distance} m ({startMethodText})
+            </span>
           </span>
           <span className="inline-flex items-center gap-1.5">
             <Layers className="w-4 h-4 text-amber-400" />
@@ -87,11 +89,7 @@ export const DagensBastaLoppKort: React.FC<DagensBastaLoppKortProps> = ({
 
         <div className="grid grid-cols-1 gap-4">
           {race.horses.map((horse) => (
-            <DagensBastaHastKort
-              key={horse.id}
-              horse={horse}
-              onSelectHorse={onSelectHorse}
-            />
+            <DagensBastaHastKort key={horse.id} horse={horse} onSelectHorse={onSelectHorse} />
           ))}
         </div>
 

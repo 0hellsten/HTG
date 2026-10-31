@@ -48,30 +48,27 @@ export const DagensBastaScreen: React.FC<DagensBastaScreenProps> = ({
     return engine.analyzeOmgang(raceDay);
   }, [engine, raceDay]);
 
-  const loadOmgang = useCallback(
-    async (gameId: string, gameType: BongGameType) => {
-      setLoading(true);
-      try {
-        const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
-        if (res && res.data) {
-          setRaceDay(res.data);
-          setStatus(res.status || 'ok');
-          setStatusMessage(res.message || 'Allt är färskt och uppdaterat.');
-        } else {
-          setRaceDay(buildFallbackBongRaceDay(gameType));
-          setStatus('stale');
-          setStatusMessage('Visar sparad information.');
-        }
-      } catch {
+  const loadOmgang = useCallback(async (gameId: string, gameType: BongGameType) => {
+    setLoading(true);
+    try {
+      const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
+      if (res && res.data) {
+        setRaceDay(res.data);
+        setStatus(res.status || 'ok');
+        setStatusMessage(res.message || 'Allt är färskt och uppdaterat.');
+      } else {
         setRaceDay(buildFallbackBongRaceDay(gameType));
         setStatus('stale');
         setStatusMessage('Visar sparad information.');
-      } finally {
-        setLoading(false);
       }
-    },
-    []
-  );
+    } catch {
+      setRaceDay(buildFallbackBongRaceDay(gameType));
+      setStatus('stale');
+      setStatusMessage('Visar sparad information.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     let isSubscribed = true;
@@ -189,6 +186,7 @@ export const DagensBastaScreen: React.FC<DagensBastaScreenProps> = ({
             </div>
             <BongDateSelector
               competitions={competitions}
+              selectedCompetitionId={selectedCompId}
               selectedDateIso={selectedComp?.dateIso || ''}
               onSelectCompetition={handleSelectCompetition}
             />

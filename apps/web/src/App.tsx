@@ -40,7 +40,7 @@ export const App: React.FC = () => {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [siblingRaces, setSiblingRaces] = useState<Race[]>([]);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [bongInitialGameType, setBongInitialGameType] = useState<BongGameType>('V75');
+  const [bongInitialGameType, setBongInitialGameType] = useState<BongGameType | undefined>();
   const [bongInitialHorses, setBongInitialHorses] = useState<
     Record<number, string[]> | undefined
   >();
@@ -107,11 +107,7 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col lg:flex-row font-sans">
-      <DesktopSidebar
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        onOpenOm={handleOpenOm}
-      />
+      <DesktopSidebar activeTab={activeTab} onTabChange={handleTabChange} onOpenOm={handleOpenOm} />
 
       <MobileDrawer
         isOpen={isMobileDrawerOpen}
@@ -124,10 +120,7 @@ export const App: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0">
         <OfflineRemsa />
 
-        <MobileHeader
-          onOpenDrawer={() => setIsMobileDrawerOpen(true)}
-          onOpenOm={handleOpenOm}
-        />
+        <MobileHeader onOpenDrawer={() => setIsMobileDrawerOpen(true)} onOpenOm={handleOpenOm} />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24 lg:pb-8">
           {activeTab === 'idag' ? (
@@ -203,10 +196,7 @@ export const App: React.FC = () => {
 
         <ScrollToTopKnapp />
 
-        <MobileBottomNav
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-        />
+        <MobileBottomNav activeTab={activeTab} onTabChange={handleTabChange} />
 
         {/* Pop-out modaler för infosidor */}
         <InfoModal
@@ -272,10 +262,7 @@ export const App: React.FC = () => {
           title="Hästens form & tidigare lopp"
         >
           {selectedHorseId && (
-            <HastScreen
-              horseId={selectedHorseId}
-              onBack={() => setSelectedHorseId(null)}
-            />
+            <HastScreen horseId={selectedHorseId} onBack={() => setSelectedHorseId(null)} />
           )}
         </InfoModal>
       </div>

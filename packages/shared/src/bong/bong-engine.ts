@@ -33,11 +33,12 @@ export class BongEngine {
     const flerbongMultiplier = Math.max(1, Math.floor(settings.flerbongMultiplier || 1));
     const sharesCount = Math.max(1, Math.floor(settings.sharesCount || 1));
     const onlyTopPool = Boolean(settings.onlyTopPool);
+    const actualLegsCount = raceDay.races.length > 0 ? raceDay.races.length : config.legsCount;
 
     const resolvedLegs = resolveLegCandidates(config, raceDay, selection);
     const mathRows = this.calculateMathRows(resolvedLegs);
 
-    if (mathRows === 0 || resolvedLegs.length !== config.legsCount) {
+    if (mathRows === 0 || resolvedLegs.length !== actualLegsCount) {
       return this.buildEmptyResult(mathRows, flerbongMultiplier, sharesCount, onlyTopPool);
     }
 
@@ -62,7 +63,7 @@ export class BongEngine {
     }
 
     const reducedRows: ReducedSingleRow[] = [];
-    const currentRow: InternalHorseCandidate[] = new Array(config.legsCount);
+    const currentRow: InternalHorseCandidate[] = new Array(actualLegsCount);
     const groupHits = new Int32Array(activeKravgrupper.length);
     const rankCounts = { A: 0, B: 0, C: 0, D: 0, Unranked: 0 };
 

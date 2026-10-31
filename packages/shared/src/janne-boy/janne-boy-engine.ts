@@ -1,4 +1,5 @@
 import { BongRaceDayData, BongRaceLeg, BongHorseInput } from '../types/bong.js';
+import { getGameConfig } from '../bong/constants.js';
 import {
   JanneBoyConfig,
   JanneBoySystemResult,
@@ -17,8 +18,9 @@ interface ScoredHorse {
 
 export class JanneBoyEngine {
   public generate(raceDay: BongRaceDayData, config: JanneBoyConfig): JanneBoySystemResult {
-    const gameType = config.gameType;
-    const rowPrice = gameType === 'V75' ? 0.5 : 0.25;
+    const gameType = config.gameType || raceDay.gameType || 'V75';
+    const cfg = getGameConfig(gameType);
+    const rowPrice = cfg.radpris;
     const budget = Math.max(rowPrice * 2, config.budget);
     const targetRows = Math.floor(budget / rowPrice);
 

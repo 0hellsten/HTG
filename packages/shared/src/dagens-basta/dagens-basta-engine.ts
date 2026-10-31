@@ -14,9 +14,7 @@ export class DagensBastaEngine {
    * Analyserar en hel tävlingsomgång och tar fram de bästa hästarna lopp för lopp.
    */
   public analyzeOmgang(raceDay: BongRaceDayData): DagensBastaOmgang {
-    const races: DagensBastaRace[] = raceDay.races.map((leg, idx) =>
-      this.analyzeRaceLeg(leg, idx)
-    );
+    const races: DagensBastaRace[] = raceDay.races.map((leg, idx) => this.analyzeRaceLeg(leg, idx));
 
     // Hitta omgångens starkaste spik och bästa skräll
     let topSpikCandidate: {
@@ -41,7 +39,7 @@ export class DagensBastaEngine {
         const bet = spikHorse.betDistribution;
         const odds = spikHorse.winOdds || 2.0;
         // Poäng baserat på stabilitet och vinstchans
-        const score = (100 / Math.max(1.1, odds)) + bet;
+        const score = 100 / Math.max(1.1, odds) + bet;
         if (!topSpikCandidate || score > topSpikCandidate.score) {
           topSpikCandidate = {
             raceNumber: race.raceNumber,
@@ -57,7 +55,7 @@ export class DagensBastaEngine {
       if (skrallHorse) {
         const odds = skrallHorse.winOdds || 15;
         const bet = skrallHorse.betDistribution;
-        const valueScore = odds * (bet > 0 ? (15 / bet) : 1);
+        const valueScore = odds * (bet > 0 ? 15 / bet : 1);
         if (!topSkrallCandidate || valueScore > topSkrallCandidate.score) {
           topSkrallCandidate = {
             raceNumber: race.raceNumber,
@@ -70,7 +68,9 @@ export class DagensBastaEngine {
       }
     }
 
-    const gameName = raceDay.gameType ? `${raceDay.gameType} ${raceDay.trackName || ''}`.trim() : 'Dagens lopp';
+    const gameName = raceDay.gameType
+      ? `${raceDay.gameType} ${raceDay.trackName || ''}`.trim()
+      : 'Dagens lopp';
 
     return {
       id: `${raceDay.gameType || 'lopp'}-${raceDay.date || 'idag'}`,
@@ -139,7 +139,8 @@ export class DagensBastaEngine {
       })
       .sort((a, b) => b.analysis.skrallScore - a.analysis.skrallScore);
 
-    const bestSkrall = skrallCandidates[0] || (scoredHorses[2] !== undefined ? scoredHorses[2] : null);
+    const bestSkrall =
+      skrallCandidates[0] || (scoredHorses[2] !== undefined ? scoredHorses[2] : null);
 
     // Bestäm öppenhet
     let openness: RaceOpenness = 'oppet';
@@ -151,11 +152,11 @@ export class DagensBastaEngine {
       const secondProb = secondScored ? secondScored.analysis.impliedWinProb : 0;
       const leadMargin = bestProb - secondProb;
 
-      if (bestProb >= 0.45 || leadMargin >= 0.20) {
+      if (bestProb >= 0.45 || leadMargin >= 0.2) {
         openness = 'tydlig_favorit';
         opennessLabel = 'Stark favorit';
         shortAnalysis = `${bestScored.horse.name || `Nummer ${bestScored.horse.startNumber}`} har loppets överlägset bästa chans och är en stark grundpelare.`;
-      } else if (secondScored && bestProb >= 0.28 && secondProb >= 0.22 && leadMargin < 0.10) {
+      } else if (secondScored && bestProb >= 0.28 && secondProb >= 0.22 && leadMargin < 0.1) {
         openness = 'tvaspanslopp';
         opennessLabel = 'Tvåhästarslås';
         shortAnalysis = `Två hästar höjer sig över mängden: ${bestScored.horse.name || 'favoriten'} och ${secondScored.horse.name || 'utmanaren'}.`;
@@ -233,13 +234,7 @@ export class DagensBastaEngine {
     impliedWinProb: number,
     valueRatio: number
   ): DagensBastaHorse {
-    const { reasons, summary } = generateHorseReasons(
-      horse,
-      leg,
-      role,
-      impliedWinProb,
-      valueRatio
-    );
+    const { reasons, summary } = generateHorseReasons(horse, leg, role, impliedWinProb, valueRatio);
 
     let shoesText = 'Skor runt om';
     if (horse.shoeFront === false && horse.shoeBack === false) {
@@ -254,8 +249,8 @@ export class DagensBastaEngine {
       horse.sulkyType === 'american'
         ? 'Amerikansk sulky'
         : horse.sulkyType === 'regular'
-        ? 'Vanlig sulky'
-        : undefined;
+          ? 'Vanlig sulky'
+          : undefined;
 
     return {
       id: horse.id,

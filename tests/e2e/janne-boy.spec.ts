@@ -14,7 +14,7 @@ test.describe('Janne Boy — Superintelligent kupongmotor', () => {
 
     // 2. Verifiera rubrik och grundläggande element
     await expect(page.locator('h1')).toContainText('Janne Boy');
-    await expect(page.locator('text=Superintelligent kupongmotor')).toBeVisible();
+    await expect(page.locator('text=Kupongförslag för vald omgång')).toBeVisible();
 
     // 3. Kontrollera strategival och budgetknappar
     await expect(page.locator('text=Balanserad Janne')).toBeVisible();
@@ -37,12 +37,12 @@ test.describe('Janne Boy — Superintelligent kupongmotor', () => {
     await expect(page.locator('text=Spelvärdesindex').first()).toBeVisible();
 
     // 7. Klicka på knappen "Öppna i Bong-maskinen"
-    const openInBongBtn = page.locator('button:has-text("Öppna i Bong-maskinen")');
+    const openInBongBtn = page.locator('button:has-text("Öppna i Bong-maskinen")').first();
     await expect(openInBongBtn).toBeVisible();
     await openInBongBtn.click();
 
     // 8. Verifiera att Bong-maskinen öppnas med kupongen
-    await expect(page.locator('h1')).toContainText('Bong-maskinen');
+    await expect(page.locator('h1:has-text("Bong-maskinen")')).toBeVisible();
     await expect(page.locator('text=Snabbkupong:')).toBeVisible();
   });
 });

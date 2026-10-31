@@ -104,27 +104,22 @@ export const JanneBoySystemView: React.FC<JanneBoySystemViewProps> = ({
               <button
                 type="button"
                 onClick={onOpenKupong}
-                className="min-h-[44px] px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer group"
+                className="min-h-[44px] px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm flex items-center gap-2 shadow-md transition-all cursor-pointer active:scale-95 group"
               >
                 <img
                   src={`${import.meta.env.BASE_URL ?? './'}bong.png`}
                   alt=""
-                  className="w-4 h-4 object-contain group-hover:scale-110 transition-transform"
+                  className="w-5 h-5 object-contain group-hover:scale-110 transition-transform"
                 />
-                <span>Visa ifylld bong</span>
+                <span>Visa min bong</span>
               </button>
             )}
 
             <button
               type="button"
               onClick={() => onOpenInBong(system)}
-              className="min-h-[44px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-extrabold text-xs sm:text-sm flex items-center gap-1.5 border border-amber-500/30 transition-all cursor-pointer group"
+              className="min-h-[44px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-amber-500/30 transition-all cursor-pointer"
             >
-              <img
-                src={`${import.meta.env.BASE_URL ?? './'}bong.png`}
-                alt=""
-                className="w-4 h-4 object-contain group-hover:scale-110 transition-transform"
-              />
               <span>Öppna i Bong-maskinen</span>
             </button>
 
@@ -170,11 +165,8 @@ export const JanneBoySystemView: React.FC<JanneBoySystemViewProps> = ({
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-700">
-            Avdelningsöversikt ({system.legs.length} lopp)
+            Avdelningar ({system.legs.length} lopp)
           </h3>
-          <span className="text-xs text-slate-500 font-medium">
-            Tryck på låsikonen för att spika en häst manuellt
-          </span>
         </div>
 
         {system.legs.map((leg) => {

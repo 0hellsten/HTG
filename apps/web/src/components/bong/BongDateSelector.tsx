@@ -4,27 +4,29 @@ import { BongCompetition } from './competitions';
 
 interface BongDateSelectorProps {
   competitions: BongCompetition[];
-  selectedDateIso: string;
+  selectedDateIso?: string;
+  selectedCompetitionId?: string;
   onSelectCompetition: (comp: BongCompetition) => void;
 }
 
 export const BongDateSelector: React.FC<BongDateSelectorProps> = ({
   competitions,
   selectedDateIso,
+  selectedCompetitionId,
   onSelectCompetition,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollStart, setScrollStart] = useState(0);
-  const [draggedDistance, setDraggedDistance] = useState(0);
+  const hasDraggedRef = useRef(false);
 
   const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     if (!scrollRef.current) return;
     setIsMouseDown(true);
     setStartX(e.pageX - scrollRef.current.offsetLeft);
     setScrollStart(scrollRef.current.scrollLeft);
-    setDraggedDistance(0);
+    hasDraggedRef.current = false;
   };
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -33,7 +35,9 @@ export const BongDateSelector: React.FC<BongDateSelectorProps> = ({
     const x = e.pageX - scrollRef.current.offsetLeft;
     const walk = x - startX;
     scrollRef.current.scrollLeft = scrollStart - walk;
-    setDraggedDistance((prev) => prev + Math.abs(walk));
+    if (Math.abs(walk) > 8) {
+      hasDraggedRef.current = true;
+    }
   };
 
   const handleMouseUpOrLeave = () => {
@@ -79,29 +83,42 @@ export const BongDateSelector: React.FC<BongDateSelectorProps> = ({
         }`}
       >
         {competitions.map((comp) => {
-          const isSelected = comp.dateIso === selectedDateIso;
+          const isSelected = Boolean(
+            selectedCompetitionId
+              ? comp.id === selectedCompetitionId
+              : selectedDateIso && comp.dateIso === selectedDateIso
+          );
           const isToday = comp.isToday;
 
           let cardStyle =
-            'bg-white text-slate-800 border-slate-300 hover:bg-slate-100 hover:border-slate-400 shadow-xs';
+            'bg-white text-slate-850 border-slate-300 hover:bg-slate-50 hover:border-slate-400 shadow-xs';
 
           if (isSelected && isToday) {
             cardStyle =
-              'bg-amber-500 text-slate-950 border-emerald-600 shadow-md ring-2 ring-emerald-500/60 scale-[1.02]';
+              'bg-amber-400 text-slate-950 border-slate-950 shadow-md ring-3 ring-amber-400/80 scale-[1.02]';
           } else if (isSelected) {
             cardStyle =
-              'bg-amber-500 text-slate-950 border-amber-600 shadow-md ring-2 ring-amber-400/50 scale-[1.02]';
+              'bg-amber-400 text-slate-950 border-slate-950 shadow-md ring-3 ring-amber-400/80 scale-[1.02]';
           } else if (isToday) {
             cardStyle =
-              'bg-emerald-50 text-emerald-950 border-emerald-500 shadow-sm ring-1 ring-emerald-400/40';
+              'bg-emerald-50 text-emerald-950 border-emerald-500 shadow-sm ring-1 ring-emerald-400/40 hover:bg-emerald-100/50';
           }
+
+          const legCountText =
+            comp.gameType === 'V86' || comp.gameType === 'V85'
+              ? '8 lopp'
+              : comp.gameType === 'V64' || comp.gameType === 'V65'
+                ? '6 lopp'
+                : '7 lopp';
 
           return (
             <button
               key={comp.id}
               type="button"
+              role="tab"
+              aria-selected={isSelected}
               onClick={() => {
-                if (draggedDistance < 6) {
+                if (!hasDraggedRef.current) {
                   onSelectCompetition(comp);
                 }
               }}
@@ -109,18 +126,22 @@ export const BongDateSelector: React.FC<BongDateSelectorProps> = ({
             >
               <div className="flex items-center justify-between gap-1.5 w-full">
                 <span className="text-xs font-bold uppercase tracking-wider flex items-center gap-1">
-                  {isToday ? (
-                    <span
-                      className={`px-1.5 py-0.5 rounded text-[10px] font-black uppercase ${
-                        isSelected ? 'bg-slate-950 text-emerald-400' : 'bg-emerald-600 text-white'
-                      }`}
-                    >
+                  {isSelected ? (
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-slate-950 text-amber-300">
+                      Vald
+                    </span>
+                  ) : isToday ? (
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-600 text-white">
                       Idag
                     </span>
                   ) : (
                     <span>{comp.weekday}</span>
                   )}
-                  <span className={isSelected ? 'text-slate-900 font-extrabold' : 'text-slate-600'}>
+                  <span
+                    className={
+                      isSelected ? 'text-slate-950 font-black' : 'text-slate-700 font-bold'
+                    }
+                  >
                     {comp.dateFormatted}
                   </span>
                 </span>
@@ -129,7 +150,7 @@ export const BongDateSelector: React.FC<BongDateSelectorProps> = ({
                   className={`text-[11px] font-black px-1.5 py-0.5 rounded ${
                     isSelected
                       ? 'bg-slate-950 text-amber-300'
-                      : comp.gameType === 'V86'
+                      : comp.gameType === 'V86' || comp.gameType === 'V85'
                         ? 'bg-blue-100 text-blue-900 border border-blue-200'
                         : 'bg-amber-100 text-amber-900 border border-amber-200'
                   }`}
@@ -141,18 +162,18 @@ export const BongDateSelector: React.FC<BongDateSelectorProps> = ({
               <div className="mt-1.5 flex items-baseline justify-between gap-1 w-full">
                 <div className="min-w-0 flex-1">
                   <div
-                    className={`text-xs font-semibold truncate ${
-                      isSelected ? 'text-slate-950' : 'text-slate-700'
+                    className={`text-xs font-bold truncate ${
+                      isSelected ? 'text-slate-950' : 'text-slate-800'
                     }`}
                   >
                     {comp.trackName}
                   </div>
                   <div
-                    className={`text-[10px] truncate ${
-                      isSelected ? 'text-slate-900' : 'text-slate-500'
+                    className={`text-[11px] font-medium truncate ${
+                      isSelected ? 'text-slate-900' : 'text-slate-600'
                     }`}
                   >
-                    Start {comp.startTime} · {comp.gameType === 'V86' ? '8 lopp' : '7 lopp'}
+                    Start {comp.startTime} · {legCountText}
                   </div>
                 </div>
 

@@ -73,7 +73,9 @@ export class DomainRateLimiter {
   }
 }
 
-export const globalRateLimiter = new DomainRateLimiter(1000);
+const defaultMinInterval =
+  process.env.NODE_ENV === 'test' || process.env.USE_FIXTURES === 'true' ? 50 : 1000;
+export const globalRateLimiter = new DomainRateLimiter(defaultMinInterval);
 
 export interface FetchOptions {
   timeoutMs?: number;

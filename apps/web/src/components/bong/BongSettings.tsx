@@ -43,7 +43,11 @@ export const BongSettings: React.FC<BongSettingsProps> = ({
                 Flerbong &amp; andelar (valfritt)
               </h3>
               <p className="text-xs text-slate-500">
-                {onlyTopPool ? (gameType === 'V75' ? 'Endast V7' : 'Endast V8') : 'Alla vinstpooler'}{' '}
+                {onlyTopPool
+                  ? gameType === 'V75'
+                    ? 'Endast V7'
+                    : 'Endast V8'
+                  : 'Alla vinstpooler'}{' '}
                 · {flerbongMultiplier}x · {sharesCount} andel(ar)
               </p>
             </div>
@@ -125,7 +129,9 @@ export const BongSettings: React.FC<BongSettingsProps> = ({
                   <div className="text-sm font-bold text-slate-800">{histogram.from1kTo10k} st</div>
                 </div>
                 <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-center">
-                  <div className="text-[11px] text-amber-700 font-semibold">10 000 – 100 000 kr</div>
+                  <div className="text-[11px] text-amber-700 font-semibold">
+                    10 000 – 100 000 kr
+                  </div>
                   <div className="text-sm font-bold text-amber-900">
                     {histogram.from10kTo100k} st
                   </div>

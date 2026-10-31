@@ -115,4 +115,23 @@ describe('JanneBoyEngine', () => {
     expect(result.funQuote).toBeTruthy();
     expect(result.costSek).toBeLessThanOrEqual(50);
   });
+
+  it('genererar ett giltigt V85-system med 8 avdelningar och 0.25 kr radpris', () => {
+    const raceDayV85: BongRaceDayData = {
+      ...createMockRaceDay(8),
+      gameType: 'V85',
+    };
+    const config: JanneBoyConfig = {
+      gameType: 'V85',
+      strategy: 'balanserad',
+      budget: 150,
+    };
+
+    const result = engine.generate(raceDayV85, config);
+
+    expect(result.gameType).toBe('V85');
+    expect(result.legs).toHaveLength(8);
+    expect(result.rowPrice).toBe(0.25);
+    expect(result.costSek).toBeLessThanOrEqual(150);
+  });
 });

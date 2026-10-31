@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Sparkles, Clock, MapPin, Flag, HelpCircle, ChevronDown, ChevronUp, Info } from 'lucide-react';
+import {
+  Sparkles,
+  Clock,
+  MapPin,
+  Flag,
+  HelpCircle,
+  ChevronDown,
+  ChevronUp,
+  Info,
+} from 'lucide-react';
 import { BongRaceLeg, HorseRank, BongHorseInput } from '@stallbacken/shared';
 
 interface BongLegHorseListProps {
@@ -102,16 +111,28 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
         {showRankHelp && (
           <div className="mt-2 p-3 rounded-xl bg-amber-50/70 border border-amber-200 text-xs sm:text-sm text-slate-800 space-y-1.5">
             <p>
-              <strong>A, B, C och D</strong> är din egen betygssättning av hästarna om du vill använda reduceringsmotorn:
+              <strong>A, B, C och D</strong> är din egen betygssättning av hästarna om du vill
+              använda reduceringsmotorn:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1 text-xs">
-              <div><strong className="text-emerald-800">A-hästar:</strong> Dina favoriter/bästa spikar som du tror mest på.</div>
-              <div><strong className="text-blue-800">B-hästar:</strong> Bra reserver och garderingar.</div>
-              <div><strong className="text-amber-800">C-hästar:</strong> Skrällar och outsider-bud.</div>
-              <div><strong className="text-slate-600">D-hästar:</strong> Långskott som du sällan vill betala för på alla rader.</div>
+              <div>
+                <strong className="text-emerald-800">A-hästar:</strong> Dina favoriter/bästa spikar
+                som du tror mest på.
+              </div>
+              <div>
+                <strong className="text-blue-800">B-hästar:</strong> Bra reserver och garderingar.
+              </div>
+              <div>
+                <strong className="text-amber-800">C-hästar:</strong> Skrällar och outsider-bud.
+              </div>
+              <div>
+                <strong className="text-slate-600">D-hästar:</strong> Långskott som du sällan vill
+                betala för på alla rader.
+              </div>
             </div>
             <p className="text-[11px] text-slate-500 pt-1">
-              Om du inte använder reduceringsmotorn spelas alla dina markerade hästar precis som på en vanlig bong!
+              Om du inte använder reduceringsmotorn spelas alla dina markerade hästar precis som på
+              en vanlig bong!
             </p>
           </div>
         )}
@@ -182,8 +203,7 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
                   </div>
                   <div className="text-xs text-slate-500 truncate mt-0.5">
                     {horse.driverName ? `${horse.driverName} · ` : ''}
-                    {streckPct} %
-                    {horse.winOdds ? ` · ${horse.winOdds} odds` : ''}
+                    {streckPct} %{horse.winOdds ? ` · ${horse.winOdds} odds` : ''}
                   </div>
                 </div>
               </div>
@@ -259,10 +279,10 @@ export const BongLegHorseList: React.FC<BongLegHorseListProps> = ({
                         rank === 'A'
                           ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500'
                           : rank === 'B'
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-500'
-                          : rank === 'C'
-                          ? 'bg-amber-600 hover:bg-amber-700 text-white border-amber-500'
-                          : 'bg-slate-700 hover:bg-slate-800 text-white border-slate-600'
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-500'
+                            : rank === 'C'
+                              ? 'bg-amber-600 hover:bg-amber-700 text-white border-amber-500'
+                              : 'bg-slate-700 hover:bg-slate-800 text-white border-slate-600'
                       }`}
                       title="Klicka för att ändra bokstav (A, B, C, D)"
                       aria-label={`Bokstav ${rank}. Klicka för att ändra`}

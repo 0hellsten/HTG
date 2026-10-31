@@ -1,4 +1,4 @@
-export type BongGameType = 'V75' | 'V86';
+export type BongGameType = 'V75' | 'V86' | 'V85' | 'GS75' | 'V64' | 'V65' | string;
 
 export type HorseRank = 'A' | 'B' | 'C' | 'D' | 'Unranked';
 

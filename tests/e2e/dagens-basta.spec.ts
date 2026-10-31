@@ -62,10 +62,7 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
     for (const word of FORBIDDEN_WORDS) {
       const regex = new RegExp(`\\b${word}\\b`, 'i');
       const found = regex.test(visibleText);
-      expect(
-        found,
-        `Förbjudet ord "${word}" hittades i synlig text på startfliken!`
-      ).toBe(false);
+      expect(found, `Förbjudet ord "${word}" hittades i synlig text på startfliken!`).toBe(false);
     }
   });
 
@@ -109,29 +106,35 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
     await expect(page.locator('h1')).toContainText(/kommande omgång/i);
   });
 
-  test('verifierar att Bong-loggan syns i mobilmenyn och på Bong-sidan', async ({ page }) => {
+  test('verifierar att Bong-maskinen inte har någon logga i header eller meny, utan bara på kupongknappen', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    // 1. Bong-ikon i bottenmenyn
+    // 1. Bong-knapp i bottenmenyn (ren ikon, ingen logga-bild)
     const bongNavBtn = page.locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Bongen")');
     await expect(bongNavBtn).toBeVisible();
-    const bongNavImg = bongNavBtn.locator('img[alt="Bong-maskinen"]');
-    await expect(bongNavImg).toBeVisible();
+    await expect(bongNavBtn.locator('img')).toHaveCount(0);
 
-    // 2. Klicka på Bongen och verifiera Bong-loggan i sidhuvudet
+    // 2. Klicka på Bongen och verifiera att Bongmaskinens sidhuvud INTE har någon logga
     await bongNavBtn.click();
     await page.waitForTimeout(300);
-    const bongHeaderImg = page.locator('main img[alt="Bong-maskinen"]:visible').first();
-    await expect(bongHeaderImg).toBeVisible();
+    const headerTitle = page.locator('h1:has-text("Bong-maskinen")');
+    await expect(headerTitle).toBeVisible();
+    await expect(headerTitle.locator('img')).toHaveCount(0);
 
-    // 3. Verifiera den flytande kupongknappen med Bong-logga
-    const flytandeBongKnapp = page.locator('button[data-testid="bong-kupong-flytande-knapp"] img[alt="Bong"]:visible');
+    // 3. Verifiera den flytande kupongknappen med Bong-logga (bong loggan är bara för kupongen)
+    const flytandeBongKnapp = page.locator(
+      'button[data-testid="bong-kupong-flytande-knapp"] img[alt="Bong"]:visible'
+    );
     await expect(flytandeBongKnapp).toBeVisible();
   });
 
-  test('verifierar att infosidor (t.ex. Om appen och Källor) öppnas som stängbara popouter', async ({ page }) => {
+  test('verifierar att infosidor (t.ex. Om appen och Källor) öppnas som stängbara popouter', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
@@ -170,7 +173,9 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
     await menuBtn.click();
     await page.waitForTimeout(300);
 
-    const janneBoyLink = page.locator('nav[aria-label="Mobil sidonavigering"] button:has-text("Janne Boy")');
+    const janneBoyLink = page.locator(
+      'nav[aria-label="Mobil sidonavigering"] button:has-text("Janne Boy")'
+    );
     await expect(janneBoyLink).toBeVisible();
     await janneBoyLink.click();
     await page.waitForTimeout(500);
@@ -191,8 +196,10 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
     await page.waitForTimeout(300);
     await expect(kupongModal).not.toBeVisible();
 
-    // 4. Verifiera "Visa ifylld bong"-knappen i systemöversikten
-    const visaBongBtn = page.locator('button:has-text("Visa ifylld bong")');
+    // 4. Verifiera "Visa min bong"-knappen i systemöversikten
+    const visaBongBtn = page.locator(
+      'button:has-text("Visa min bong"), button:has-text("Visa ifylld bong")'
+    );
     await expect(visaBongBtn).toBeVisible();
 
     // 5. Verifiera att hästar i Janne Boy är klickbara och öppnar hästpopout
@@ -218,6 +225,6 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
     await page.waitForTimeout(500);
 
     // Verifiera att vi hamnar i Bong-maskinen
-    await expect(page.locator('main img[alt="Bong-maskinen"]:visible').first()).toBeVisible();
+    await expect(page.locator('h1:has-text("Bong-maskinen")')).toBeVisible();
   });
 });

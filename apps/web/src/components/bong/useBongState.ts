@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   BongEngine,
   BongGameType,
@@ -51,6 +51,9 @@ export function useBongState(
   const [copied, setCopied] = useState<boolean>(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
+  const userSelectedRef = useRef(false);
+  const lastRequestIdRef = useRef(0);
+
   useEffect(() => {
     let isSubscribed = true;
 
@@ -76,13 +79,15 @@ export function useBongState(
           : getDefaultUpcomingCompetitions();
 
       setCompetitions(formatted);
-      const match = initialGameType
-        ? formatted.find((c) => c.gameType === initialGameType) || formatted[0]
-        : formatted[0];
-      if (match) {
-        setSelectedCompId(match.id);
-        setGameType(match.gameType);
-        loadGame(match.id, match.gameType);
+      if (!userSelectedRef.current) {
+        const match = initialGameType
+          ? formatted.find((c) => c.gameType === initialGameType) || formatted[0]
+          : formatted[0];
+        if (match) {
+          setSelectedCompId(match.id);
+          setGameType(match.gameType);
+          loadGame(match.id, match.gameType);
+        }
       }
     }
 
@@ -117,7 +122,10 @@ export function useBongState(
   }, [initialGameType]);
 
   async function loadGame(gameId: string, gType: BongGameType) {
+    const reqId = ++lastRequestIdRef.current;
     const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
+    if (reqId !== lastRequestIdRef.current) return;
+
     if (res.data) {
       setRaceDay(res.data);
       setStatus(res.status);
@@ -144,6 +152,7 @@ export function useBongState(
   }
 
   const handleSelectCompetition = (comp: BongCompetition) => {
+    userSelectedRef.current = true;
     setSelectedCompId(comp.id);
     setGameType(comp.gameType);
     setActiveLegIndex(0);
@@ -265,13 +274,50 @@ export function useBongState(
   };
 
   return {
-    competitions, selectedDateIso: selectedCompId, gameType, activeLegIndex, setActiveLegIndex,
-    raceDay, status, fetchedAt, selectedHorses, ranks, onlyTopPool, flerbongMultiplier,
-    sharesCount, showFilters, setShowFilters, minA, setMinA, maxA, setMaxA, maxC, setMaxC,
-    maxD, setMaxD, minStrecksumma, setMinStrecksumma, maxStrecksumma, setMaxStrecksumma,
-    minPayout, setMinPayout, copied, saveMessage, calculationResult, handleSelectCompetition,
-    handleToggleHorse, handleSetRank, handleClearLeg, handleResetCoupon, handleApplyPreset,
-    handleCopyRows, handleDownloadFile, handleSaveBong, setOnlyTopPool, setFlerbongMultiplier,
+    competitions,
+    selectedDateIso: raceDay.date || selectedCompId,
+    selectedCompetitionId: selectedCompId,
+    gameType,
+    activeLegIndex,
+    setActiveLegIndex,
+    raceDay,
+    status,
+    fetchedAt,
+    selectedHorses,
+    ranks,
+    onlyTopPool,
+    flerbongMultiplier,
+    sharesCount,
+    showFilters,
+    setShowFilters,
+    minA,
+    setMinA,
+    maxA,
+    setMaxA,
+    maxC,
+    setMaxC,
+    maxD,
+    setMaxD,
+    minStrecksumma,
+    setMinStrecksumma,
+    maxStrecksumma,
+    setMaxStrecksumma,
+    minPayout,
+    setMinPayout,
+    copied,
+    saveMessage,
+    calculationResult,
+    handleSelectCompetition,
+    handleToggleHorse,
+    handleSetRank,
+    handleClearLeg,
+    handleResetCoupon,
+    handleApplyPreset,
+    handleCopyRows,
+    handleDownloadFile,
+    handleSaveBong,
+    setOnlyTopPool,
+    setFlerbongMultiplier,
     setSharesCount,
   };
 }

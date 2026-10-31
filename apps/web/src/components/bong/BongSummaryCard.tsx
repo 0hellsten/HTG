@@ -118,16 +118,20 @@ export const BongSummaryCard: React.FC<BongSummaryCardProps> = ({
           </div>
           <ul className="space-y-1.5 list-disc pl-4 text-slate-300">
             <li>
-              <strong>Välj hästar:</strong> Tryck på flikarna (Avd 1, Avd 2 osv.) och kryssa för de hästar du tror på i varje lopp.
+              <strong>Välj hästar:</strong> Tryck på flikarna (Avd 1, Avd 2 osv.) och kryssa för de
+              hästar du tror på i varje lopp.
             </li>
             <li>
-              <strong>Snabbkupong:</strong> Vill du slippa välja själv trycker du bara på en av knapparna ovanför (t.ex. <em>"Lagom (~100 kr)"</em>) så fylls kupongen i automatiskt.
+              <strong>Snabbkupong:</strong> Vill du slippa välja själv trycker du bara på en av
+              knapparna ovanför (t.ex. <em>"Lagom (~100 kr)"</em>) så fylls kupongen i automatiskt.
             </li>
             <li>
-              <strong>Kupongpris:</strong> Priset räknas om direkt när du lägger till eller tar bort hästar.
+              <strong>Kupongpris:</strong> Priset räknas om direkt när du lägger till eller tar bort
+              hästar.
             </li>
             <li>
-              <strong>Bong-knappen:</strong> Tryck på den runda Bong-ikonen längst ned till höger när du vill se hela den ifyllda bongen.
+              <strong>Bong-knappen:</strong> Tryck på den runda Bong-ikonen längst ned till höger
+              när du vill se hela den ifyllda bongen.
             </li>
           </ul>
         </div>

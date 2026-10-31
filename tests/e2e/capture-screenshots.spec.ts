@@ -74,7 +74,9 @@ test.describe('Verifierande skärmdumpar för ny startflik och logga', () => {
     const menuBtn = page.locator('header button[aria-label="Öppna sidomeny"]');
     await menuBtn.click();
     await page.waitForTimeout(300);
-    const janneBoyLink = page.locator('nav[aria-label="Mobil sidonavigering"] button:has-text("Janne Boy")');
+    const janneBoyLink = page.locator(
+      'nav[aria-label="Mobil sidonavigering"] button:has-text("Janne Boy")'
+    );
     await janneBoyLink.click();
     await page.waitForTimeout(400);
     await page.screenshot({

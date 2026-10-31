@@ -8,6 +8,7 @@ interface BongOmgangHeaderProps {
   raceDay: BongRaceDayData;
   competitions: BongCompetition[];
   selectedDateIso: string;
+  selectedCompetitionId?: string;
   onSelectCompetition: (comp: BongCompetition) => void;
 }
 
@@ -15,30 +16,22 @@ export const BongOmgangHeader: React.FC<BongOmgangHeaderProps> = ({
   raceDay,
   competitions,
   selectedDateIso,
+  selectedCompetitionId,
   onSelectCompetition,
 }) => {
   return (
     <div className="space-y-4 border-b border-slate-200 pb-5">
-      {}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <div className="flex items-center gap-3">
-            <img
-              src={`${import.meta.env.BASE_URL ?? './'}bong.png`}
-              alt="Bong-maskinen"
-              className="h-11 w-11 sm:h-12 sm:w-12 object-contain drop-shadow-md select-none shrink-0"
-            />
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
-              Bong-maskinen
-            </h1>
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
+            Bong-maskinen
+          </h1>
           <p className="text-slate-600 text-sm sm:text-base mt-1">
-            Professionell systemkalkylator, reduceringsmotor och radkalkyl för travet.
+            Systemkalkylator, reduceringsmotor och radkalkyl för travet.
           </p>
         </div>
       </div>
 
-      {}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs font-semibold text-slate-600 px-1">
           <span>Kommande tävlingar (dra för att se längre fram)</span>
@@ -48,6 +41,7 @@ export const BongOmgangHeader: React.FC<BongOmgangHeaderProps> = ({
         <BongDateSelector
           competitions={competitions}
           selectedDateIso={selectedDateIso}
+          selectedCompetitionId={selectedCompetitionId}
           onSelectCompetition={onSelectCompetition}
         />
       </div>

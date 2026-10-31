@@ -1,5 +1,17 @@
 import React from 'react';
-import { ArrowLeft, BookOpen, Calendar, Calculator, Search, Award, Star, Compass, Activity, Download, Trophy } from 'lucide-react';
+import {
+  ArrowLeft,
+  BookOpen,
+  Calendar,
+  Calculator,
+  Search,
+  Award,
+  Star,
+  Compass,
+  Activity,
+  Download,
+  Trophy,
+} from 'lucide-react';
 import { JanneBoyIcon } from '../components/janne-boy/JanneBoyIcon';
 
 interface OmAppenScreenProps {
@@ -8,11 +20,7 @@ interface OmAppenScreenProps {
   canInstall?: boolean;
 }
 
-export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({
-  onBack,
-  onInstall,
-  canInstall,
-}) => {
+export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({ onBack, onInstall, canInstall }) => {
   const pagesGuide = [
     {
       title: 'Idag',
@@ -115,7 +123,8 @@ export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({
               <span>Ladda ned Android-app (.apk)</span>
             </h2>
             <p className="text-sm text-slate-300 mt-1">
-              Färdig installationsfil för Android-telefoner. Kan skickas eller laddas ned direkt till telefonen.
+              Färdig installationsfil för Android-telefoner. Kan skickas eller laddas ned direkt
+              till telefonen.
             </p>
           </div>
           <a
@@ -128,7 +137,8 @@ export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({
           </a>
         </div>
         <p className="text-xs text-slate-400 border-t border-slate-800 pt-3">
-          Öppna filen på Android-telefonen och tryck på "Installera" för att få Tangitza direkt bland dina appar.
+          Öppna filen på Android-telefonen och tryck på "Installera" för att få Tangitza direkt
+          bland dina appar.
         </p>
       </div>
 
@@ -191,8 +201,8 @@ export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({
       <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-2 text-slate-700 text-sm sm:text-base leading-relaxed">
         <h3 className="font-bold text-slate-950 text-base">En liten sammanfattning</h3>
         <p>
-          Du kan klicka runt precis hur du vill utan att vara rädd att något ändras eller försvinner.
-          Vill du börja om trycker du bara på <strong>Idag</strong> längst ner.
+          Du kan klicka runt precis hur du vill utan att vara rädd att något ändras eller
+          försvinner. Vill du börja om trycker du bara på <strong>Idag</strong> längst ner.
         </p>
       </div>
 

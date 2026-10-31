@@ -149,13 +149,7 @@ describe('DagensBastaEngine', () => {
   it('genererar konkreta travmotiveringar utan engelska eller tekniska ord', () => {
     const leg = mockRaceDay.races[0];
     const horse = leg.horses[0];
-    const { reasons, summary } = generateHorseReasons(
-      horse,
-      leg,
-      'basta_chansen',
-      0.45,
-      1.1
-    );
+    const { reasons, summary } = generateHorseReasons(horse, leg, 'basta_chansen', 0.45, 1.1);
 
     expect(reasons.length).toBeGreaterThanOrEqual(4);
     expect(summary).toBeTruthy();
@@ -177,13 +171,7 @@ describe('DagensBastaEngine', () => {
   it('känner igen voltstart och springspår korrekt', () => {
     const legVolt = mockRaceDay.races[1];
     const horseVolt = legVolt.horses[0];
-    const { reasons } = generateHorseReasons(
-      horseVolt,
-      legVolt,
-      'basta_chansen',
-      0.35,
-      1.0
-    );
+    const { reasons } = generateHorseReasons(horseVolt, legVolt, 'basta_chansen', 0.35, 1.0);
 
     const lageReason = reasons.find((r) => r.category === 'lage');
     expect(lageReason).toBeDefined();

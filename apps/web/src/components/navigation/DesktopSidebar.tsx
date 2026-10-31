@@ -1,7 +1,6 @@
 import React from 'react';
 import { Tab, NAV_ITEMS } from './navItems';
 import { JanneBoyIcon } from '../janne-boy/JanneBoyIcon';
-import { BongIcon } from '../bong/BongIcon';
 
 interface DesktopSidebarProps {
   activeTab: Tab;
@@ -29,7 +28,6 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           const isJanne = item.id === 'janneboy';
-          const isBong = item.id === 'bong';
 
           return (
             <button
@@ -43,8 +41,6 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
             >
               {isJanne ? (
                 <JanneBoyIcon className="w-5 h-5 object-contain shrink-0" />
-              ) : isBong ? (
-                <BongIcon className="w-5 h-5 object-contain shrink-0" />
               ) : (
                 <Icon className="w-5 h-5 shrink-0" />
               )}

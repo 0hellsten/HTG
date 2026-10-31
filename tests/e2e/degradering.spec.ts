@@ -21,11 +21,14 @@ test.describe('Krav: Tålighet och degradering med avstängda källor', () => {
     await expect(trackCard).toBeVisible();
 
     // 3. Öppna första loppet
-    const firstRaceButton = page.locator('button:has-text("Lopp 1"):visible').first();
-    if (await firstRaceButton.isVisible()) {
-      await firstRaceButton.click();
+    const openRaceBtn = page.locator('button:has-text("Se alla loppets hästar")').first();
+    if (await openRaceBtn.isVisible()) {
+      await openRaceBtn.click();
     } else {
-      await trackCard.click();
+      const allaKnapp = page.locator('button:has-text("Alla lopp & banor")');
+      if (await allaKnapp.isVisible()) await allaKnapp.click();
+      const raceBtn = page.locator('button:has-text("Lopp 1"):visible').first();
+      await raceBtn.click();
     }
 
     // Verifiera att loppkortet visas trots att oddsen är nere

@@ -24,6 +24,7 @@ export const BongScreen: React.FC<BongScreenProps> = ({
   const {
     competitions,
     selectedDateIso,
+    selectedCompetitionId,
     gameType,
     activeLegIndex,
     setActiveLegIndex,
@@ -81,6 +82,7 @@ export const BongScreen: React.FC<BongScreenProps> = ({
         raceDay={raceDay}
         competitions={competitions}
         selectedDateIso={selectedDateIso}
+        selectedCompetitionId={selectedCompetitionId}
         onSelectCompetition={handleSelectCompetition}
       />
 
