@@ -19,7 +19,7 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
         <img
           src={`${import.meta.env.BASE_URL ?? './'}logo.png`}
           alt="Tangitza"
-          className="h-12 w-auto max-w-[180px] object-contain rounded-lg drop-shadow-md"
+          className="h-16 w-auto max-w-[200px] object-contain rounded-lg drop-shadow-md"
         />
       </div>
 

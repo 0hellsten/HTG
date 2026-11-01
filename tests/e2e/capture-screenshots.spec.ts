@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import path from 'path';
 
 const ARTIFACTS_DIR =
-  'C:/Users/hells/.gemini/antigravity/brain/2cc29c58-6aea-4590-a26f-8057872053f1';
+  'C:/Users/hells/.gemini/antigravity/brain/d8fa7c56-09d5-4d25-aa11-0dbb691cf9d8';
 
 test.describe('Verifierande skärmdumpar för ny startflik och logga', () => {
   test('Laptop (1440x900)', async ({ page }) => {
