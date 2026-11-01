@@ -20,15 +20,18 @@ test.describe('Krav: Tålighet och degradering med avstängda källor', () => {
     const trackCard = page.locator('button:has-text("lopp"):visible').first();
     await expect(trackCard).toBeVisible();
 
-    // 3. Öppna första loppet
-    const openRaceBtn = page.locator('button:has-text("Se alla loppets hästar")').first();
-    if (await openRaceBtn.isVisible()) {
-      await openRaceBtn.click();
+    // 3. Öppna första loppet (navigera till LoppScreen)
+    const openDirectBtn = page.locator('button:has-text("Se alla loppets hästar och full startlista")').first();
+    if (await openDirectBtn.isVisible().catch(() => false)) {
+      await openDirectBtn.click();
     } else {
-      const allaKnapp = page.locator('button:has-text("Alla lopp & banor")');
-      if (await allaKnapp.isVisible()) await allaKnapp.click();
-      const raceBtn = page.locator('button:has-text("Lopp 1"):visible').first();
-      await raceBtn.click();
+      const loppForLopp = page.locator('button:has-text("Lopp för lopp")').first();
+      if (await loppForLopp.isVisible().catch(() => false)) {
+        await loppForLopp.click();
+      }
+      const race1 = page.locator('button:has-text("Lopp 1 ·")').first();
+      await race1.waitFor({ state: 'visible', timeout: 5000 });
+      await race1.click();
     }
 
     // Verifiera att loppkortet visas trots att oddsen är nere

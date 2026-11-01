@@ -82,5 +82,13 @@ test.describe('Verifierande skärmdumpar för ny startflik och logga', () => {
     await page.screenshot({
       path: path.join(ARTIFACTS_DIR, 'janne-boy-bong-knapp-mobil.png'),
     });
+
+    // 7. Öppna ifylld bong-kupong och visa ATG-inlämningsknappar
+    const flytandeBongKnapp = page.locator('button[data-testid="bong-kupong-flytande-knapp"]');
+    await flytandeBongKnapp.click();
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: path.join(ARTIFACTS_DIR, 'bong-inlamning-atg-mobil.png'),
+    });
   });
 });

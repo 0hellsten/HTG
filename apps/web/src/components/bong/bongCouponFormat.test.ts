@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { formatBongLegHorses, buildBongCouponViewModel } from './bongCouponFormat';
+import {
+  formatBongLegHorses,
+  buildBongCouponViewModel,
+  formatBongCouponShareText,
+  getAtgSpelUrl,
+  buildAtgXmlFile,
+} from './bongCouponFormat';
 import { BongHorseInput, BongRaceDayData } from '@stallbacken/shared';
 
 describe('bongCouponFormat', () => {
@@ -76,5 +82,55 @@ describe('bongCouponFormat', () => {
     expect(model.couponSrc).toBe('./v86.jpg');
     expect(model.rows.length).toBe(8);
     expect(model.rows[7].text).toBe('1,10');
+  });
+
+  it('formaterar delbar kupongtext på ren svenska', () => {
+    const raceDay: BongRaceDayData = {
+      gameType: 'V75',
+      turnover: 10000000,
+      trackName: 'Solvalla',
+      date: '2026-10-31',
+      races: Array.from({ length: 7 }, (_, i) => ({
+        legIndex: i,
+        startTime: '16:20',
+        horses: mockHorses,
+      })),
+    };
+    const model = buildBongCouponViewModel(raceDay, { 0: ['h1', 'h2'], 1: ['h5'] }, 'V75', 100);
+    const text = formatBongCouponShareText(model);
+
+    expect(text).toContain('Tangitza · V75 Solvalla');
+    expect(text).toContain('Kostnad: 100 kr');
+    expect(text).toContain('Avd 1: 1,2');
+    expect(text).toContain('Avd 2: 5');
+    expect(text).toContain('Avd 3: –');
+  });
+
+  it('genererar korrekt direktlänk till ATG för respektive spelform', () => {
+    expect(getAtgSpelUrl('V75')).toBe('https://www.atg.se/spel/V75');
+    expect(getAtgSpelUrl('v86')).toBe('https://www.atg.se/spel/V86');
+  });
+
+  it('skapar ATG XML-fil med marks-sträng för filinlämning', () => {
+    const raceDay: BongRaceDayData = {
+      gameType: 'V75',
+      turnover: 10000000,
+      trackName: 'Solvalla',
+      date: '2026-10-31',
+      races: Array.from({ length: 7 }, (_, i) => ({
+        legIndex: i,
+        startTime: '16:20',
+        horses: mockHorses,
+      })),
+    };
+    const model = buildBongCouponViewModel(raceDay, { 0: ['h1', 'h5'] }, 'V75', 50);
+    const xml = buildAtgXmlFile(model, '2026-10-31');
+
+    expect(xml).toContain('<v75Coupon');
+    expect(xml).toContain('date="2026-10-31"');
+    // Avd 1 har häst 1 och 5 -> 100010000000000
+    expect(xml).toContain('<leg marks="100010000000000" legno="1"/>');
+    // Avd 2 har inga valda -> 15 nollor
+    expect(xml).toContain('<leg marks="000000000000000" legno="2"/>');
   });
 });

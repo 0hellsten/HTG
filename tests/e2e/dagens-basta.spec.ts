@@ -190,6 +190,14 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
     const kupongModal = page.locator('div[aria-label="Ifylld bong-kupong"]');
     await expect(kupongModal).toBeVisible();
 
+    // Verifiera att "Öppna kupongen hos ATG", "Kopiera rader" och "Spara fil (ATG)" finns
+    const atgBtn = kupongModal.locator('button:has-text("Öppna kupongen hos ATG")');
+    await expect(atgBtn).toBeVisible();
+    const copyBtn = kupongModal.locator('button:has-text("Kopiera rader")');
+    await expect(copyBtn).toBeVisible();
+    const saveFileBtn = kupongModal.locator('button:has-text("Spara fil (ATG)")');
+    await expect(saveFileBtn).toBeVisible();
+
     // Stäng kupong-modalen
     const stangKupongBtn = kupongModal.locator('button[aria-label="Stäng kupong"]').first();
     await stangKupongBtn.click();
@@ -224,5 +232,16 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
 
     // Verifiera att vi hamnar i Bong-maskinen
     await expect(page.locator('h1:has-text("Bong-maskinen")')).toBeVisible();
+  });
+
+  test('verifierar blocket för sena ändringar och strykningar på startsidan', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(500);
+
+    // Blocket för Sena ändringar syns för dagens omgång
+    const senaAndringarBlock = page.locator('text=/Sena ändringar|Inga sena ändringar/i').first();
+    await expect(senaAndringarBlock).toBeVisible();
   });
 });

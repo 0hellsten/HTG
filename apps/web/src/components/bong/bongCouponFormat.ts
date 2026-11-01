@@ -74,3 +74,62 @@ export function buildBongCouponViewModel(
     rows,
   };
 }
+
+/**
+ * Formaterar kupongen som en prydlig text sammanställning lämplig att kopiera eller skicka via SMS.
+ */
+export function formatBongCouponShareText(model: BongCouponViewModel): string {
+  const lines: string[] = [
+    `Tangitza · ${model.gameType} ${model.trackName}`.trim(),
+    `${model.dateStr ? model.dateStr + ' · ' : ''}Kostnad: ${model.costSekStr}`,
+    '',
+  ];
+
+  for (const row of model.rows) {
+    lines.push(`Avd ${row.legNumber}: ${row.text || '–'}`);
+  }
+
+  return lines.join('\n');
+}
+
+/**
+ * Returnerar den officiella direktlänken till ATG för spelformen.
+ */
+export function getAtgSpelUrl(gameType: BongGameType | string): string {
+  return `https://www.atg.se/spel/${gameType.toUpperCase()}`;
+}
+
+/**
+ * Bygger en XML-fil enligt ATG:s officiella filinlämningsformat (ATG File Betting XSD ver 1.8).
+ */
+export function buildAtgXmlFile(model: BongCouponViewModel, raceDate?: string): string {
+  const tagName = `${model.gameType.toLowerCase()}Coupon`;
+  const dateFormatted = raceDate ? raceDate.slice(0, 10) : new Date().toISOString().slice(0, 10);
+
+  const legsXml = model.rows
+    .map((row) => {
+      const numbers = row.text
+        ? row.text
+            .split(',')
+            .map((s) => parseInt(s.trim(), 10))
+            .filter((n) => Number.isInteger(n) && n >= 1 && n <= 15)
+        : [];
+      let marks = '';
+      for (let pos = 1; pos <= 15; pos++) {
+        marks += numbers.includes(pos) ? '1' : '0';
+      }
+      return `      <leg marks="${marks}" legno="${row.legNumber}"/>`;
+    })
+    .join('\n');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<issuer schemaversion="ATG File Betting XSD ver 1.8" version="1.0" product="Tangitza" company="Tangitza">
+  <betcoupons>
+    <${tagName} betmultiplier="1" date="${dateFormatted}" couponid="1">
+${legsXml}
+    </${tagName}>
+  </betcoupons>
+</issuer>
+`;
+}
+

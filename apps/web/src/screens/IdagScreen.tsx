@@ -16,6 +16,7 @@ import { IdagSkelett } from '../components/SkelettKort';
 import { HastsKoIkon } from '../components/HastsKoIkon';
 import { DagensBastaOmgangBanner } from '../components/dagens-basta/DagensBastaOmgangBanner';
 import { DagensBastaLoppKort } from '../components/dagens-basta/DagensBastaLoppKort';
+import { SenaAndringarBlock } from '../components/SenaAndringarBlock';
 import {
   BongCompetition,
   formatCompetitionFromApi,
@@ -326,6 +327,13 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
         </div>
       ) : (
         <>
+          {/* Sena ändringar för dagens omgång (strykningar, sko- och vagnändringar) */}
+          {selectedOffset === 0 && raceDayData && (
+            <BlockErrorBoundary fallbackTitle="Sena ändringar">
+              <SenaAndringarBlock raceDay={raceDayData} />
+            </BlockErrorBoundary>
+          )}
+
           {/* Omgångens drag: Dagens spik & skräll i toppen */}
           {dagensBastaOmgang ? (
             <BlockErrorBoundary fallbackTitle="Omgångens spik och skräll">
