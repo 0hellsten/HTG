@@ -31,17 +31,20 @@ export const BongDateSelector: React.FC<BongDateSelectorProps> = ({
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!isMouseDown || !scrollRef.current) return;
-    e.preventDefault();
     const x = e.pageX - scrollRef.current.offsetLeft;
     const walk = x - startX;
     scrollRef.current.scrollLeft = scrollStart - walk;
-    if (Math.abs(walk) > 8) {
+    if (Math.abs(walk) > 20) {
       hasDraggedRef.current = true;
     }
   };
 
   const handleMouseUpOrLeave = () => {
     setIsMouseDown(false);
+    // Återställ drag-indikator efter att klick hunnit bearbetas
+    setTimeout(() => {
+      hasDraggedRef.current = false;
+    }, 100);
   };
 
   const scrollBy = (offset: number) => {

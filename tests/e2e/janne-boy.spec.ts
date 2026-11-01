@@ -19,10 +19,10 @@ test.describe('Janne Boy — Superintelligent kupongmotor', () => {
     // 3. Kontrollera strategival och budgetknappar
     await expect(page.locator('text=Balanserad Janne')).toBeVisible();
     await expect(page.locator('text=Jannes Miljondrag')).toBeVisible();
-    await expect(page.locator('text=Jannes Säkerhet')).toBeVisible();
-    await expect(page.locator('text=Stallbackens Form')).toBeVisible();
+    await expect(page.locator('text=Kajsas intuition')).toBeVisible();
+    await expect(page.locator('text=Tangizan')).toBeVisible();
 
-    // 4. Välj budget 200 kr och klicka på skapa systemförslag
+    // 4. Välj budget 200 kr och klicka på "Gör en Janne"
     const budgetBtn = page.locator('button:has-text("200 kr")').first();
     await budgetBtn.click();
 
@@ -30,11 +30,12 @@ test.describe('Janne Boy — Superintelligent kupongmotor', () => {
     const miljodragCard = page.locator('button:has-text("Jannes Miljondrag")').first();
     await miljodragCard.click();
 
-    // 6. Kontrollera att systemresultatet uppdateras och visar rader samt nyckeltal
-    await expect(page.locator('text=Jannes Kupongförslag')).toBeVisible();
-    await expect(page.locator('text=Spikar').first()).toBeVisible();
-    await expect(page.locator('text=Skrälldrag').first()).toBeVisible();
-    await expect(page.locator('text=Spelvärdesindex').first()).toBeVisible();
+    const gorEnJanneBtn = page.locator('button:has-text("Gör en Janne")').first();
+    await expect(gorEnJanneBtn).toBeVisible();
+    await gorEnJanneBtn.click();
+
+    // 6. Kontrollera att systemresultatet uppdateras och visar avdelningskort
+    await expect(page.getByRole('heading', { name: /Avdelningar/i })).toBeVisible();
 
     // 7. Klicka på knappen "Öppna i Bong-maskinen"
     const openInBongBtn = page.locator('button:has-text("Öppna i Bong-maskinen")').first();

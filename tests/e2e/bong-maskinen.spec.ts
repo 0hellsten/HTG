@@ -43,6 +43,7 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
 
     // 4. Växla till en V86-omgång i datumväljaren
     const v86Btn = page.locator('button:has-text("V86")').first();
+    await v86Btn.scrollIntoViewIfNeeded();
     await expect(v86Btn).toBeVisible();
     await v86Btn.click();
 

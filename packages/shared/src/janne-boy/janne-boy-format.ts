@@ -32,9 +32,9 @@ export function createOverallExplanation(
     case 'miljondrag':
       return `Jannes Miljondrag prioriterar matematiskt övervärde! Systemet innehåller ${spikText}${skrallText} för totalt ${costText}.`;
     case 'sakerhet':
-      return `Jannes Säkerhet bygger på stabilitet och hög vinstchans med ${spikText} för ${costText}.`;
+      return `Kajsas intuition bygger på stabilitet och hög vinstchans med ${spikText} för ${costText}.`;
     case 'form':
-      return `Stallbackens Form lyfter fram heta ekipage med dagsform och barfotafördel: ${spikText}${skrallText} för ${costText}.`;
+      return `Tangizan lyfter fram heta ekipage med dagsform och barfotafördel: ${spikText}${skrallText} för ${costText}.`;
     case 'balanserad':
     default:
       return `Balanserat systemförslag med ${spikText}${skrallText} för totalt ${costText}.`;

@@ -132,17 +132,8 @@ export function useBongState(
       setFetchedAt(res.fetchedAt);
 
       if (!initialSelectedHorses) {
-        const newSel: Record<number, string[]> = {};
-        const newRanks: Record<string, HorseRank> = {};
-        res.data.races.forEach((r, idx) => {
-          const h1 = r.horses[0]?.id;
-          const h2 = r.horses[1]?.id;
-          newSel[idx] = [h1, h2].filter(Boolean) as string[];
-          if (h1) newRanks[h1] = 'A';
-          if (h2) newRanks[h2] = 'B';
-        });
-        setSelectedHorses(newSel);
-        setRanks(newRanks);
+        setSelectedHorses({});
+        setRanks({});
       }
     } else {
       setRaceDay(buildFallbackBongRaceDay(gType));

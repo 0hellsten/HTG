@@ -30,20 +30,20 @@ export const JanneBoyControls: React.FC<JanneBoyControlsProps> = ({
 }) => {
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold whitespace-nowrap shrink-0">
             <span className="font-black text-amber-400 text-sm">{gameType}</span>
             <span className="text-slate-400">·</span>
-            <span>{racesCount} lopp</span>
+            <span className="whitespace-nowrap font-bold text-slate-100">{racesCount}&nbsp;lopp</span>
             {trackName && (
               <>
                 <span className="text-slate-400">·</span>
-                <span>{trackName}</span>
+                <span className="truncate max-w-[150px] sm:max-w-none">{trackName}</span>
               </>
             )}
           </span>
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap ml-0.5">
             Välj kupongstorlek:
           </span>
         </div>
@@ -117,12 +117,12 @@ export const JanneBoyControls: React.FC<JanneBoyControlsProps> = ({
         {isCalculating ? (
           <>
             <RefreshCw className="w-4 h-4 animate-spin" />
-            <span>Janne tar fram nytt tips...</span>
+            <span>Gör en Janne...</span>
           </>
         ) : (
           <>
             <JanneBoyIcon className="w-5 h-5" />
-            <span>Ta fram nytt kupongtips ({budget} kr)</span>
+            <span>Gör en Janne ({budget} kr)</span>
             <Sparkles className="w-4 h-4 text-slate-950" />
           </>
         )}

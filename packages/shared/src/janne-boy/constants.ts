@@ -17,14 +17,14 @@ export const JANNE_BOY_STRATEGIES: JanneBoyStrategyInfo[] = [
   },
   {
     id: 'sakerhet',
-    label: 'Jannes Säkerhet',
+    label: 'Kajsas intuition',
     tagline: 'Trygg kupong med hög vinstchans',
     description:
       'Bygger på omgångens stabilaste hästar och etablerade toppkuskar för maximal chans till full pott.',
   },
   {
     id: 'form',
-    label: 'Stallbackens Form',
+    label: 'Tangizan',
     tagline: 'Heta hästar, formkuskar & ändringar',
     description:
       'Prioriterar hästar som tävlar med toppform, intressanta ändringar och kuskar i segerzonen.',

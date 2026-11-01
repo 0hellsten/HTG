@@ -196,11 +196,9 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
     await page.waitForTimeout(300);
     await expect(kupongModal).not.toBeVisible();
 
-    // 4. Verifiera "Visa min bong"-knappen i systemöversikten
-    const visaBongBtn = page.locator(
-      'button:has-text("Visa min bong"), button:has-text("Visa ifylld bong")'
-    );
-    await expect(visaBongBtn).toBeVisible();
+    // 4. Verifiera "Öppna i Bong-maskinen"-knappen i systemöversikten
+    const oppnaBongBtn = page.locator('button:has-text("Öppna i Bong-maskinen")').first();
+    await expect(oppnaBongBtn).toBeVisible();
 
     // 5. Verifiera att hästar i Janne Boy är klickbara och öppnar hästpopout
     const horseBtn = page.locator('div.min-w-0 button[type="button"]:has(span)').first();

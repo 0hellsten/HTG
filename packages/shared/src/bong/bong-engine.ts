@@ -99,7 +99,7 @@ export class BongEngine {
 
     return {
       gameType: config.gameType,
-      legsCount: config.legsCount,
+      legsCount: actualLegsCount,
       mathRows,
       reducedRows: reducedCount,
       reductionPercentage,
@@ -132,9 +132,9 @@ export class BongEngine {
     vMultiplier: number;
   }): void {
     const { legIndex, legs, currentRow, rankCounts, groupHits, reducedRows } = ctx;
-    const config = this.config;
+    const totalLegs = legs.length;
 
-    if (legIndex === config.legsCount) {
+    if (legIndex === totalLegs) {
       if (!this.passesAbcdFilters(rankCounts, ctx.abcdConditions)) return;
       if (!this.passesKravgrupper(groupHits, ctx.activeKravgrupper)) return;
       if (ctx.streckFilter) {
@@ -183,6 +183,7 @@ export class BongEngine {
     }
 
     const currentLegCandidates = legs[legIndex];
+    if (!currentLegCandidates) return;
     for (let i = 0; i < currentLegCandidates.length; i++) {
       const candidate = currentLegCandidates[i];
 
