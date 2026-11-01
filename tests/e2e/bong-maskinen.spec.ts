@@ -14,24 +14,18 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
     await expect(bongTab).toBeVisible();
     await bongTab.click();
 
-    // 2. Verifiera rubrik och grundläggande element
+    // 2. Verifiera rubrik och grundläggande element (Snabbkupong ska vara borttagen)
     await expect(page.locator('h1')).toContainText('Bong-maskinen');
-    await expect(page.locator('text=Snabbkupong:')).toBeVisible();
-    await expect(page.locator('button:has-text("Liten (~50 kr)")')).toBeVisible();
-    await expect(page.locator('button:has-text("Lagom (~100 kr)")')).toBeVisible();
-    await expect(page.locator('button:has-text("Större (~200 kr)")')).toBeVisible();
-    await expect(page.locator('button:has-text("Favoritrad (1 häst/lopp)")')).toBeVisible();
+    await expect(page.locator('text=Snabbkupong:')).not.toBeVisible();
+    await expect(page.locator('button:has-text("Rensa")').first()).toBeVisible();
 
     // Testa hjälp-ruta
-    const helpBtn = page.locator('button:has-text("Hur gör jag?")');
+    const helpBtn = page.locator('button:has-text("Hur gör jag?")').first();
     await expect(helpBtn).toBeVisible();
     await helpBtn.click();
     await expect(page.locator('text=Så här fungerar Bong-maskinen:')).toBeVisible();
-
-    // Testa snabbkupongsval
-    await page.locator('button:has-text("Favoritrad (1 häst/lopp)")').click();
-    await expect(page.locator('text=1 rader')).toBeVisible();
-    await page.locator('button:has-text("Lagom (~100 kr)")').click();
+    await expect(page.locator('text=Välj hästar:')).toBeVisible();
+    await expect(page.locator('text=Snabbkupong:')).not.toBeVisible();
 
     // 3. Verifiera dragbar datumväljare med kommande tävlingar
     await expect(page.locator('text=Kommande tävlingar')).toBeVisible();
@@ -59,10 +53,15 @@ test.describe('Bong-maskinen — Systemkalkylator, tävlingsväljare och reducer
     await v75Btn.click();
     await expect(page.locator('text=Avd 7')).toBeVisible();
 
-    // 6. Öppna filter och justera ABCD-krav
+    // 6. Öppna filter och justera ABCD-krav samt testa nya "Hur gör jag?" för reducering
     const filterBtn = page.locator('button:has-text("Reduceringsmotor")');
     await filterBtn.click();
     await expect(page.locator('text=ABCD-villkor per enkelrad')).toBeVisible();
+
+    const reduceringHelpBtn = page.locator('button:has-text("Hur fungerar reduceringen?")');
+    await expect(reduceringHelpBtn).toBeVisible();
+    await reduceringHelpBtn.click();
+    await expect(page.locator('text=Bokstäverna på hästarna (ABCD):')).toBeVisible();
 
     // 7. Kontrollera informations-I och öppna hästinfo och analys
     const infoBtn = page.locator('button[title*="Information och analys"]').first();

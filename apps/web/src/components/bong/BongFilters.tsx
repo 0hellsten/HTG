@@ -1,5 +1,5 @@
-import React from 'react';
-import { SlidersHorizontal, ChevronUp, ChevronDown } from 'lucide-react';
+import React, { useState } from 'react';
+import { SlidersHorizontal, ChevronUp, ChevronDown, HelpCircle } from 'lucide-react';
 
 interface BongFiltersProps {
   showFilters: boolean;
@@ -38,6 +38,7 @@ export const BongFilters: React.FC<BongFiltersProps> = ({
   onChangeMinStrecksumma,
   onChangeMaxStrecksumma,
 }) => {
+  const [showHelp, setShowHelp] = useState(false);
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       <button
@@ -67,6 +68,53 @@ export const BongFilters: React.FC<BongFiltersProps> = ({
 
       {showFilters && (
         <div className="p-5 sm:p-6 border-t border-slate-100 bg-slate-50/50 space-y-6">
+          {/* Hur gör jag? - förklaring av reducering */}
+          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setShowHelp((prev) => !prev)}
+              aria-expanded={showHelp}
+              className="w-full p-3.5 sm:p-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2 text-amber-900 font-bold text-xs sm:text-sm">
+                <HelpCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>Hur fungerar reduceringen? (Hur gör jag?)</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
+                <span>{showHelp ? 'Dölj förklaring' : 'Visa förklaring'}</span>
+                {showHelp ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </div>
+            </button>
+
+            {showHelp && (
+              <div className="p-4 border-t border-slate-100 bg-slate-50/80 text-slate-700 text-xs sm:text-sm space-y-3 leading-relaxed">
+                <div>
+                  <h5 className="font-extrabold text-slate-900 mb-1">1. Bokstäverna på hästarna (ABCD):</h5>
+                  <ul className="space-y-1 list-disc pl-4 text-slate-600">
+                    <li><strong className="text-emerald-700">A-hästar:</strong> Dina spikar och loppens bästa vinnarchanser.</li>
+                    <li><strong className="text-sky-700">B-hästar:</strong> Bra kompletterande hästar och starka utmanare.</li>
+                    <li><strong className="text-amber-700">C-hästar:</strong> Skrällar med högt spelvärde som rensar kupongen.</li>
+                    <li><strong className="text-slate-700">D-hästar:</strong> Djupa garderingar eller reserver.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h5 className="font-extrabold text-slate-900 mb-1">2. Sätt dina villkorskrav:</h5>
+                  <p className="text-slate-600">
+                    Här ställer du in hur många hästar av varje bokstav som får vinna på din kupong.
+                    Till exempel: <em>”Minst 2 A-hästar och högst 1 C-häst”</em>.
+                  </p>
+                </div>
+
+                <div>
+                  <h5 className="font-extrabold text-slate-900 mb-1">3. Kupongpriset minskar rejält:</h5>
+                  <p className="text-slate-600">
+                    Maskinen plockar bort alla enkelrader som inte klarar dina villkor. Du behåller alla dina vinnaridéer men slipper betala för osannolika kombinationer.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
           <div>
             <h4 className="text-sm font-bold text-slate-900 mb-3 uppercase tracking-wider">
               ABCD-villkor per enkelrad

@@ -1,16 +1,18 @@
 import React from 'react';
-import { Flag, Clock, Layers, ArrowUpRight } from 'lucide-react';
+import { Flag, Clock, Layers, ArrowUpRight, Calendar } from 'lucide-react';
 import { DagensBastaRace } from '@stallbacken/shared';
 import { DagensBastaHastKort } from './DagensBastaHastKort';
 
 interface DagensBastaLoppKortProps {
   race: DagensBastaRace;
+  dateText?: string;
   onSelectHorse?: (horseId: string) => void;
   onOpenRace?: (raceNumber: number) => void;
 }
 
 export const DagensBastaLoppKort: React.FC<DagensBastaLoppKortProps> = ({
   race,
+  dateText,
   onSelectHorse,
   onOpenRace,
 }) => {
@@ -59,6 +61,12 @@ export const DagensBastaLoppKort: React.FC<DagensBastaLoppKortProps> = ({
 
         {/* Förutsättningar */}
         <div className="mt-3.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-300 font-medium">
+          {dateText && (
+            <span className="inline-flex items-center gap-1.5 text-amber-300 font-bold">
+              <Calendar className="w-4 h-4 text-amber-400" />
+              <span className="capitalize">{dateText}</span>
+            </span>
+          )}
           <span className="inline-flex items-center gap-1.5">
             <Clock className="w-4 h-4 text-amber-400" />
             <span className="font-bold text-white">Start {race.startTime}</span>

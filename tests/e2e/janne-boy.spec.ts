@@ -44,6 +44,6 @@ test.describe('Janne Boy — Superintelligent kupongmotor', () => {
 
     // 8. Verifiera att Bong-maskinen öppnas med kupongen
     await expect(page.locator('h1:has-text("Bong-maskinen")')).toBeVisible();
-    await expect(page.locator('text=Snabbkupong:')).toBeVisible();
+    await expect(page.locator('button:has-text("Rensa")').first()).toBeVisible();
   });
 });

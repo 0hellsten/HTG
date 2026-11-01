@@ -64,7 +64,7 @@ export const StatusScreen: React.FC<StatusScreenProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto pb-16">
+    <div className="space-y-6 max-w-3xl mx-auto pb-16 w-full overflow-x-hidden">
       {}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-4">
         <div className="flex items-center gap-3">
@@ -112,8 +112,8 @@ export const StatusScreen: React.FC<StatusScreenProps> = ({ onBack }) => {
                   key={src.sourceId}
                   className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-2.5"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
+                  <div className="flex items-start justify-between gap-3 min-w-0">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       <div className="shrink-0 pt-0.5">
                         <FarskhetsPrick
                           status={src.status}
@@ -121,7 +121,7 @@ export const StatusScreen: React.FC<StatusScreenProps> = ({ onBack }) => {
                           onRetry={handleUpdateAll}
                         />
                       </div>
-                      <h2 className="text-lg font-bold text-slate-950">{src.label}</h2>
+                      <h2 className="text-lg font-bold text-slate-950 truncate">{src.label}</h2>
                     </div>
 
                     <span
@@ -137,15 +137,15 @@ export const StatusScreen: React.FC<StatusScreenProps> = ({ onBack }) => {
                     </span>
                   </div>
 
-                  <p className="text-slate-600 text-sm leading-relaxed pl-6">
+                  <p className="text-slate-600 text-sm leading-relaxed pl-6 break-words">
                     {src.message || 'Informationen är tillgänglig.'}
                   </p>
 
-                  <div className="flex items-center gap-2 text-xs text-slate-500 pl-6 pt-1 border-t border-slate-100">
-                    <Clock className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-2 text-xs text-slate-500 pl-6 pt-1 border-t border-slate-100 flex-wrap">
+                    <Clock className="w-3.5 h-3.5 shrink-0" />
                     <span>
                       Senaste lyckade hämtning:{' '}
-                      <strong className="text-slate-700 font-semibold">
+                      <strong className="text-slate-700 font-semibold break-words">
                         {formatTimestamp(src.succeededAt || src.attemptedAt)}
                       </strong>
                     </span>

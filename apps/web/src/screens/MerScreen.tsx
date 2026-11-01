@@ -103,9 +103,6 @@ export const MerScreen: React.FC<MerScreenProps> = ({ onSelectOption }) => {
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
           <span>Tangitza</span>
         </div>
-        <p className="text-slate-500 text-sm">
-          Privat och icke-kommersiell travapplikation för lugn läsning.
-        </p>
         <p className="text-xs text-slate-400">Version 1.0</p>
         <div className="pt-4">
           <span className="text-[11px] font-mono tracking-widest text-slate-400 select-none block">

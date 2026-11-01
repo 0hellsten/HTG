@@ -311,6 +311,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
             <BlockErrorBoundary fallbackTitle="Omgångens spik och skräll">
               <DagensBastaOmgangBanner
                 omgang={dagensBastaOmgang}
+                dateText={displayDateFormatted}
                 onScrollToRace={(raceNr) => {
                   setActiveViewMode('basta');
                   setSelectedRaceFilter(raceNr);
@@ -401,6 +402,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
                     <div key={race.raceNumber} id={`lopp-${race.raceNumber}`}>
                       <DagensBastaLoppKort
                         race={race}
+                        dateText={displayDateFormatted}
                         onSelectHorse={onSelectHorse}
                         onOpenRace={handleOpenRaceFromBasta}
                       />
@@ -422,6 +424,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
                     <BlockErrorBoundary key={day.id} fallbackTitle={`Bana ${day.trackName}`}>
                       <BanaKort
                         day={day}
+                        dateText={displayDateFormatted}
                         isFavorite={favoriteTrackIds.includes(day.trackId)}
                         onToggleFavorite={() => handleToggleFavorite(day.trackId, day.trackName)}
                         onOpenRace={onOpenRace}
@@ -447,6 +450,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
 
 interface BanaKortProps {
   day: RaceDay;
+  dateText?: string;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onOpenRace: (raceId: string, siblingRaces: Race[]) => void;
@@ -455,6 +459,7 @@ interface BanaKortProps {
 
 const BanaKort: React.FC<BanaKortProps> = ({
   day,
+  dateText,
   isFavorite,
   onToggleFavorite,
   onOpenRace,
@@ -479,6 +484,11 @@ const BanaKort: React.FC<BanaKortProps> = ({
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-950">{day.trackName}</h2>
+            {dateText && (
+              <span className="px-2.5 py-0.5 rounded-full bg-slate-900 text-amber-300 font-bold text-xs uppercase tracking-wider capitalize">
+                {dateText}
+              </span>
+            )}
             {isFavorite && (
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-semibold">
                 <HastsKoIkon className="w-3.5 h-3.5" filled />

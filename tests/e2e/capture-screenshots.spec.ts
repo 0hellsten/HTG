@@ -48,7 +48,7 @@ test.describe('Verifierande skärmdumpar för ny startflik och logga', () => {
     });
 
     // 4. Bong-maskinen med Bong-logga på mobil
-    const bongNavBtn = page.locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Bongen")');
+    const bongNavBtn = page.locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Bong")');
     await bongNavBtn.click();
     await page.waitForTimeout(400);
     await page.screenshot({

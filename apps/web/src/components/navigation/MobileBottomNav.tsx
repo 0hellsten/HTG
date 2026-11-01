@@ -33,9 +33,19 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ activeTab, onT
                 className={`w-5 h-5 mb-0.5 shrink-0 ${isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'}`}
               />
             )}
-            <span className="text-[10px] font-medium leading-none truncate max-w-full">
-              {item.mobileLabel || item.label}
-            </span>
+            {item.id === 'janneboy' ? (
+              <span className="text-[9px] font-semibold leading-[1.1] text-center">
+                Janne<br />Boy
+              </span>
+            ) : item.id === 'bong' ? (
+              <span className="text-[9px] font-semibold leading-[1.1] text-center">
+                Bong<br />Maskinen
+              </span>
+            ) : (
+              <span className="text-[10px] font-medium leading-none truncate max-w-full">
+                {item.mobileLabel || item.label}
+              </span>
+            )}
           </button>
         );
       })}

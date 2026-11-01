@@ -59,7 +59,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose, title, ic
         </div>
 
         {/* Scrollbart innehåll */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50 text-slate-900">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 bg-slate-50 text-slate-900 w-full min-w-0">
           {children}
         </div>
 

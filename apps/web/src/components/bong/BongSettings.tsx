@@ -1,5 +1,5 @@
-import React from 'react';
-import { RotateCcw } from 'lucide-react';
+import React, { useState } from 'react';
+import { RotateCcw, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { BongGameType, BongCalculationResult } from '@stallbacken/shared';
 
 interface BongSettingsProps {
@@ -27,7 +27,8 @@ export const BongSettings: React.FC<BongSettingsProps> = ({
   onChangeSharesCount,
   onResetCoupon,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -68,6 +69,55 @@ export const BongSettings: React.FC<BongSettingsProps> = ({
 
         {isOpen && (
           <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50/50 space-y-4">
+            {/* Hur gör jag? - förklaring av flerbong och andelar */}
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setShowHelp((prev) => !prev)}
+                aria-expanded={showHelp}
+                className="w-full p-3.5 sm:p-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-2 text-amber-900 font-bold text-xs sm:text-sm">
+                  <HelpCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Hur fungerar flerbong och andelar? (Hur gör jag?)</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
+                  <span>{showHelp ? 'Dölj förklaring' : 'Visa förklaring'}</span>
+                  {showHelp ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                </div>
+              </button>
+
+              {showHelp && (
+                <div className="p-4 border-t border-slate-100 bg-slate-50/80 text-slate-700 text-xs sm:text-sm space-y-3 leading-relaxed">
+                  <div>
+                    <h5 className="font-extrabold text-slate-900 mb-1">
+                      Endast {gameType === 'V75' ? 'V7' : 'V8'} (2,5x utdelning):
+                    </h5>
+                    <p className="text-slate-600">
+                      Du satsar allt på att få alla rätt. Du avstår utdelning för lägre vinstpooler
+                      (femmor och sexor), men får istället 2,5 gånger pengarna vid full pott!
+                    </p>
+                  </div>
+
+                  <div>
+                    <h5 className="font-extrabold text-slate-900 mb-1">Flerbong:</h5>
+                    <p className="text-slate-600">
+                      Lämnar in samma kupong flera gånger. Väljer du till exempel 2x så dubblas både
+                      insatsen och alla dina eventuella vinster.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h5 className="font-extrabold text-slate-900 mb-1">Andelar:</h5>
+                    <p className="text-slate-600">
+                      Perfekt om du spelar ihop med vänner. Skriv in hur många andelar ni delar på så
+                      räknas kostnaden per person ut automatiskt.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-white cursor-pointer">
                 <input

@@ -113,8 +113,8 @@ test.describe('Smart startflik — Idag med Bästa hästarna & Alla lopp', () =>
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    // 1. Bong-knapp i bottenmenyn (ren ikon, ingen logga-bild)
-    const bongNavBtn = page.locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Bongen")');
+    // 1. Bong-knapp i bottenmenyn (ren ikon, ingen logga-bild, två rader: Bong Maskinen)
+    const bongNavBtn = page.locator('nav[aria-label="Mobil bottenmeny"] button:has-text("Bong")');
     await expect(bongNavBtn).toBeVisible();
     await expect(bongNavBtn.locator('img')).toHaveCount(0);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ArrowLeft,
   BookOpen,
@@ -11,6 +11,8 @@ import {
   Activity,
   Download,
   Trophy,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { JanneBoyIcon } from '../components/janne-boy/JanneBoyIcon';
 
@@ -21,6 +23,13 @@ interface OmAppenScreenProps {
 }
 
 export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({ onBack, onInstall, canInstall }) => {
+  const [openCards, setOpenCards] = useState<Record<number, boolean>>({});
+  const [openAndroid, setOpenAndroid] = useState(false);
+  const [openSummary, setOpenSummary] = useState(false);
+
+  const toggleCard = (idx: number) => {
+    setOpenCards((prev) => ({ ...prev, [idx]: !prev[idx] }));
+  };
   const pagesGuide = [
     {
       title: 'Idag',
@@ -48,7 +57,7 @@ export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({ onBack, onInstall,
       label: 'Bygg egna kuponger & reducera',
       icon: Calculator,
       description:
-        'Här sätter du ihop din egen kupong för V75 och V86. Du kan välja dina hästar själv eller trycka på "Snabbkupong" för att få ett snabbt förslag. Här ser du direkt vad kupongen kostar.',
+        'Här sätter du ihop din egen kupong för V75 och V86. Du väljer dina hästar själv och kan använda reduceringsmotorn för att få ner kupongpriset. Här ser du direkt vad kupongen kostar.',
     },
     {
       title: 'Hästar',
@@ -114,32 +123,60 @@ export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({ onBack, onInstall,
         </p>
       </div>
 
-      {/* Nedladdning av Android-app */}
-      <div className="bg-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-800 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-bold text-amber-400 flex items-center gap-2">
-              <Download className="w-5 h-5 text-amber-400" />
-              <span>Ladda ned Android-app (.apk)</span>
-            </h2>
-            <p className="text-sm text-slate-300 mt-1">
-              Färdig installationsfil för Android-telefoner. Kan skickas eller laddas ned direkt
-              till telefonen.
+      {/* Nedladdning av Android-app - fällbart kort */}
+      <div className="bg-slate-900 text-white rounded-2xl overflow-hidden shadow-sm border border-slate-800">
+        <button
+          type="button"
+          onClick={() => setOpenAndroid((prev) => !prev)}
+          aria-expanded={openAndroid}
+          className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-800/80 transition-colors cursor-pointer min-h-[56px]"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 text-amber-400">
+              <Download className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-amber-400">
+                Ladda ned Android-app (.apk)
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300">
+                Installationsfil för att installera Tangitza på din telefon
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0 text-slate-400">
+            <span className="text-xs font-medium hidden sm:inline text-slate-300">
+              {openAndroid ? 'Dölj' : 'Visa'}
+            </span>
+            {openAndroid ? (
+              <ChevronUp className="w-5 h-5 text-amber-400" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-amber-400" />
+            )}
+          </div>
+        </button>
+
+        {openAndroid && (
+          <div className="p-5 border-t border-slate-800 bg-slate-950/60 space-y-4">
+            <p className="text-sm text-slate-300">
+              Färdig installationsfil för Android-telefoner. Kan laddas ned direkt till telefonen:
+            </p>
+            <div>
+              <a
+                href={`${import.meta.env.BASE_URL ?? './'}Stallbacken.apk`}
+                download="Tangitza.apk"
+                className="min-h-[46px] px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm sm:text-base inline-flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shrink-0 no-underline"
+              >
+                <Download className="w-4 h-4" />
+                <span>Ladda ned Tangitza (.apk)</span>
+              </a>
+            </div>
+            <p className="text-xs text-slate-400 border-t border-slate-800 pt-3">
+              Öppna filen på Android-telefonen och tryck på "Installera" för att få Tangitza direkt
+              bland dina appar.
             </p>
           </div>
-          <a
-            href={`${import.meta.env.BASE_URL ?? './'}Stallbacken.apk`}
-            download="Tangitza.apk"
-            className="min-h-[46px] px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm sm:text-base inline-flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shrink-0 no-underline"
-          >
-            <Download className="w-4 h-4" />
-            <span>Ladda ned Tangitza (.apk)</span>
-          </a>
-        </div>
-        <p className="text-xs text-slate-400 border-t border-slate-800 pt-3">
-          Öppna filen på Android-telefonen och tryck på "Installera" för att få Tangitza direkt
-          bland dina appar.
-        </p>
+        )}
       </div>
 
       {canInstall && onInstall && (
@@ -165,45 +202,83 @@ export const OmAppenScreen: React.FC<OmAppenScreenProps> = ({ onBack, onInstall,
 
       <div className="space-y-3">
         <h2 className="text-base sm:text-lg font-extrabold text-slate-900 px-1">
-          Här är vad varje sida gör
+          Här är vad varje sida gör (tryck för att läsa)
         </h2>
 
         {pagesGuide.map((page, idx) => {
           const Icon = page.icon;
+          const isOpen = Boolean(openCards[idx]);
           return (
             <div
               key={idx}
-              className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-2xs space-y-1.5"
+              className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs transition-colors"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/80 flex items-center justify-center shrink-0 text-amber-900">
-                  {page.customIcon ? (
-                    <JanneBoyIcon className="h-6 w-auto object-contain" />
-                  ) : Icon ? (
-                    <Icon className="w-5 h-5" />
-                  ) : null}
+              <button
+                type="button"
+                onClick={() => toggleCard(idx)}
+                aria-expanded={isOpen}
+                className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-50/80 transition-colors cursor-pointer min-h-[56px]"
+              >
+                <div className="flex items-center gap-3 min-w-0 pr-2">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/80 flex items-center justify-center shrink-0 text-amber-900">
+                    {page.customIcon ? (
+                      <JanneBoyIcon className="h-6 w-auto object-contain" />
+                    ) : Icon ? (
+                      <Icon className="w-5 h-5" />
+                    ) : null}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-extrabold text-base sm:text-lg text-slate-950 leading-tight">
+                      {page.title}
+                    </h3>
+                    <p className="text-xs font-semibold text-amber-800 truncate">{page.label}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-extrabold text-base sm:text-lg text-slate-950 leading-tight">
-                    {page.title}
-                  </h3>
-                  <p className="text-xs font-semibold text-amber-800">{page.label}</p>
+
+                <div className="flex items-center gap-1.5 shrink-0 text-slate-400">
+                  <span className="text-xs font-medium hidden sm:inline text-slate-500">
+                    {isOpen ? 'Dölj' : 'Läs mer'}
+                  </span>
+                  {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 </div>
-              </div>
-              <p className="text-slate-700 text-sm sm:text-base leading-relaxed pl-13 pt-0.5">
-                {page.description}
-              </p>
+              </button>
+
+              {isOpen && (
+                <div className="px-5 pb-5 pt-1 border-t border-slate-100 bg-slate-50/40 text-slate-700 text-sm sm:text-base leading-relaxed pl-16">
+                  {page.description}
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-2 text-slate-700 text-sm sm:text-base leading-relaxed">
-        <h3 className="font-bold text-slate-950 text-base">En liten sammanfattning</h3>
-        <p>
-          Du kan klicka runt precis hur du vill utan att vara rädd att något ändras eller
-          försvinner. Vill du börja om trycker du bara på <strong>Idag</strong> längst ner.
-        </p>
+      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
+        <button
+          type="button"
+          onClick={() => setOpenSummary((prev) => !prev)}
+          aria-expanded={openSummary}
+          className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors cursor-pointer min-h-[56px]"
+        >
+          <div className="flex items-center gap-2.5">
+            <h3 className="font-bold text-slate-950 text-base sm:text-lg">
+              En liten sammanfattning
+            </h3>
+          </div>
+          <div className="flex items-center gap-1.5 text-slate-400">
+            <span className="text-xs font-medium hidden sm:inline text-slate-500">
+              {openSummary ? 'Dölj' : 'Läs mer'}
+            </span>
+            {openSummary ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </div>
+        </button>
+
+        {openSummary && (
+          <div className="px-5 pb-5 pt-1 border-t border-slate-100 bg-slate-50/40 text-slate-700 text-sm sm:text-base leading-relaxed">
+            Du kan klicka runt precis hur du vill utan att vara rädd att något ändras eller
+            försvinner. Vill du börja om trycker du bara på <strong>Idag</strong> längst ner.
+          </div>
+        )}
       </div>
 
       <div className="pt-6 border-t border-slate-200 text-center text-slate-500 text-sm space-y-1">

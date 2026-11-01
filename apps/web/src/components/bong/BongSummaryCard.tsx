@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
-import { Sparkles, RotateCcw, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { RotateCcw, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { BongCalculationResult } from '@stallbacken/shared';
 
 export type QuickCouponPreset = 'small' | 'medium' | 'large' | 'spikar';
 
 interface BongSummaryCardProps {
   calculationResult: BongCalculationResult;
-  onApplyPreset: (preset: QuickCouponPreset) => void;
+  onApplyPreset?: (preset: QuickCouponPreset) => void;
   onResetCoupon: () => void;
 }
 
 export const BongSummaryCard: React.FC<BongSummaryCardProps> = ({
   calculationResult,
-  onApplyPreset,
   onResetCoupon,
 }) => {
   const [showHelp, setShowHelp] = useState(false);
@@ -71,45 +70,6 @@ export const BongSummaryCard: React.FC<BongSummaryCardProps> = ({
         </div>
       </div>
 
-      <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-1.5">
-        <span className="text-xs font-semibold text-amber-300 flex items-center gap-1 mr-1">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Snabbkupong:</span>
-        </span>
-
-        <button
-          type="button"
-          onClick={() => onApplyPreset('small')}
-          className="min-h-[44px] px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold border border-slate-700 transition-colors cursor-pointer"
-        >
-          Liten (~50 kr)
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onApplyPreset('medium')}
-          className="min-h-[44px] px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold border border-slate-700 transition-colors cursor-pointer"
-        >
-          Lagom (~100 kr)
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onApplyPreset('large')}
-          className="min-h-[44px] px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold border border-slate-700 transition-colors cursor-pointer"
-        >
-          Större (~200 kr)
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onApplyPreset('spikar')}
-          className="min-h-[44px] px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold border border-slate-700 transition-colors cursor-pointer"
-        >
-          Favoritrad (1 häst/lopp)
-        </button>
-      </div>
-
       {showHelp && (
         <div className="mt-2 p-3.5 rounded-lg bg-slate-800/95 border border-slate-700 text-slate-200 text-xs sm:text-sm space-y-2 leading-relaxed">
           <div className="font-bold text-amber-300 flex items-center gap-1.5">
@@ -120,10 +80,6 @@ export const BongSummaryCard: React.FC<BongSummaryCardProps> = ({
             <li>
               <strong>Välj hästar:</strong> Tryck på flikarna (Avd 1, Avd 2 osv.) och kryssa för de
               hästar du tror på i varje lopp.
-            </li>
-            <li>
-              <strong>Snabbkupong:</strong> Vill du slippa välja själv trycker du bara på en av
-              knapparna ovanför (t.ex. <em>"Lagom (~100 kr)"</em>) så fylls kupongen i automatiskt.
             </li>
             <li>
               <strong>Kupongpris:</strong> Priset räknas om direkt när du lägger till eller tar bort

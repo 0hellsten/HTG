@@ -4,11 +4,13 @@ import { DagensBastaOmgang } from '@stallbacken/shared';
 
 interface DagensBastaOmgangBannerProps {
   omgang: DagensBastaOmgang;
+  dateText?: string;
   onScrollToRace?: (raceNumber: number) => void;
 }
 
 export const DagensBastaOmgangBanner: React.FC<DagensBastaOmgangBannerProps> = ({
   omgang,
+  dateText,
   onScrollToRace,
 }) => {
   const { topSpik, topSkrall } = omgang;
@@ -24,8 +26,18 @@ export const DagensBastaOmgangBanner: React.FC<DagensBastaOmgangBannerProps> = (
             <h2 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight leading-tight">
               {omgang.gameName || 'Dagens omgång'}
             </h2>
-            <p className="text-sm sm:text-base font-bold text-amber-950">
-              {omgang.trackName} · Start {omgang.startTime} · {omgang.races.length} lopp analyserade
+            <p className="text-sm sm:text-base font-bold text-amber-950 flex items-center gap-1.5 flex-wrap">
+              <span>{omgang.trackName}</span>
+              {dateText && (
+                <>
+                  <span>·</span>
+                  <span className="capitalize">{dateText}</span>
+                </>
+              )}
+              <span>·</span>
+              <span>Start {omgang.startTime}</span>
+              <span>·</span>
+              <span>{omgang.races.length} lopp analyserade</span>
             </p>
           </div>
         </div>
