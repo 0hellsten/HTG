@@ -15,8 +15,10 @@ import { JanneBoyOmgangBanner } from '../components/janne-boy/JanneBoyOmgangBann
 import {
   BongCompetition,
   formatCompetitionFromApi,
-  buildFallbackBongRaceDay,
-  getDefaultUpcomingCompetitions,
+  getCachedCompetitions,
+  cacheCompetitions,
+  getCachedOmgang,
+  cacheOmgang,
 } from '../components/bong/competitions';
 import { BongDateSelector } from '../components/bong/BongDateSelector';
 import { BongKupongModal } from '../components/bong/BongKupongModal';
@@ -29,7 +31,7 @@ interface JanneBoyScreenProps {
 
 export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, onSelectHorse }) => {
   const [competitions, setCompetitions] = useState<BongCompetition[]>(() =>
-    getDefaultUpcomingCompetitions()
+    getCachedCompetitions()
   );
   const [selectedCompId, setSelectedCompId] = useState<string>('');
   const [gameType, setGameType] = useState<BongGameType>('V75');
@@ -42,15 +44,8 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
   const [isKupongModalOpen, setIsKupongModalOpen] = useState<boolean>(false);
 
   const engine = useMemo(() => new JanneBoyEngine(), []);
-  const [raceDay, setRaceDay] = useState<BongRaceDayData>(() => buildFallbackBongRaceDay('V75'));
-  const [systemResult, setSystemResult] = useState<JanneBoySystemResult | null>(() =>
-    new JanneBoyEngine().generate(buildFallbackBongRaceDay('V75'), {
-      gameType: 'V75',
-      strategy: 'balanserad',
-      budget: 100,
-      lockedHorses: {},
-    })
-  );
+  const [raceDay, setRaceDay] = useState<BongRaceDayData | null>(null);
+  const [systemResult, setSystemResult] = useState<JanneBoySystemResult | null>(null);
 
   const loadLiveOmgang = useCallback(
     async (
@@ -60,29 +55,44 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
       currentBudget: number,
       locks: Record<number, string[]>
     ) => {
+      const cached = getCachedOmgang(gameId);
+      if (cached) {
+        setRaceDay(cached);
+        setIsLive(true);
+        const config: JanneBoyConfig = {
+          gameType: type,
+          strategy: currentStrat,
+          budget: currentBudget,
+          lockedHorses: locks,
+        };
+        setSystemResult(engine.generate(cached, config));
+      }
+
       try {
         setLoadingLive(true);
         const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
-        const activeRaceDay = res.data || buildFallbackBongRaceDay(type);
-        setRaceDay(activeRaceDay);
-        setIsLive(!!res.data);
-        const config: JanneBoyConfig = {
-          gameType: type,
-          strategy: currentStrat,
-          budget: currentBudget,
-          lockedHorses: locks,
-        };
-        setSystemResult(engine.generate(activeRaceDay, config));
+        if (res && res.data && res.data.races && res.data.races.length > 0) {
+          setRaceDay(res.data);
+          setIsLive(true);
+          cacheOmgang(gameId, res.data);
+          const config: JanneBoyConfig = {
+            gameType: type,
+            strategy: currentStrat,
+            budget: currentBudget,
+            lockedHorses: locks,
+          };
+          setSystemResult(engine.generate(res.data, config));
+        } else if (!cached) {
+          setIsLive(false);
+          setRaceDay(null);
+          setSystemResult(null);
+        }
       } catch {
-        const fallback = buildFallbackBongRaceDay(type);
-        setRaceDay(fallback);
-        const config: JanneBoyConfig = {
-          gameType: type,
-          strategy: currentStrat,
-          budget: currentBudget,
-          lockedHorses: locks,
-        };
-        setSystemResult(engine.generate(fallback, config));
+        if (!cached) {
+          setIsLive(false);
+          setRaceDay(null);
+          setSystemResult(null);
+        }
       } finally {
         setLoadingLive(false);
       }
@@ -109,17 +119,16 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
 
       if (!isSubscribed) return;
 
-      const formatted =
-        res.data && res.data.length > 0
-          ? res.data.map(formatCompetitionFromApi)
-          : getDefaultUpcomingCompetitions();
-
-      setCompetitions(formatted);
-      const initial = formatted[0];
-      if (initial) {
-        setSelectedCompId(initial.id);
-        setGameType(initial.gameType);
-        loadLiveOmgang(initial.id, initial.gameType, 'balanserad', 100, {});
+      if (res && res.data && res.data.length > 0) {
+        const formatted = res.data.map(formatCompetitionFromApi);
+        setCompetitions(formatted);
+        cacheCompetitions(formatted);
+        const initial = formatted[0];
+        if (initial) {
+          setSelectedCompId(initial.id);
+          setGameType(initial.gameType);
+          loadLiveOmgang(initial.id, initial.gameType, 'balanserad', 100, {});
+        }
       }
     }
 
@@ -137,7 +146,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
   };
 
   const handleGenerate = () => {
-    if (isCalculating) return;
+    if (isCalculating || !raceDay) return;
     setIsCalculating(true);
     const config: JanneBoyConfig = { gameType, strategy, budget, lockedHorses };
     setSystemResult(engine.generate(raceDay, config));
@@ -146,6 +155,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
 
   const handleSelectStrategy = (newStrat: JanneBoyStrategy) => {
     setStrategy(newStrat);
+    if (!raceDay) return;
     setSystemResult(
       engine.generate(raceDay, {
         gameType,
@@ -158,6 +168,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
 
   const handleChangeBudget = (newBudget: number) => {
     setBudget(newBudget);
+    if (!raceDay) return;
     setSystemResult(
       engine.generate(raceDay, {
         gameType,
@@ -219,7 +230,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
               <span>{isLive ? 'Live-odds från ATG' : 'Kvalitetssäkrat travunderlag'}</span>
             </span>
             <span className="text-[10px] text-slate-500">
-              {raceDay.trackName} · {raceDay.date || 'Vald omgång'}
+              {raceDay ? `${raceDay.trackName} · ${raceDay.date || 'Vald omgång'}` : 'Hämtar omgång...'}
             </span>
           </div>
           <button
@@ -235,7 +246,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
             title="Uppdatera underlag"
             className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className={`w-4 h-4 ${loadingLive ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
@@ -253,12 +264,12 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
         />
       </div>
 
-      <JanneBoyOmgangBanner raceDay={raceDay} />
+      {raceDay && <JanneBoyOmgangBanner raceDay={raceDay} />}
 
       <JanneBoyControls
         gameType={gameType}
-        racesCount={raceDay.races.length}
-        trackName={raceDay.trackName}
+        racesCount={raceDay?.races?.length || (gameType === 'V86' || gameType === 'V85' ? 8 : 7)}
+        trackName={raceDay?.trackName || 'Omgång'}
         strategy={strategy}
         budget={budget}
         isCalculating={isCalculating}
@@ -267,7 +278,15 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
         onGenerate={handleGenerate}
       />
 
-      {systemResult && (
+      {loadingLive && !systemResult ? (
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-3 shadow-sm my-4">
+          <div className="w-12 h-12 mx-auto rounded-full bg-amber-100 flex items-center justify-center text-amber-600 animate-pulse">
+            <Sparkles className="w-6 h-6" />
+          </div>
+          <p className="text-lg font-bold text-slate-900">Räknar fram kupongförslag...</p>
+          <p className="text-sm text-slate-600">Hämtar aktuella odds och analyserar avdelningarna.</p>
+        </div>
+      ) : systemResult ? (
         <JanneBoySystemView
           system={systemResult}
           lockedHorses={lockedHorses}
@@ -277,7 +296,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
           onOpenKupong={() => setIsKupongModalOpen(true)}
           onSelectHorse={onSelectHorse}
         />
-      )}
+      ) : null}
 
       {/* Flytande Bong-knapp (visar ifylld bong/kupong) */}
       {systemResult && (
@@ -297,7 +316,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
         </button>
       )}
 
-      {isKupongModalOpen && systemResult && (
+      {isKupongModalOpen && systemResult && raceDay && (
         <BongKupongModal
           isOpen={isKupongModalOpen}
           onClose={() => setIsKupongModalOpen(false)}

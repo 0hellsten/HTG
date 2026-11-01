@@ -12,7 +12,10 @@ import { QuickCouponPreset } from './BongSummaryCard';
 import {
   BongCompetition,
   formatCompetitionFromApi,
-  getDefaultUpcomingCompetitions,
+  getCachedCompetitions,
+  cacheCompetitions,
+  getCachedOmgang,
+  cacheOmgang,
   buildFallbackBongRaceDay,
 } from './competitions';
 import { buildPresetSelection } from './bongPresets';
@@ -23,14 +26,26 @@ export function useBongState(
   initialSelectedHorses?: Record<number, string[]>
 ) {
   const [competitions, setCompetitions] = useState<BongCompetition[]>(() =>
-    getDefaultUpcomingCompetitions()
+    getCachedCompetitions()
   );
-  const [selectedCompId, setSelectedCompId] = useState<string>('');
-  const [gameType, setGameType] = useState<BongGameType>(initialGameType || 'V75');
+  const [selectedCompId, setSelectedCompId] = useState<string>(() => {
+    const cached = getCachedCompetitions();
+    return cached.length > 0 ? cached[0].id : '';
+  });
+  const [gameType, setGameType] = useState<BongGameType>(() => {
+    if (initialGameType) return initialGameType;
+    const cached = getCachedCompetitions();
+    return cached.length > 0 ? cached[0].gameType : 'V75';
+  });
   const [activeLegIndex, setActiveLegIndex] = useState<number>(0);
-  const [raceDay, setRaceDay] = useState<BongRaceDayData>(() =>
-    buildFallbackBongRaceDay(initialGameType || 'V75')
-  );
+  const [raceDay, setRaceDay] = useState<BongRaceDayData>(() => {
+    const cachedComps = getCachedCompetitions();
+    if (cachedComps.length > 0) {
+      const cachedData = getCachedOmgang(cachedComps[0].id);
+      if (cachedData) return cachedData;
+    }
+    return buildFallbackBongRaceDay(initialGameType || 'V75');
+  });
   const [status, setStatus] = useState<SourceStatus>('ok');
   const [fetchedAt, setFetchedAt] = useState<string>(new Date().toISOString());
   const [selectedHorses, setSelectedHorses] = useState<Record<number, string[]>>(
@@ -73,20 +88,19 @@ export function useBongState(
 
       if (!isSubscribed) return;
 
-      const formatted =
-        res.data && res.data.length > 0
-          ? res.data.map(formatCompetitionFromApi)
-          : getDefaultUpcomingCompetitions();
-
-      setCompetitions(formatted);
-      if (!userSelectedRef.current) {
-        const match = initialGameType
-          ? formatted.find((c) => c.gameType === initialGameType) || formatted[0]
-          : formatted[0];
-        if (match) {
-          setSelectedCompId(match.id);
-          setGameType(match.gameType);
-          loadGame(match.id, match.gameType);
+      if (res.data && res.data.length > 0) {
+        const formatted = res.data.map(formatCompetitionFromApi);
+        setCompetitions(formatted);
+        cacheCompetitions(formatted);
+        if (!userSelectedRef.current) {
+          const match = initialGameType
+            ? formatted.find((c) => c.gameType === initialGameType) || formatted[0]
+            : formatted[0];
+          if (match) {
+            setSelectedCompId(match.id);
+            setGameType(match.gameType);
+            loadGame(match.id, match.gameType);
+          }
         }
       }
     }
@@ -123,11 +137,16 @@ export function useBongState(
 
   async function loadGame(gameId: string, gType: BongGameType) {
     const reqId = ++lastRequestIdRef.current;
+    const cached = getCachedOmgang(gameId);
+    if (cached) {
+      setRaceDay(cached);
+    }
     const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
     if (reqId !== lastRequestIdRef.current) return;
 
     if (res.data) {
       setRaceDay(res.data);
+      cacheOmgang(gameId, res.data);
       setStatus(res.status);
       setFetchedAt(res.fetchedAt);
 
@@ -135,7 +154,7 @@ export function useBongState(
         setSelectedHorses({});
         setRanks({});
       }
-    } else {
+    } else if (!cached) {
       setRaceDay(buildFallbackBongRaceDay(gType));
       setStatus(res.status);
       setFetchedAt(res.fetchedAt);

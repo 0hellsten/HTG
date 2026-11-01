@@ -15,6 +15,52 @@ export interface BongCompetition {
   isToday: boolean;
 }
 
+export const CACHE_KEY_KOMMANDE = 'tangitza_upcoming_competitions_cache';
+export const CACHE_KEY_OMGANG_PREFIX = 'tangitza_omgang_cache_';
+
+export function getCachedCompetitions(): BongCompetition[] {
+  if (typeof window === 'undefined' || !window.localStorage) return [];
+  try {
+    const raw = window.localStorage.getItem(CACHE_KEY_KOMMANDE);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      const todayStr = new Date().toISOString().slice(0, 10);
+      if (parsed.some((c: BongCompetition) => c.dateIso >= todayStr)) {
+        return parsed;
+      }
+    }
+  } catch {}
+  return [];
+}
+
+export function cacheCompetitions(list: BongCompetition[]): void {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  try {
+    window.localStorage.setItem(CACHE_KEY_KOMMANDE, JSON.stringify(list));
+  } catch {}
+}
+
+export function getCachedOmgang(gameId: string): BongRaceDayData | null {
+  if (typeof window === 'undefined' || !window.localStorage) return null;
+  try {
+    const raw = window.localStorage.getItem(CACHE_KEY_OMGANG_PREFIX + gameId);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && Array.isArray(parsed.races) && parsed.races.length > 0) {
+      return parsed;
+    }
+  } catch {}
+  return null;
+}
+
+export function cacheOmgang(gameId: string, data: BongRaceDayData): void {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  try {
+    window.localStorage.setItem(CACHE_KEY_OMGANG_PREFIX + gameId, JSON.stringify(data));
+  } catch {}
+}
+
 export function formatCompetitionFromApi(g: {
   id: string;
   gameType: BongGameType;
