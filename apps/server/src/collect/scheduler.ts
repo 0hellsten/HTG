@@ -1,25 +1,16 @@
 import { logger } from '../lib/logger.js';
 import { atgRacingInfoAdapter } from '../adapters/atg-racinginfo.js';
 import { atgOddsAdapter } from '../adapters/atg-odds.js';
-import { smhiWeatherAdapter } from '../adapters/smhi-weather.js';
-import { tipsExpressenAdapter } from '../adapters/tips-expressen.js';
-import { tipsTravrondenAdapter } from '../adapters/tips-travronden.js';
-import { tipsAftonbladetAdapter } from '../adapters/tips-aftonbladet.js';
-import { tipsSulkysportAdapter } from '../adapters/tips-sulkysport.js';
 import { getDb } from '../db/connection.js';
 
 export class StallbackenScheduler {
   private isRunning = false;
+  private isTicking = false;
   private intervalTimer: NodeJS.Timeout | null = null;
-  private isWarmingUp = false;
 
   start(): void {
     if (this.isRunning || process.env.NODE_ENV === 'test') return;
     this.isRunning = true;
-
-    setTimeout(() => {
-      this.warmup().catch((err) => logger.error('Fel under uppvärmning', err));
-    }, 1000);
 
     this.intervalTimer = setInterval(
       () => {
@@ -48,65 +39,12 @@ export class StallbackenScheduler {
     return stockholmHour >= 1 && stockholmHour < 7;
   }
 
-  async warmup(): Promise<void> {
-    if (this.isWarmingUp) return;
-    this.isWarmingUp = true;
-    logger.info('Startar schemaläggarens uppvärmning av travdata...');
-
-    try {
-      const today = new Date();
-      for (let offset = 0; offset <= 2; offset++) {
-        const d = new Date(today.getTime() + offset * 86400000);
-        const dateStr = d.toISOString().split('T')[0];
-        await atgRacingInfoAdapter.fetchCalendar(dateStr, false);
-      }
-
-      await tipsExpressenAdapter.fetch();
-      await tipsAftonbladetAdapter.fetch();
-      await tipsTravrondenAdapter.fetch();
-      await tipsSulkysportAdapter.fetch();
-
-      const db = getDb();
-      const activeTracks = db
-        .prepare(
-          `SELECT DISTINCT rd.track_id 
-           FROM race_days rd 
-           JOIN races r ON r.race_day_id = rd.id
-           WHERE r.status = 'kommande'`
-        )
-        .all() as Array<{ track_id: string }>;
-
-      for (const t of activeTracks.slice(0, 3)) {
-        await smhiWeatherAdapter.fetch({ trackId: t.track_id });
-      }
-
-      const upcomingRaces = db
-        .prepare(
-          `SELECT id FROM races 
-           WHERE status = 'kommande' 
-           ORDER BY scheduled_start ASC 
-           LIMIT 5`
-        )
-        .all() as Array<{ id: string }>;
-
-      for (const r of upcomingRaces) {
-        await atgRacingInfoAdapter.fetchRace(r.id, false);
-        await atgOddsAdapter.fetchOddsForRace(r.id, false);
-      }
-
-      logger.info('Uppvärmning slutförd med färsk travdata');
-    } catch (err) {
-      logger.warn('Uppvärmning avbröts eller fick delvis fel', { error: String(err) });
-    } finally {
-      this.isWarmingUp = false;
-    }
-  }
-
   async tick(): Promise<void> {
-    if (this.isQuietHours()) {
+    if (this.isQuietHours() || this.isTicking) {
       return;
     }
 
+    this.isTicking = true;
     try {
       await atgRacingInfoAdapter.fetchCalendar(undefined, false);
 
@@ -125,6 +63,8 @@ export class StallbackenScheduler {
       }
     } catch (err) {
       logger.warn('Tick i schemaläggare avslutades med varning', { error: String(err) });
+    } finally {
+      this.isTicking = false;
     }
   }
 }
