@@ -1,47 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 /**
- * Helskärmsöverlägg som visas medan appen laddar in initial data.
- * Visar waiting.gif (hästen) i en centrerad cirkel, med animerade prickar
- * under texten "Laddar". Prickarna tänds och släcks i sekvens.
- *
- * Komponenten fadar ut när `visible` sätts till false och anropar
- * `onDone` när fade-animationen är klar.
+ * Laddningsindikator som visas centrerad i innehållsytan medan data hämtas.
+ * En rund cirkel med waiting.gif (hästen), och "Laddar" med animerade prickar
+ * strax under. Täcker INTE hela skärmen — navigering och header syns som vanligt.
  */
 
-interface LaddaOverlayProps {
-  /** Styr om överläggningen ska visas (true) eller börja fadas ut (false) */
-  visible: boolean;
-  /** Anropas när utfadningen är klar — ta bort komponenten från DOM */
-  onDone: () => void;
-}
-
-export const LaddaOverlay: React.FC<LaddaOverlayProps> = ({ visible, onDone }) => {
-  const [phase, setPhase] = useState<'showing' | 'fading' | 'gone'>('showing');
-
-  useEffect(() => {
-    if (!visible && phase === 'showing') {
-      setPhase('fading');
-      const timer = setTimeout(() => {
-        setPhase('gone');
-        onDone();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [visible, phase, onDone]);
-
-  if (phase === 'gone') return null;
-
+export const LaddaOverlay: React.FC = () => {
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-100 transition-opacity duration-500 ${
-        phase === 'fading' ? 'opacity-0 pointer-events-none' : 'opacity-100'
-      }`}
+      className="flex flex-col items-center justify-center py-20 sm:py-28"
       role="status"
-      aria-label="Appen laddar"
+      aria-label="Laddar innehåll"
     >
-      {/* Cirkel med häst-GIF */}
-      <div className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-full border-4 border-amber-400 bg-white shadow-lg overflow-hidden flex items-center justify-center">
+      {/* Centrerad cirkel med häst-GIF */}
+      <div className="w-44 h-44 sm:w-52 sm:h-52 rounded-full border-4 border-amber-400 bg-white shadow-lg overflow-hidden">
         <img
           src="/waiting.gif"
           alt="Häst som väntar"
@@ -49,9 +22,9 @@ export const LaddaOverlay: React.FC<LaddaOverlayProps> = ({ visible, onDone }) =
         />
       </div>
 
-      {/* "Laddar" med animerade prickar — placerad strax under cirkeln */}
-      <div className="mt-6 flex items-baseline gap-0.5 select-none" aria-hidden="true">
-        <span className="text-xl sm:text-2xl font-bold text-slate-700 tracking-wide">
+      {/* "Laddar" med animerade prickar — strax under cirkeln */}
+      <div className="mt-5 flex items-baseline gap-0.5 select-none" aria-hidden="true">
+        <span className="text-lg sm:text-xl font-bold text-slate-600 tracking-wide">
           Laddar
         </span>
         <AnimatedDots />
@@ -61,8 +34,7 @@ export const LaddaOverlay: React.FC<LaddaOverlayProps> = ({ visible, onDone }) =
 };
 
 /**
- * Tre prickar som sekventiellt blinkar (tänds/släcks) med en liten fördröjning.
- * Använder CSS-animation via inline keyframes för att undvika extra beroenden.
+ * Tre prickar som sekventiellt pulserar (tänds/släcks) med fördröjning.
  */
 const AnimatedDots: React.FC = () => {
   return (
@@ -70,7 +42,7 @@ const AnimatedDots: React.FC = () => {
       {[0, 1, 2].map((i) => (
         <span
           key={i}
-          className="inline-block w-2 h-2 rounded-full bg-amber-500"
+          className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500"
           style={{
             animation: 'dotPulse 1.4s ease-in-out infinite',
             animationDelay: `${i * 0.3}s`,

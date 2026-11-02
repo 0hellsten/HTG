@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Race, BongGameType } from '@stallbacken/shared';
 import { IdagScreen } from './screens/IdagScreen';
 import { LoppScreen } from './screens/LoppScreen';
@@ -49,18 +49,12 @@ export const App: React.FC = () => {
 
   // Initialt laddningsöverlägg — visas tills första datan kommit in
   const [initialLoading, setInitialLoading] = useState(true);
-  const [overlayRemoved, setOverlayRemoved] = useState(false);
-
-  const handleOverlayDone = useCallback(() => {
-    setOverlayRemoved(true);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
 
     async function preload() {
       try {
-        // Hämta initial data så att skärmen har innehåll redo
         await Promise.all([
           apiFetch('/api/dagar/idag'),
           apiFetch('/api/omganger/kommande'),
@@ -69,15 +63,14 @@ export const App: React.FC = () => {
         // Även om hämtningen misslyckas låter vi appen visa sig
       } finally {
         if (!cancelled) {
-          // Vänta en kort stund så att GIF:en hinner synas
           setTimeout(() => {
             if (!cancelled) setInitialLoading(false);
-          }, 800);
+          }, 600);
         }
       }
     }
 
-    // Timeout-gräns: visa appen efter max 8 sekunder oavsett
+    // Visa appen efter max 8 sekunder oavsett
     const maxWait = setTimeout(() => {
       if (!cancelled) setInitialLoading(false);
     }, 8000);
@@ -151,11 +144,6 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col lg:flex-row font-sans">
-      {/* Laddningsöverlägg — döljer allt tills initial data är redo */}
-      {!overlayRemoved && (
-        <LaddaOverlay visible={initialLoading} onDone={handleOverlayDone} />
-      )}
-
       <DesktopSidebar activeTab={activeTab} onTabChange={handleTabChange} onOpenOm={handleOpenOm} />
 
       <MobileDrawer
@@ -172,7 +160,9 @@ export const App: React.FC = () => {
         <MobileHeader onOpenDrawer={() => setIsMobileDrawerOpen(true)} onOpenOm={handleOpenOm} />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24 lg:pb-8">
-          {activeTab === 'idag' ? (
+          {initialLoading ? (
+            <LaddaOverlay />
+          ) : activeTab === 'idag' ? (
             selectedRaceId ? (
               <LoppScreen
                 raceId={selectedRaceId}
