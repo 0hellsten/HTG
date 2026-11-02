@@ -6,12 +6,16 @@ import React, { useState } from 'react';
  * strax under. Täcker INTE hela skärmen — navigering och header syns som vanligt.
  */
 
-export const LaddaOverlay: React.FC = () => {
+interface LaddaOverlayProps {
+  compact?: boolean;
+}
+
+export const LaddaOverlay: React.FC<LaddaOverlayProps> = ({ compact = false }) => {
   const [horseImageUnavailable, setHorseImageUnavailable] = useState(false);
 
   return (
     <div
-      className="flex flex-col items-center justify-center py-20 sm:py-28"
+      className={`flex flex-col items-center justify-center ${compact ? 'py-4' : 'py-20 sm:py-28'}`}
       role="status"
       aria-label="Laddar innehåll"
     >
@@ -36,9 +40,7 @@ export const LaddaOverlay: React.FC = () => {
 
       {/* "Laddar" med animerade prickar — strax under cirkeln */}
       <div className="mt-5 flex items-baseline gap-0.5 select-none" aria-hidden="true">
-        <span className="text-lg sm:text-xl font-bold text-slate-600 tracking-wide">
-          Laddar
-        </span>
+        <span className="text-lg sm:text-xl font-bold text-slate-600 tracking-wide">Laddar</span>
         <AnimatedDots />
       </div>
     </div>

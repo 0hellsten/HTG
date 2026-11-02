@@ -13,6 +13,7 @@ import {
 import { FarskhetsPrick } from '../components/FarskhetsPrick';
 import { BlockErrorBoundary } from '../components/BlockErrorBoundary';
 import { IdagSkelett } from '../components/SkelettKort';
+import { LaddaOverlay } from '../components/LaddaOverlay';
 import { HastsKoIkon } from '../components/HastsKoIkon';
 import { DagensBastaOmgangBanner } from '../components/dagens-basta/DagensBastaOmgangBanner';
 import { DagensBastaLoppKort } from '../components/dagens-basta/DagensBastaLoppKort';
@@ -181,7 +182,14 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
         setRaceDayData(null);
       }
     }
-  }, [selectedOffset, competitions, targetDateStr, fetchDagar, loadLiveOmgang, loadingCompetitions]);
+  }, [
+    selectedOffset,
+    competitions,
+    targetDateStr,
+    fetchDagar,
+    loadLiveOmgang,
+    loadingCompetitions,
+  ]);
 
   const handleToggleFavorite = (trackId: string, trackName: string) => {
     toggleFavoriteTrack(trackId, trackName);
@@ -276,15 +284,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
       </div>
 
       {/* Bakgrundsuppdatering-indikator om vi visar sparat innehåll men hämtar nytt i bakgrunden */}
-      {loading && (raceDays.length > 0 || raceDayData) && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 shadow-2xs">
-          <span className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping shrink-0" />
-            <span>Uppdaterar tävlingar, odds och analyser...</span>
-          </span>
-          <span className="text-[11px] text-amber-700 font-medium">Ett ögonblick</span>
-        </div>
-      )}
+      {loading && (raceDays.length > 0 || raceDayData) && <LaddaOverlay compact />}
 
       {/* Datumväljare */}
       <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Välj tävlingsdag">
@@ -308,23 +308,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
 
       {/* Väntsida när vi laddar in data första gången */}
       {(loading || loadingCompetitions) && !raceDayData && raceDays.length === 0 ? (
-        <div className="bg-white rounded-2xl border-2 border-slate-200 p-8 text-center space-y-4 shadow-sm my-2">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600 shadow-xs">
-            <Trophy className="w-7 h-7" />
-          </div>
-          <div className="space-y-1.5">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-950">
-              Hämtar dagens tävlingar och odds...
-            </h2>
-            <p className="text-slate-600 text-sm sm:text-base max-w-md mx-auto">
-              Uppdaterar startlistor, odds och expertanalyser direkt från ATG. Det tar bara ett
-              ögonblick.
-            </p>
-          </div>
-          <div className="pt-4 max-w-2xl mx-auto">
-            <IdagSkelett />
-          </div>
-        </div>
+        <LaddaOverlay />
       ) : (
         <>
           {/* Sena ändringar för dagens omgång (strykningar, sko- och vagnändringar) */}
@@ -389,9 +373,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
           {activeViewMode === 'basta' && (
             <div className="space-y-4">
               {loadingOmgang && !dagensBastaOmgang ? (
-                <div className="pt-2">
-                  <IdagSkelett />
-                </div>
+                <LaddaOverlay compact />
               ) : dagensBastaOmgang && dagensBastaOmgang.races.length > 0 ? (
                 <>
                   {/* Snabbväljare / Filter för lopp */}
@@ -457,7 +439,8 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
                     Ingen stor spelomgång för det här datumet
                   </p>
                   <p className="text-sm text-slate-600 max-w-md mx-auto">
-                    Klicka på &quot;Alla lopp &amp; banor&quot; för att se samtliga dagens lopp och startlistor.
+                    Klicka på &quot;Alla lopp &amp; banor&quot; för att se samtliga dagens lopp och
+                    startlistor.
                   </p>
                   <button
                     type="button"

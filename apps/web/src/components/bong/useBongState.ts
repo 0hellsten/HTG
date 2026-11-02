@@ -25,6 +25,10 @@ export function useBongState(
   initialGameType?: BongGameType,
   initialSelectedHorses?: Record<number, string[]>
 ) {
+  const [isLoading, setIsLoading] = useState(() => {
+    const cached = getCachedCompetitions();
+    return !cached.some((competition) => getCachedOmgang(competition.id));
+  });
   const [competitions, setCompetitions] = useState<BongCompetition[]>(() =>
     getCachedCompetitions()
   );
@@ -73,35 +77,39 @@ export function useBongState(
     let isSubscribed = true;
 
     async function loadUpcoming() {
-      const res = await apiFetch<
-        Array<{
-          id: string;
-          gameType: BongGameType;
-          gameName: string;
-          date: string;
-          trackName: string;
-          startTime: string;
-          turnover: number;
-          jackpotPool: number;
-        }>
-      >('/api/omganger/kommande');
+      try {
+        const res = await apiFetch<
+          Array<{
+            id: string;
+            gameType: BongGameType;
+            gameName: string;
+            date: string;
+            trackName: string;
+            startTime: string;
+            turnover: number;
+            jackpotPool: number;
+          }>
+        >('/api/omganger/kommande');
 
-      if (!isSubscribed) return;
+        if (!isSubscribed) return;
 
-      if (res.data && res.data.length > 0) {
-        const formatted = res.data.map(formatCompetitionFromApi);
-        setCompetitions(formatted);
-        cacheCompetitions(formatted);
-        if (!userSelectedRef.current) {
-          const match = initialGameType
-            ? formatted.find((c) => c.gameType === initialGameType) || formatted[0]
-            : formatted[0];
-          if (match) {
-            setSelectedCompId(match.id);
-            setGameType(match.gameType);
-            loadGame(match.id, match.gameType);
+        if (res.data && res.data.length > 0) {
+          const formatted = res.data.map(formatCompetitionFromApi);
+          setCompetitions(formatted);
+          cacheCompetitions(formatted);
+          if (!userSelectedRef.current) {
+            const match = initialGameType
+              ? formatted.find((c) => c.gameType === initialGameType) || formatted[0]
+              : formatted[0];
+            if (match) {
+              setSelectedCompId(match.id);
+              setGameType(match.gameType);
+              await loadGame(match.id, match.gameType);
+            }
           }
         }
+      } finally {
+        if (isSubscribed) setIsLoading(false);
       }
     }
 
@@ -140,24 +148,31 @@ export function useBongState(
     const cached = getCachedOmgang(gameId);
     if (cached) {
       setRaceDay(cached);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
     }
-    const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
-    if (reqId !== lastRequestIdRef.current) return;
+    try {
+      const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
+      if (reqId !== lastRequestIdRef.current) return;
 
-    if (res.data) {
-      setRaceDay(res.data);
-      cacheOmgang(gameId, res.data);
-      setStatus(res.status);
-      setFetchedAt(res.fetchedAt);
+      if (res.data) {
+        setRaceDay(res.data);
+        cacheOmgang(gameId, res.data);
+        setStatus(res.status);
+        setFetchedAt(res.fetchedAt);
 
-      if (!initialSelectedHorses) {
-        setSelectedHorses({});
-        setRanks({});
+        if (!initialSelectedHorses) {
+          setSelectedHorses({});
+          setRanks({});
+        }
+      } else if (!cached) {
+        setRaceDay(buildFallbackBongRaceDay(gType));
+        setStatus(res.status);
+        setFetchedAt(res.fetchedAt);
       }
-    } else if (!cached) {
-      setRaceDay(buildFallbackBongRaceDay(gType));
-      setStatus(res.status);
-      setFetchedAt(res.fetchedAt);
+    } finally {
+      if (reqId === lastRequestIdRef.current) setIsLoading(false);
     }
   }
 
@@ -284,6 +299,7 @@ export function useBongState(
   };
 
   return {
+    isLoading,
     competitions,
     selectedDateIso: raceDay.date || selectedCompId,
     selectedCompetitionId: selectedCompId,

@@ -9,6 +9,7 @@ import { BongSettings } from '../components/bong/BongSettings';
 import { BongHorseInfoModal } from '../components/bong/BongHorseInfoModal';
 import { BongKupongModal } from '../components/bong/BongKupongModal';
 import { useBongState } from '../components/bong/useBongState';
+import { LaddaOverlay } from '../components/LaddaOverlay';
 
 interface BongScreenProps {
   initialGameType?: BongGameType;
@@ -22,6 +23,7 @@ export const BongScreen: React.FC<BongScreenProps> = ({
   onSelectHorse,
 }) => {
   const {
+    isLoading,
     competitions,
     selectedDateIso,
     selectedCompetitionId,
@@ -75,6 +77,14 @@ export const BongScreen: React.FC<BongScreenProps> = ({
     : false;
 
   const modalHorseRank = selectedModalHorse ? ranks[selectedModalHorse.id] || 'A' : 'A';
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4 pb-20">
+        <LaddaOverlay />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 pb-20">

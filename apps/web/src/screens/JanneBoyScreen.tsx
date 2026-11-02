@@ -10,6 +10,7 @@ import {
 } from '@stallbacken/shared';
 import { JanneBoyControls } from '../components/janne-boy/JanneBoyControls';
 import { JanneBoyIcon } from '../components/janne-boy/JanneBoyIcon';
+import { LaddaOverlay } from '../components/LaddaOverlay';
 import { JanneBoySystemView } from '../components/janne-boy/JanneBoySystemView';
 import { JanneBoyOmgangBanner } from '../components/janne-boy/JanneBoyOmgangBanner';
 import {
@@ -33,18 +34,28 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
   const [competitions, setCompetitions] = useState<BongCompetition[]>(() =>
     getCachedCompetitions()
   );
-  const [selectedCompId, setSelectedCompId] = useState<string>('');
-  const [gameType, setGameType] = useState<BongGameType>('V75');
+  const [selectedCompId, setSelectedCompId] = useState<string>(
+    () => getCachedCompetitions()[0]?.id || ''
+  );
+  const [gameType, setGameType] = useState<BongGameType>(
+    () => getCachedCompetitions()[0]?.gameType || 'V75'
+  );
   const [strategy, setStrategy] = useState<JanneBoyStrategy>('balanserad');
   const [budget, setBudget] = useState<number>(100);
   const [lockedHorses, setLockedHorses] = useState<Record<number, string[]>>({});
   const [isLive, setIsLive] = useState<boolean>(false);
-  const [loadingLive, setLoadingLive] = useState<boolean>(false);
+  const [loadingLive, setLoadingLive] = useState<boolean>(() => {
+    const initialCompetition = getCachedCompetitions()[0];
+    return !initialCompetition || !getCachedOmgang(initialCompetition.id);
+  });
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [isKupongModalOpen, setIsKupongModalOpen] = useState<boolean>(false);
 
   const engine = useMemo(() => new JanneBoyEngine(), []);
-  const [raceDay, setRaceDay] = useState<BongRaceDayData | null>(null);
+  const [raceDay, setRaceDay] = useState<BongRaceDayData | null>(() => {
+    const cachedCompetition = getCachedCompetitions()[0];
+    return cachedCompetition ? getCachedOmgang(cachedCompetition.id) || null : null;
+  });
   const [systemResult, setSystemResult] = useState<JanneBoySystemResult | null>(null);
 
   const loadLiveOmgang = useCallback(
@@ -104,31 +115,37 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
     let isSubscribed = true;
 
     async function loadUpcoming() {
-      const res = await apiFetch<
-        Array<{
-          id: string;
-          gameType: BongGameType;
-          gameName: string;
-          date: string;
-          trackName: string;
-          startTime: string;
-          turnover: number;
-          jackpotPool: number;
-        }>
-      >('/api/omganger/kommande');
+      let liveLoadStarted = false;
+      try {
+        const res = await apiFetch<
+          Array<{
+            id: string;
+            gameType: BongGameType;
+            gameName: string;
+            date: string;
+            trackName: string;
+            startTime: string;
+            turnover: number;
+            jackpotPool: number;
+          }>
+        >('/api/omganger/kommande');
 
-      if (!isSubscribed) return;
+        if (!isSubscribed) return;
 
-      if (res && res.data && res.data.length > 0) {
-        const formatted = res.data.map(formatCompetitionFromApi);
-        setCompetitions(formatted);
-        cacheCompetitions(formatted);
-        const initial = formatted[0];
-        if (initial) {
-          setSelectedCompId(initial.id);
-          setGameType(initial.gameType);
-          loadLiveOmgang(initial.id, initial.gameType, 'balanserad', 100, {});
+        if (res && res.data && res.data.length > 0) {
+          const formatted = res.data.map(formatCompetitionFromApi);
+          setCompetitions(formatted);
+          cacheCompetitions(formatted);
+          const initial = formatted[0];
+          if (initial) {
+            setSelectedCompId(initial.id);
+            setGameType(initial.gameType);
+            liveLoadStarted = true;
+            await loadLiveOmgang(initial.id, initial.gameType, 'balanserad', 100, {});
+          }
         }
+      } finally {
+        if (isSubscribed && !liveLoadStarted) setLoadingLive(false);
       }
     }
 
@@ -230,7 +247,9 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
               <span>{isLive ? 'Live-odds från ATG' : 'Kvalitetssäkrat travunderlag'}</span>
             </span>
             <span className="text-[10px] text-slate-500">
-              {raceDay ? `${raceDay.trackName} · ${raceDay.date || 'Vald omgång'}` : 'Hämtar omgång...'}
+              {raceDay
+                ? `${raceDay.trackName} · ${raceDay.date || 'Vald omgång'}`
+                : 'Hämtar omgång...'}
             </span>
           </div>
           <button
@@ -279,13 +298,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
       />
 
       {loadingLive && !systemResult ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-3 shadow-sm my-4">
-          <div className="w-12 h-12 mx-auto rounded-full bg-amber-100 flex items-center justify-center text-amber-600 animate-pulse">
-            <Sparkles className="w-6 h-6" />
-          </div>
-          <p className="text-lg font-bold text-slate-900">Räknar fram kupongförslag...</p>
-          <p className="text-sm text-slate-600">Hämtar aktuella odds och analyserar avdelningarna.</p>
-        </div>
+        <LaddaOverlay compact />
       ) : systemResult ? (
         <JanneBoySystemView
           system={systemResult}
