@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 /**
  * Laddningsindikator som visas centrerad i innehållsytan medan data hämtas.
@@ -7,6 +7,8 @@ import React from 'react';
  */
 
 export const LaddaOverlay: React.FC = () => {
+  const [horseImageUnavailable, setHorseImageUnavailable] = useState(false);
+
   return (
     <div
       className="flex flex-col items-center justify-center py-20 sm:py-28"
@@ -15,11 +17,21 @@ export const LaddaOverlay: React.FC = () => {
     >
       {/* Centrerad cirkel med häst-GIF */}
       <div className="w-44 h-44 sm:w-52 sm:h-52 rounded-full border-4 border-amber-400 bg-white shadow-lg overflow-hidden">
-        <img
-          src="/waiting.gif"
-          alt="Häst som väntar"
-          className="w-full h-full object-cover"
-        />
+        {horseImageUnavailable ? (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-amber-50 text-amber-900">
+            <span className="text-6xl leading-none" role="img" aria-label="Häst">
+              🐎
+            </span>
+            <span className="text-sm font-semibold">Strax redo</span>
+          </div>
+        ) : (
+          <img
+            src={`${import.meta.env.BASE_URL}waiting.gif`}
+            alt="Häst och kusk värmer upp"
+            className="h-full w-full object-cover"
+            onError={() => setHorseImageUnavailable(true)}
+          />
+        )}
       </div>
 
       {/* "Laddar" med animerade prickar — strax under cirkeln */}

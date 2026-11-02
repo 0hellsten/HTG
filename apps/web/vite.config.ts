@@ -8,7 +8,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'pwa-192.png', 'pwa-512.png'],
+      includeAssets: [
+        'favicon.ico',
+        'apple-touch-icon.png',
+        'pwa-192.png',
+        'pwa-512.png',
+        'waiting.gif',
+      ],
       manifest: {
         name: 'Tangitza',
         short_name: 'Tangitza',
@@ -38,7 +44,8 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,gif}'],
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.includes('/api/'),
