@@ -5,7 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@9.15.4",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0 <25"
   },
   "scripts": {
     "dev": "concurrently -n \"server,web\" -c \"blue,green\" \"pnpm --filter @stallbacken/server dev\" \"pnpm --filter @stallbacken/web dev\"",
