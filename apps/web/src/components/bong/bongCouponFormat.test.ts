@@ -3,7 +3,7 @@ import {
   formatBongLegHorses,
   buildBongCouponViewModel,
   formatBongCouponShareText,
-  getAtgSpelUrl,
+  ATG_FILE_UPLOAD_URL,
   buildAtgXmlFile,
 } from './bongCouponFormat';
 import { BongHorseInput, BongRaceDayData } from '@stallbacken/shared';
@@ -106,9 +106,8 @@ describe('bongCouponFormat', () => {
     expect(text).toContain('Avd 3: –');
   });
 
-  it('genererar korrekt direktlänk till ATG för respektive spelform', () => {
-    expect(getAtgSpelUrl('V75')).toBe('https://www.atg.se/spel/reducerat/V75');
-    expect(getAtgSpelUrl('v86')).toBe('https://www.atg.se/spel/reducerat/V86');
+  it('länkar direkt till ATG:s filinlämning', () => {
+    expect(ATG_FILE_UPLOAD_URL).toBe('https://www.atg.se/spel/fil');
   });
 
   it('skapar ATG XML-fil med marks-sträng för filinlämning', () => {
@@ -124,12 +123,13 @@ describe('bongCouponFormat', () => {
       })),
     };
     const model = buildBongCouponViewModel(raceDay, { 0: ['h1', 'h5'] }, 'V75', 50);
-    const xml = buildAtgXmlFile(model, '2026-10-31');
+    model.rows[0].text = '1,5,20';
+    const xml = buildAtgXmlFile(model, '2026-10-31', '5');
 
     expect(xml).toContain('<v75Coupon');
     expect(xml).toContain('date="2026-10-31"');
-    // Avd 1 har häst 1 och 5 -> 100010000000000
-    expect(xml).toContain('<leg marks="100010000000000" legno="1"/>');
+    expect(xml).toContain('trackcode="5"');
+    expect(xml).toContain('<leg marks="10001000000000000001" legno="1"/>');
     // Avd 2 har inga valda -> 15 nollor
     expect(xml).toContain('<leg marks="000000000000000" legno="2"/>');
   });

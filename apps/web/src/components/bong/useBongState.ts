@@ -46,7 +46,7 @@ export function useBongState(
     const cachedComps = getCachedCompetitions();
     if (cachedComps.length > 0) {
       const cachedData = getCachedOmgang(cachedComps[0].id);
-      if (cachedData) return cachedData;
+      if (cachedData) return { ...cachedData, gameId: cachedComps[0].id };
     }
     return buildFallbackBongRaceDay(initialGameType || 'V75');
   });
@@ -147,7 +147,7 @@ export function useBongState(
     const reqId = ++lastRequestIdRef.current;
     const cached = getCachedOmgang(gameId);
     if (cached) {
-      setRaceDay(cached);
+      setRaceDay({ ...cached, gameId });
       setIsLoading(false);
     } else {
       setIsLoading(true);
@@ -157,7 +157,7 @@ export function useBongState(
       if (reqId !== lastRequestIdRef.current) return;
 
       if (res.data) {
-        setRaceDay(res.data);
+        setRaceDay({ ...res.data, gameId });
         cacheOmgang(gameId, res.data);
         setStatus(res.status);
         setFetchedAt(res.fetchedAt);

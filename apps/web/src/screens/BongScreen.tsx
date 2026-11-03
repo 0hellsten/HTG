@@ -179,6 +179,13 @@ export const BongScreen: React.FC<BongScreenProps> = ({
         raceDay={raceDay}
         selectedHorses={selectedHorses}
         costSek={calculationResult.totalCost}
+        canExportSystem={
+          raceDay.gameId === selectedCompetitionId &&
+          calculationResult.reducedRows === calculationResult.mathRows &&
+          !onlyTopPool &&
+          flerbongMultiplier === 1 &&
+          calculationResult.sharesCount === 1
+        }
       />
     </div>
   );

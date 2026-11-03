@@ -33,6 +33,7 @@ export interface BongRaceLeg {
 }
 
 export interface BongRaceDayData {
+  gameId?: string;
   gameType: BongGameType;
   turnover: number;
   jackpotPool?: number;

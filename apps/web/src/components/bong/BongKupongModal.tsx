@@ -4,8 +4,9 @@ import { BongGameType, BongRaceDayData } from '@stallbacken/shared';
 import {
   buildBongCouponViewModel,
   formatBongCouponShareText,
-  getAtgSpelUrl,
+  ATG_FILE_UPLOAD_URL,
   buildAtgXmlFile,
+  getAtgTrackCode,
 } from './bongCouponFormat';
 
 interface BongKupongModalProps {
@@ -15,6 +16,7 @@ interface BongKupongModalProps {
   raceDay: BongRaceDayData;
   selectedHorses: Record<number, string[]>;
   costSek: number;
+  canExportSystem?: boolean;
 }
 
 export const BongKupongModal: React.FC<BongKupongModalProps> = ({
@@ -24,6 +26,7 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
   raceDay,
   selectedHorses,
   costSek,
+  canExportSystem = true,
 }) => {
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState<boolean>(false);
@@ -42,20 +45,8 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
   const isV86 = gameType === 'V86';
   const model = buildBongCouponViewModel(raceDay, selectedHorses, gameType, costSek);
 
-  const handleOpenAtg = async () => {
-    window.open(getAtgSpelUrl(model.gameType), '_blank', 'noopener,noreferrer');
-    const shareText = formatBongCouponShareText(model);
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(shareText);
-      }
-    } catch {
-      // Ignorera urklippsfel, huvudsaken är att ATG-sidan öppnas
-    }
-
-    setFeedbackMessage('Kupongraderna är kopierade! ATG öppnas i en ny flik.');
-    setTimeout(() => setFeedbackMessage(null), 5000);
-  };
+  const trackCode = getAtgTrackCode(model, raceDay);
+  const canExport = canExportSystem && Boolean(trackCode);
 
   const handleCopyRows = async () => {
     const shareText = formatBongCouponShareText(model);
@@ -75,20 +66,22 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
     }
   };
 
-  const handleDownloadXml = () => {
+  const handleDownloadXml = (openAtg = false) => {
+    if (!canExport || !trackCode || !raceDay.date) return;
     try {
-      const xml = buildAtgXmlFile(model, raceDay.date);
+      const xml = buildAtgXmlFile(model, raceDay.date, trackCode);
       const blob = new Blob([xml], { type: 'application/xml;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `tangitza-${model.gameType.toLowerCase()}.xml`);
+      link.download = `tangitza-${model.gameType.toLowerCase()}-${raceDay.date?.slice(0, 10)}.xml`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      setFeedbackMessage('ATG-fil sparad (klar för filinlämning)!');
+      if (openAtg) window.open(ATG_FILE_UPLOAD_URL, '_blank', 'noopener,noreferrer');
+      setFeedbackMessage('Välj Tangitza-filen bland dina hämtade filer.');
       setTimeout(() => setFeedbackMessage(null), 3000);
     } catch {
       setFeedbackMessage('Kunde inte spara fil.');
@@ -201,11 +194,12 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
             {/* Ett tryck till ATG: Huvudknapp */}
             <button
               type="button"
-              onClick={handleOpenAtg}
+              onClick={() => handleDownloadXml(true)}
+              disabled={!canExport}
               className="w-full min-h-[50px] px-4 py-3 bg-emerald-700 hover:bg-emerald-800 active:scale-[0.98] text-white font-bold text-base sm:text-lg rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all"
             >
               <ExternalLink className="w-5 h-5 shrink-0" />
-              <span>Öppna kupongen hos ATG</span>
+              <span>Spara fil och öppna ATG</span>
             </button>
 
             {/* Bekräftelsemeddelande */}
@@ -238,7 +232,8 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
 
               <button
                 type="button"
-                onClick={handleDownloadXml}
+                onClick={() => handleDownloadXml()}
+                disabled={!canExport}
                 className="min-h-[44px] px-3 py-2 bg-amber-200/90 hover:bg-amber-300 active:scale-[0.98] text-slate-900 font-semibold text-xs sm:text-sm rounded-lg border border-amber-900/20 flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                 title="Spara fil i ATG-format för filinlämning"
               >
@@ -248,7 +243,9 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
             </div>
 
             <p className="text-[11px] sm:text-xs text-center text-amber-900/80 font-medium">
-              Ett tryck kopierar dina hästar och öppnar dagens spelformulär på ATG.se.
+              {canExport
+                ? 'Välj den hämtade filen hos ATG. Kontrollera omgång, hästar och kostnad.'
+                : 'Filen kan sparas för en komplett kupong utan reducering eller specialval.'}
             </p>
           </div>
         </div>

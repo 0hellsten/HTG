@@ -54,7 +54,9 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
   const engine = useMemo(() => new JanneBoyEngine(), []);
   const [raceDay, setRaceDay] = useState<BongRaceDayData | null>(() => {
     const cachedCompetition = getCachedCompetitions()[0];
-    return cachedCompetition ? getCachedOmgang(cachedCompetition.id) || null : null;
+    if (!cachedCompetition) return null;
+    const cached = getCachedOmgang(cachedCompetition.id);
+    return cached ? { ...cached, gameId: cachedCompetition.id } : null;
   });
   const [systemResult, setSystemResult] = useState<JanneBoySystemResult | null>(null);
 
@@ -68,7 +70,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
     ) => {
       const cached = getCachedOmgang(gameId);
       if (cached) {
-        setRaceDay(cached);
+        setRaceDay({ ...cached, gameId });
         setIsLive(true);
         const config: JanneBoyConfig = {
           gameType: type,
@@ -83,7 +85,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
         setLoadingLive(true);
         const res = await apiFetch<BongRaceDayData>(`/api/omganger/${gameId}`);
         if (res && res.data && res.data.races && res.data.races.length > 0) {
-          setRaceDay(res.data);
+          setRaceDay({ ...res.data, gameId });
           setIsLive(true);
           cacheOmgang(gameId, res.data);
           const config: JanneBoyConfig = {
@@ -336,6 +338,7 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
           selectedHorses={couponSelectedHorses}
           gameType={gameType}
           costSek={systemResult.costSek}
+          canExportSystem={raceDay.gameId === selectedCompId}
         />
       )}
     </div>
