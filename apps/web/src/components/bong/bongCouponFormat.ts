@@ -96,7 +96,7 @@ export function formatBongCouponShareText(model: BongCouponViewModel): string {
  * Returnerar den officiella direktlänken till ATG för spelformen.
  */
 export function getAtgSpelUrl(gameType: BongGameType | string): string {
-  return `https://www.atg.se/spel/${gameType.toUpperCase()}`;
+  return `https://www.atg.se/spel/reducerat/${gameType.toUpperCase()}`;
 }
 
 /**
@@ -132,4 +132,3 @@ ${legsXml}
 </issuer>
 `;
 }
-

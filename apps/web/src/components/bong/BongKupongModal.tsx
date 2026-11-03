@@ -43,6 +43,7 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
   const model = buildBongCouponViewModel(raceDay, selectedHorses, gameType, costSek);
 
   const handleOpenAtg = async () => {
+    window.open(getAtgSpelUrl(model.gameType), '_blank', 'noopener,noreferrer');
     const shareText = formatBongCouponShareText(model);
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -51,9 +52,6 @@ export const BongKupongModal: React.FC<BongKupongModalProps> = ({
     } catch {
       // Ignorera urklippsfel, huvudsaken är att ATG-sidan öppnas
     }
-
-    const atgUrl = getAtgSpelUrl(model.gameType);
-    window.open(atgUrl, '_blank', 'noopener,noreferrer');
 
     setFeedbackMessage('Kupongraderna är kopierade! ATG öppnas i en ny flik.');
     setTimeout(() => setFeedbackMessage(null), 5000);

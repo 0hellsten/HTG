@@ -78,16 +78,9 @@ export const BongScreen: React.FC<BongScreenProps> = ({
 
   const modalHorseRank = selectedModalHorse ? ranks[selectedModalHorse.id] || 'A' : 'A';
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4 pb-20">
-        <LaddaOverlay />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4 pb-20">
+      {isLoading && <LaddaOverlay />}
       <BongOmgangHeader
         raceDay={raceDay}
         competitions={competitions}

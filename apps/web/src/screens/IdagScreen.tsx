@@ -37,12 +37,14 @@ import { saveLastSyncTime } from '../components/OfflineRemsa';
 import { apiFetch } from '../lib/api';
 
 interface IdagScreenProps {
+  initialLoading?: boolean;
   onOpenRace: (raceId: string, siblingRaces: Race[]) => void;
   onOpenTrack?: (trackId: string) => void;
   onSelectHorse?: (horseId: string) => void;
 }
 
 export const IdagScreen: React.FC<IdagScreenProps> = ({
+  initialLoading = false,
   onOpenRace,
   onOpenTrack,
   onSelectHorse,
@@ -284,7 +286,10 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
       </div>
 
       {/* Bakgrundsuppdatering-indikator om vi visar sparat innehåll men hämtar nytt i bakgrunden */}
-      {loading && (raceDays.length > 0 || raceDayData) && <LaddaOverlay compact />}
+      {(initialLoading ||
+        loading ||
+        loadingOmgang ||
+        (loadingCompetitions && !raceDayData && !raceDays.length)) && <LaddaOverlay />}
 
       {/* Datumväljare */}
       <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Välj tävlingsdag">
@@ -307,9 +312,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
       </div>
 
       {/* Väntsida när vi laddar in data första gången */}
-      {(loading || loadingCompetitions) && !raceDayData && raceDays.length === 0 ? (
-        <LaddaOverlay />
-      ) : (
+      {(loading || loadingCompetitions) && !raceDayData && raceDays.length === 0 ? null : (
         <>
           {/* Sena ändringar för dagens omgång (strykningar, sko- och vagnändringar) */}
           {selectedOffset === 0 && raceDayData && (
@@ -373,7 +376,7 @@ export const IdagScreen: React.FC<IdagScreenProps> = ({
           {activeViewMode === 'basta' && (
             <div className="space-y-4">
               {loadingOmgang && !dagensBastaOmgang ? (
-                <LaddaOverlay compact />
+                <IdagSkelett />
               ) : dagensBastaOmgang && dagensBastaOmgang.races.length > 0 ? (
                 <>
                   {/* Snabbväljare / Filter för lopp */}

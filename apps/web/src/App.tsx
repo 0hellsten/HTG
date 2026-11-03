@@ -17,7 +17,7 @@ import { MerScreen } from './screens/MerScreen';
 import { OfflineRemsa } from './components/OfflineRemsa';
 import { ScrollToTopKnapp } from './components/ScrollToTopKnapp';
 import { InfoModal } from './components/InfoModal';
-import { LaddaOverlay } from './components/LaddaOverlay';
+
 import { Tab } from './components/navigation/navItems';
 import { DesktopSidebar } from './components/navigation/DesktopSidebar';
 import { MobileDrawer } from './components/navigation/MobileDrawer';
@@ -55,10 +55,7 @@ export const App: React.FC = () => {
 
     async function preload() {
       try {
-        await Promise.all([
-          apiFetch('/api/dagar/idag'),
-          apiFetch('/api/omganger/kommande'),
-        ]);
+        await Promise.all([apiFetch('/api/dagar/idag'), apiFetch('/api/omganger/kommande')]);
       } catch {
         // Även om hämtningen misslyckas låter vi appen visa sig
       } finally {
@@ -160,9 +157,7 @@ export const App: React.FC = () => {
         <MobileHeader onOpenDrawer={() => setIsMobileDrawerOpen(true)} onOpenOm={handleOpenOm} />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24 lg:pb-8">
-          {initialLoading ? (
-            <LaddaOverlay />
-          ) : activeTab === 'idag' ? (
+          {activeTab === 'idag' ? (
             selectedRaceId ? (
               <LoppScreen
                 raceId={selectedRaceId}
@@ -185,6 +180,7 @@ export const App: React.FC = () => {
               />
             ) : (
               <IdagScreen
+                initialLoading={initialLoading}
                 onOpenRace={(raceId, siblings) => {
                   setSelectedRaceId(raceId);
                   setSiblingRaces(siblings);

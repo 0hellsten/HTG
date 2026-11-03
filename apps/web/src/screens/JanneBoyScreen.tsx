@@ -297,9 +297,8 @@ export const JanneBoyScreen: React.FC<JanneBoyScreenProps> = ({ onOpenInBong, on
         onGenerate={handleGenerate}
       />
 
-      {loadingLive && !systemResult ? (
-        <LaddaOverlay compact />
-      ) : systemResult ? (
+      {loadingLive && <LaddaOverlay />}
+      {systemResult ? (
         <JanneBoySystemView
           system={systemResult}
           lockedHorses={lockedHorses}

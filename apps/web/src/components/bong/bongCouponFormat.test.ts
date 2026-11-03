@@ -107,8 +107,8 @@ describe('bongCouponFormat', () => {
   });
 
   it('genererar korrekt direktlänk till ATG för respektive spelform', () => {
-    expect(getAtgSpelUrl('V75')).toBe('https://www.atg.se/spel/V75');
-    expect(getAtgSpelUrl('v86')).toBe('https://www.atg.se/spel/V86');
+    expect(getAtgSpelUrl('V75')).toBe('https://www.atg.se/spel/reducerat/V75');
+    expect(getAtgSpelUrl('v86')).toBe('https://www.atg.se/spel/reducerat/V86');
   });
 
   it('skapar ATG XML-fil med marks-sträng för filinlämning', () => {
